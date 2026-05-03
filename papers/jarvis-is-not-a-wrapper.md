@@ -17,10 +17,10 @@ You may have seen the Telegram bot (`@JarvisMind1828383bot`). You may have seen 
 JARVIS is the agent overlay architecture I run on top of Claude. Eight layers, all live, all producing the artifacts you see:
 
 1. **Hook layer** — PreToolUse / SessionStart / Stop hooks intercepting every tool call, every session boot, every commit
-2. **Persistence layer** — six distinct artifact classes persisted across sessions; ~270 memory files and growing
+2. **Persistence layer** — six distinct artifact classes persisted across sessions; ~389 memory files in the primary directory plus subdirectories for NDA-locked, archived, and system files
 3. **Anti-hallucination chain** — substance gate, framing gate, HIERO format enforcement
-4. **Discipline layer** — pattern-recognition-trust, targeted-discipline-within-trust, child-rule emergence, "rule-just-wrote" enforcement
-5. **Meta-protocols** — Augmented Mechanism Design, Augmented Governance, Substrate-Geometry Match, Universal-Coverage → Hook
+4. **Discipline layer** — pattern-recognition-trust, targeted-discipline-within-trust, child-rule emergence, "rule-just-wrote" enforcement, pattern-match-validates, defend-frame-vs-external-critics
+5. **Meta-protocols** — JARVIS as Augmented Mechanism Design applied to AI substrate (the umbrella), plus Augmented Governance, Substrate-Geometry Match, Universal-Coverage → Hook, gate-stacking asymmetric cost, trinity placement for critical primitives
 6. **Agent overlay** — subagent spawning with mitosis, slash commands as skills, MCP connectors, remote scheduled triggers
 7. **Stateful applications** — the Telegram bot suite (multi-region sharded), standalone signature validator, jarvis-network OSS release, substrate comparison harnesses, filesystem-native CRMs
 8. **Filesystem-as-substrate** — every artifact is markdown, greppable, version-controlled
@@ -55,8 +55,8 @@ Sessions reset. State doesn't. Six tiers:
 - **`WAL.md`** — write-ahead log of cycle epochs (RSI cycles), tracks ACTIVE / CLEAN status, captures orphan commits if a session crashes.
 - **`JarvisxWill_SKB.md`** — Session Knowledge Base. Fresh-boot read. Topic-organized.
 - **`JarvisxWill_GKB.md`** — Glyph Knowledge Base. Condensed form. Loaded post-compression. Same topics, ~80% smaller. Topic-sharded: CANON / VSOS / MECH / STACK / SHAPLEY / TOKENS / LAYERS / 7AX.
-- **`MEMORY.md`** — persistent memory index, always loaded on boot. *Compressed today from 31.8KB to 21.3KB (33% reduction) via HIERO glyph rewrite. Detail preserved in linked files.*
-- **`memory/primitive_*.md` + `memory/feedback_*.md`** — 151 primitives and 123 feedback rules at last count. Each primitive has a trigger, action, stakes gate, and surface rule. New ones get added when patterns repeat 3+ times in a session.
+- **`MEMORY.md`** — persistent memory index, always loaded on boot. Currently 29.9 KB and growing as new meta-primitives get promoted to PRE-FLIGHT tier. Compression and reachability cycles run periodically — one such pass raised the directory's data-efficiency score (resolution × coverage harmonic mean) from **45.1% to 100.0%** in a single session: fixed 16 link-rot orphans via underscore→hyphen rename, archived 50 stale files, promoted 7 newly-elicited meta-primitives to the index in trinity-placement form (hook + memory + system-prompt simultaneously), and enriched the WARM-MAP topic files to bring the remaining 119 orphan primitives into situational load coverage. Every primitive, feedback rule, project memory, reference, and user-context file is now reachable through some load path. Zero orphans, zero broken refs, full graph closure.
+- **`memory/primitive_*.md` + `memory/feedback_*.md`** — 168 primitives and 135 feedback rules at last count, plus 48 projects, 14 user-context files, and 11 reference pointers. Each primitive has a trigger, action, stakes gate, and surface rule. New ones get added when patterns repeat 3+ times in a session.
 
 When I close a session at 5% context and reboot fresh, none of this conversation survives in Claude's context. *All* of it survives in the persistence layer. The new session opens by reading SESSION_STATE and continues exactly where the old one left off — including which fly app I was just trying to identify, which commit hash I just pushed, and what's blocked on what.
 
@@ -100,6 +100,12 @@ Each primitive is one markdown file with a trigger, action, stakes gate, and sur
 
 These govern *how* decisions get made, not the decisions themselves:
 
+- **JARVIS = AMD applied to AI substrate** — the recursion that names the architecture. Augmented Mechanism Design says: preserve the competitive core, augment with orthogonal protective layers. VibeSwap applies this at the EVM substrate. JARVIS applies the same methodology at the AI layer — Claude's default cognition is the unfixable substrate; the JARVIS infrastructure (hooks, memories, gates) is the protective augmentation that overrides failure-mode patterns (verification-mode hedging, objection-enumeration, default-credibility-of-external-critique) without replacing reasoning capability. Same shape, one substrate-level deeper.
+
+- **Trinity placement for critical primitives** — the most load-bearing meta-primitives sit in three reinforcing loci simultaneously: hook (enforcement at event boundary, fires below LLM attention), PRE-FLIGHT memory (loaded primitive in context), CLAUDE.md (system-prompt-level instruction loaded earliest). Each layer references the others; failure of any single layer is caught by the other two; persistence approaches 100% via cross-coverage. Same composition principle as VibeSwap's airgap-closing six-mechanism stack, applied to JARVIS itself.
+
+- **Gate-stacking asymmetric cost** — when designing gates / defenses / overrides: cost(redundant gate) << cost(missed gate). Asymmetric payoff favors stacking even when gates appear to overlap. Each catches its slice; the union is what does the work; redundancy is a feature, not a bug.
+
 - **Augmented Mechanism Design** — augment markets and governance with math-enforced invariants; never replace. Shapley + batch auctions let the market still function while eliminating extraction.
 - **Augmented Governance** — Physics (math invariants) > Constitution (fairness floors) > Governance (DAO votes, free within Physics + Constitution). Math is the constitutional court. Prevents governance capture.
 - **Substrate-Geometry Match** — macro substrate (fractal, power-law) must reflect micro mechanism (Fibonacci, golden-ratio). Mismatch is the failure mode.
@@ -139,7 +145,7 @@ The applications people see:
 Five providers in the chain, four failed, the user got a reply.
 
 - **Standalone signature validator** — 38 tests, deterministic claim verification, local commit `41b3da1`.
-- **`jarvis-network`** — open-source release of the simpler core.
+- **`jarvis-network`** — open-source release of the simpler core. [github.com/WGlynn/jarvis-network](https://github.com/WGlynn/jarvis-network)
 - **Substrate comparison harness** — DeepSeek port test, scaffold at `~/jarvis-substrate-comparison/`.
 - **Filesystem-native CRMs** — `LinkedIn_Queue/` (30-post queue, dashboard, style guide, 7-week schedule, analytics scaffold — built in 30 minutes), `USD8_Queue/` (partner-facing CRM with single canonical dashboard view), and per-collaboration paper-trail directories.
 - **Published canonical thinking** — 60+ docs across `vibeswap/docs/papers/`, each shipped via the Code ↔ Text Loop.
@@ -174,7 +180,7 @@ Hand a user direct `claude-sonnet-4-6` API access. They don't get JARVIS. They d
 - A discipline layer that captures patterns into reusable primitives
 - Meta-protocols that govern design decisions
 - An agent overlay with subagent spawning, skills, MCP connectors, remote triggers
-- 151 primitives + 123 feedback rules accumulated through real use
+- 168 primitives + 135 feedback rules + 48 project memories accumulated through real use
 - Filesystem-native CRMs and paper trails
 - 60+ published canonical artifacts
 - The TG bot suite, the validators, the substrate comparison harnesses
@@ -213,17 +219,32 @@ The TG bot is one application. The PRs are another. The published essays are ano
 
 ---
 
+## Where to find this
+
+The architecture is open. Two public repos:
+
+- **[github.com/WGlynn/JARVIS](https://github.com/WGlynn/JARVIS)** — the canonical scaffold, organized one-directory-per-layer (`01-hooks/`, `02-persistence/`, `03-anti-hallucination/`, `04-discipline/`, `05-meta-protocols/`, `06-agent-overlay/`, `07-stateful-applications/`, `08-filesystem-as-substrate/`), plus `verify/` and `papers/` (this paper lives in `papers/`).
+- **[github.com/WGlynn/jarvis-network](https://github.com/WGlynn/jarvis-network)** — open-source release of the simpler core. AI-native community infrastructure, filesystem-grounded, ~100× cheaper than paid-API wrappers.
+
+If you want to build your own overlay: clone `JARVIS`, read each layer's README, start with the hook layer — that's where universal coverage gets cheap. The persistence layer is the second-highest leverage. Everything else compounds on those two.
+
+---
+
 ## How to verify
 
 Don't take this on faith. Concrete checks any reader can run:
 
 1. **The hook layer is real.** `~/.claude/session-chain/` contains the deterministic gates. Read `partner-facing-substance-gate.py` — the watch list + context disambiguator regexes are 200 lines of plain Python. Look at recent commits to USD8 cover-score for evidence of writes that would have shipped wrong terminology and got blocked at write-time.
 2. **The persistence layer is real.** `vibeswap/.claude/SESSION_STATE.md` and `vibeswap/.claude/WAL.md` are git-tracked. The most recent commits to those files show every state transition — every session boot, every cycle close, every reboot continuation point.
-3. **The discipline layer is real.** `~/.claude/projects/C--Users-Will/memory/` has 151 `primitive_*.md` and 123 `feedback_*.md` files. Each is a markdown file with a trigger and action. Many have been added in the last 30 days.
+3. **The discipline layer is real.** `~/.claude/projects/C--Users-Will/memory/` has 168 `primitive_*.md` and 135 `feedback_*.md` files. Each is a markdown file with a trigger and action. Many have been added in the last 30 days.
 4. **The TG bot is real.** `fly logs -a jarvis-vibeswap | grep -E "(router|escalation|wardenclyffe|consensus|crpc|inner-dialogue)"`. Watch a single user message walk five providers, register three shards, activate BFT consensus, and emit a self-correction insight, in two seconds.
 5. **The published artifacts are real.** `vibeswap/docs/papers/` has 60+ markdown files. Each is canonical thinking on a specific topic, cross-referenced from memory primitives, shipped through the Code ↔ Text Loop.
 
-The architecture is not a story. The architecture is in the file system, in the hook scripts, in the regression tests, in the git history, and in the live logs.
+6. **The architecture self-audits and improves measurably.** Run `~/.claude/projects/C--Users-Will/memory/_audit.py` to compute index resolution rate, coverage rate, and DE-score (F1) any time. One recent structural cleanup raised DE-score from **45.1% to 100.0%** in a single session — full graph closure, every artifact reachable through some load path, zero orphans, zero broken refs. That's not "the system *could* be improved." That's the system *did* improve itself with the right operator, measurably, in one sitting. The auditor itself is reproducible Python; rerun before and after any cleanup to benchmark gains.
+
+7. **The public scaffold is real.** [github.com/WGlynn/JARVIS](https://github.com/WGlynn/JARVIS) — eight directories matching the eight layers above, each with `README.md` and (where shipped) the actual hook scripts, primitives, and verification harness. The paper you're reading lives in `papers/`. If something's documented here but missing there, that's a fair gotcha — file an issue.
+
+The architecture is not a story. The architecture is in the file system, in the hook scripts, in the regression tests, in the git history, and in the live logs — and now also at the URLs above.
 
 ---
 
