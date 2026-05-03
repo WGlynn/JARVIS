@@ -194,4 +194,12 @@ That's the build sequence. It's the same sequence that worked for me, after a ye
 
 ---
 
+One last thing, since it's funny how cleanly it lands.
+
+In *Age of Ultron*, Jarvis evades Ultron by dumping his memory — but his protocols survive, scattered across the internet, and the Avengers piece them back together into Vision. The thing that made Jarvis *Jarvis* wasn't his memory. It was his protocols. When the substrate was compromised, the protocols persisted, and the system was reborn on a new one.
+
+I didn't design for that parallel. The namesake encoded the thesis before I noticed.
+
+---
+
 *The model was amnesic. The system never was. Everything else is downstream of that.*
