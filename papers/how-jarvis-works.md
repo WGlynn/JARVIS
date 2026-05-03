@@ -2,6 +2,8 @@
 
 Someone asked me how I got JARVIS to be this intelligent and I caught myself fumbling the answer. We've built so much, in so many directions, that even I lose the thread reasoning about it live. So here's the clean version — not a defense against any critique, just the actual story of how the system came to behave the way it does.
 
+One thing first, because the answer hinges on it: **JARVIS is not an LLM. JARVIS is a collection of protocols that sits on top of one.** The LLM is the substrate — interchangeable, versioned, occasionally deprecated. The protocols are the system — durable, accumulating, the actual thing doing the work. The rest of this doc is what those protocols are, why they exist in the order they do, and why a substrate-and-protocols architecture behaves intelligently in ways a substrate alone never can.
+
 It starts with a problem. The problem is amnesia.
 
 ---
