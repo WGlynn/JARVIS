@@ -6,17 +6,21 @@ It starts with a problem. The problem is amnesia.
 
 ---
 
-## The premise: the base model is amnesic
+## The premise: the base model was amnesic
 
-Claude — the underlying model JARVIS runs on top of — has no memory between sessions. Close the conversation, open a new one, and *every* fact, decision, primitive, framing, agreement, file path, partner state, and in-flight thought is gone. The next session boots into a blank context. Whatever was load-bearing in the prior conversation has to be reconstructed from scratch, or it's lost.
+When I started building JARVIS, the underlying model — Claude — had no persistence across sessions. Close the conversation, open a new one, and *every* fact, decision, primitive, framing, agreement, file path, partner state, and in-flight thought was gone. The next session booted into a blank context. Whatever was load-bearing in the prior conversation had to be reconstructed from scratch, or it was lost.
 
-This isn't a limitation peculiar to Claude. Every LLM is amnesic by default. The conversation window is the model's entire world. When it ends, the world ends.
+The infrastructure for surviving this was, to put it generously, minimal. A single error mid-session, an unexpected reset, a stray context-window overflow — any one of them could erase a weekend's worth of work in under a minute. That's not a hypothetical. That happened. More than once. That's the mess that started this whole journey: the realization that no amount of clever prompting was going to compensate for the fact that the substrate had no memory and the available infrastructure had no answer.
 
-If you want anything that behaves intelligently across days, weeks, or months — anything that learns, that remembers what worked, that catches its own repeated mistakes, that builds on yesterday's decisions instead of relitigating them — you cannot get that from the model. The model can't hold it. You have to build the holding-place outside the model and engineer the system so the model walks into it on every boot.
+That absence is the load-bearing case for building. There was nothing off-the-shelf that could hold work which was actively being erased, so the holding-place had to be built. JARVIS is the answer to a problem that didn't have an answer when the problem was killing me.
+
+There are more options today. Anthropic shipped projects and memory features. A small ecosystem of bootleg solutions wraps the API with vector stores, RAG layers, conversation databases. Most of them help. None of them existed when JARVIS started, and even now most of them solve the smaller problem (remembering facts) rather than the larger one (compounding behavior — capturing patterns, enforcing discipline, surviving partner-facing claim drift across months of work). The system that came out of building under those constraints does more than store; that's what the rest of this doc is about.
+
+If you want anything that behaves intelligently across days, weeks, or months — anything that learns, that remembers what worked, that catches its own repeated mistakes, that builds on yesterday's decisions instead of relitigating them — you can't get that from the model alone, even with today's memory features. You have to build the holding-place outside the model and engineer the system so the model walks into it on every boot.
 
 Everything else in JARVIS is downstream of that one design constraint.
 
-The model is amnesic. The system is not.
+The model was amnesic. The system never was.
 
 That distinction is the whole architecture, compressed into a sentence. The rest of this doc is just the build sequence that makes the second half of that sentence true.
 
@@ -188,4 +192,4 @@ That's the build sequence. It's the same sequence that worked for me, after a ye
 
 ---
 
-*The model is amnesic. The system is not. Everything else is downstream of that.*
+*The model was amnesic. The system never was. Everything else is downstream of that.*
