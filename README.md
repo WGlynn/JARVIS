@@ -14,18 +14,29 @@ The simplest test: would removing the LLM kill the system, or replace one substr
 
 The full essay: [`papers/jarvis-is-not-a-wrapper.md`](./papers/jarvis-is-not-a-wrapper.md).
 
-## The eight layers
+## The eight layers (architecture description)
 
 | # | Layer | What it does |
 |---|---|---|
 | 1 | [Hooks](./01-hooks/) | Deterministic gates on every tool call, session boot, and commit |
 | 2 | [Persistence](./02-persistence/) | Six tiers of state that survive session boundaries |
-| 3 | [Anti-hallucination](./03-anti-hallucination/) | Substance gate, HIERO format, claim-level discipline |
-| 4 | [Discipline](./04-discipline/) | Pattern capture into reusable primitives — 151 primitives + 123 feedback rules |
+| 3 | [Anti-hallucination](./03-anti-hallucination/) | Substance gate, HIERO format, time-logic gate, claim-level discipline |
+| 4 | [Discipline](./04-discipline/) | Pattern capture into reusable primitives — 151+ primitives, 123+ feedback rules |
 | 5 | [Meta-protocols](./05-meta-protocols/) | How design decisions get made: AMD, AGov, Substrate-Geometry Match, Universal-Coverage → Hook, ETM |
 | 6 | [Agent overlay](./06-agent-overlay/) | Subagent spawning, slash commands as skills, MCP connectors, remote scheduled triggers |
 | 7 | [Stateful applications](./07-stateful-applications/) | The Telegram bot suite, standalone signature validator, jarvis-network OSS, filesystem-native CRMs, 60+ published papers |
 | 8 | [Filesystem-as-substrate](./08-filesystem-as-substrate/) | Why markdown + git is the orchestration layer, not Notion + Salesforce |
+
+## Modules (runnable / installable artifacts)
+
+The eight layers above describe the architecture. The modules below are concrete: each subdirectory is self-contained, has its own README, and can be used independently of the others.
+
+| Module | What it is |
+|---|---|
+| [`substrate/`](./substrate/) | The live primitive corpus + cron canonicals + hooks + Python wrapper. `pip install -e ./substrate` makes the corpus importable as typed objects with a derivable dependency graph. Formerly hosted at `WGlynn/jarvis-substrate`. |
+| [`installer/`](./installer/) | Kernel install scripts. Adopts the JARVIS hook + memory + cron-prompt layout into a fresh `~/.claude/` setup. Formerly hosted at `WGlynn/jarvis-os`. |
+| [`papers/`](./papers/) | Essays that specify or justify pieces of the architecture. Mostly Medium-grade write-ups; some have PDF companions. |
+| [`verify/`](./verify/) | Reader-runnable checks against the live system. Five verification scripts that test the architecture claims hold. |
 
 ## How to read this repo
 
