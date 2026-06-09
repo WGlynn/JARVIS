@@ -18,6 +18,7 @@ Born from a real incident: a partner-facing doc said `clawback` but the mechanis
 |---|---|---|
 | **Substance gate** | Flagged terms must have correct context disambiguators | `partner-facing-substance-gate.py` |
 | **HIERO format** | Memory writes use operator-density (`⇒ ¬ ∧ ∨ ✓ ✗ →`), not prose | `hiero-gate.py` |
+| **Time-logic gate** | Temporal claims (duration / since-when / implied history) verify-then-assert against git log / file mtime / user-stated / session-clock; absent anchor ships as `[unverified]` | See [`time-logic-gate.md`](./time-logic-gate.md) |
 | **Empty-Repo Test** | Descriptions must let a reader reconstruct the artifact from words alone. Architectural words ✓, marketing ✗ | Reviewer-applied |
 | **Anti-Stale Feed** | Verify current state before asserting. Never claim from memory alone | Discipline-layer rule (P·anti-stale-feed) |
 | **Verify Credentials Before Publishing** | Grep source-of-truth profile memory before writing any credential / title / numerical claim | Discipline-layer rule (F·verify-credentials-before-publishing) |

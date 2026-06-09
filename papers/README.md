@@ -6,6 +6,7 @@ The essays that specify or justify pieces of the JARVIS architecture.
 |---|---|
 | [`jarvis-is-not-a-wrapper.md`](./jarvis-is-not-a-wrapper.md) | The source-of-truth essay that specifies this repo. Eight layers, concrete artifacts, five verification checks. |
 | [`jarvis-is-not-a-wrapper.x-thread.md`](./jarvis-is-not-a-wrapper.x-thread.md) | 22-tweet condensed version for X / Twitter. Each tweet ≤280 chars. |
+| [`structural-fairness-has-a-name.md`](./structural-fairness-has-a-name.md) | The brand-anchor essay. Names the chain (Shapley 5-axiom + AMD + Augmented Governance + Composable Fairness Arrow Inversion) that "structural fairness" actually is. Published on Medium 2026-06-09. |
 
 ## More papers
 
