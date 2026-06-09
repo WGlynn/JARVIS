@@ -86,4 +86,15 @@ The protocols are tested by violation. When a session produces a violation, the 
 
 - Primitive files implementing each protocol: `~/.claude/projects/.../memory/primitive_*.md`
 - Cross-referenced from MEMORY.md's load-bearing index
-- Public expansions: [`vibeswap/docs/papers/`](https://github.com/wglynn/vibeswap/tree/master/docs) — the augmented-mechanism-design paper, ETM essays, Substrate-Geometry exhibits
+- Public expansions: [`papers/`](../papers/) — augmented-mechanism-design, ETM essays, Substrate-Geometry exhibits, plus the 120+ paper canonical corpus
+
+## Essays in this layer
+
+| File | What it specifies |
+|---|---|
+| [`augmented-dev-loops.md`](./augmented-dev-loops.md) | The dev-loop discipline: how to compose feedback into substrate state, not just session state. |
+| [`cross-context-protocol.md`](./cross-context-protocol.md) | CCP — how the agent maintains coherence across sessions where context expires. Parent of AA#3. |
+| [`jarvis-evolutionary-loop.md`](./jarvis-evolutionary-loop.md) | The substrate-modifies-itself cycle. Failures produce primitives produce gates produce fewer failures. |
+| [`jarvis-protocol-llm-overlay.md`](./jarvis-protocol-llm-overlay.md) | The kernel framing — why JARVIS is to LLM substrates what an OS is to hardware. |
+| [`odysseus-mission-loop.md`](./odysseus-mission-loop.md) | The five-step inbound→outbound→embedded→attribution→guided-entry loop. Substrate-agnostic propagation protocol. |
+| [`v3-jarvis-protocol.md`](./v3-jarvis-protocol.md) | The V3 specification — WWWD-orchestrated 3-agent parallel discipline with honest-finding + immediate-fix. |

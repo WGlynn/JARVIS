@@ -6,10 +6,19 @@
 
 | Class | Filename pattern | What it captures | Count |
 |---|---|---|---|
-| **Primitives** | `primitive_*.md` | Reusable patterns: triggers, actions, stakes gates, surface rules | 151 |
-| **Feedback rules** | `feedback_*.md` | User-corrections-turned-rules: "stop doing X" or "always do Y" | 123 |
+| **Primitives** | `primitive_*.md` | Reusable patterns: triggers, actions, stakes gates, surface rules | 216 |
+| **Feedback rules** | `feedback_*.md` | User-corrections-turned-rules: "stop doing X" or "always do Y" | 194 |
+| **Projects** | `project_*.md` | In-flight project state: goals, decisions, status, relationships | 59 |
+| **References** | `reference_*.md` | External entities: people, products, repos, partners | 17 |
 
 Each file has the same shape — a trigger, an action, a stakes gate (when to invoke vs. skip), and a surface rule (how to mention it). Primitives are reusable patterns; feedback rules are user-specific corrections. The distinction matters less than the discipline of writing them down.
+
+## Essays in this layer
+
+| File | What it specifies |
+|---|---|
+| [`capture-on-same-turn.md`](./capture-on-same-turn.md) | The capture-as-you-go discipline. Don't batch primitive-extraction at session end. |
+| [`contribution-graph-constitution.md`](./contribution-graph-constitution.md) | How the contribution-graph classifier became constitutional — Physics > Constitution > Governance applied to substrate-design. Agent owns the math; user owns the action. |
 
 ## Examples — captured live in recent sessions
 
