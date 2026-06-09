@@ -21,10 +21,10 @@ The full essay: [`papers/jarvis-is-not-a-wrapper.md`](./papers/jarvis-is-not-a-w
 | 1 | [Hooks](./01-hooks/) | Deterministic gates on every tool call, session boot, and commit |
 | 2 | [Persistence](./02-persistence/) | Six tiers of state that survive session boundaries |
 | 3 | [Anti-hallucination](./03-anti-hallucination/) | Substance gate, HIERO format, time-logic gate, claim-level discipline |
-| 4 | [Discipline](./04-discipline/) | Pattern capture into reusable primitives — 151+ primitives, 123+ feedback rules |
+| 4 | [Discipline](./04-discipline/) | Pattern capture into reusable primitives — 216 primitives + 194 feedback rules + 59 projects + 17 references in the live corpus (see [`substrate/memory/`](./substrate/memory/) for the public slice) |
 | 5 | [Meta-protocols](./05-meta-protocols/) | How design decisions get made: AMD, AGov, Substrate-Geometry Match, Universal-Coverage → Hook, ETM |
 | 6 | [Agent overlay](./06-agent-overlay/) | Subagent spawning, slash commands as skills, MCP connectors, remote scheduled triggers |
-| 7 | [Stateful applications](./07-stateful-applications/) | The Telegram bot suite, standalone signature validator, jarvis-network OSS, filesystem-native CRMs, 60+ published papers |
+| 7 | [Stateful applications](./07-stateful-applications/) | The Telegram bot suite, standalone signature validator, jarvis-network OSS, filesystem-native CRMs, 120+ published papers (see [`papers/`](./papers/)) |
 | 8 | [Filesystem-as-substrate](./08-filesystem-as-substrate/) | Why markdown + git is the orchestration layer, not Notion + Salesforce |
 
 ## Modules (runnable / installable artifacts)
