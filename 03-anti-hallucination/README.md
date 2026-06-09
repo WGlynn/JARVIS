@@ -16,12 +16,18 @@ Born from a real incident: a partner-facing doc said `clawback` but the mechanis
 
 | Mechanism | What it enforces | Where |
 |---|---|---|
-| **Substance gate** | Flagged terms must have correct context disambiguators | `partner-facing-substance-gate.py` |
+| **Substance gate** | Flagged terms must have correct context disambiguators (closed-set terminology) | `partner-facing-substance-gate.py` |
 | **HIERO format** | Memory writes use operator-density (`⇒ ¬ ∧ ∨ ✓ ✗ →`), not prose | `hiero-gate.py` |
 | **Time-logic gate** | Temporal claims (duration / since-when / implied history) verify-then-assert against git log / file mtime / user-stated / session-clock; absent anchor ships as `[unverified]` | See [`time-logic-gate.md`](./time-logic-gate.md) |
+| **Entity-attribution gate** | Open-set `@<handle>` attributions verify against the platform's API (gh api, etc.) before assert; never confabulate plausible-sounding handles | See [`entity-attribution-gate.md`](./entity-attribution-gate.md) |
+| **Verification-before-deny gate** | Default to WebSearch / WebFetch when user surfaces a current-event claim, before saying "I don't know" | See [`verification-before-deny.md`](./verification-before-deny.md) |
 | **Empty-Repo Test** | Descriptions must let a reader reconstruct the artifact from words alone. Architectural words ✓, marketing ✗ | Reviewer-applied |
 | **Anti-Stale Feed** | Verify current state before asserting. Never claim from memory alone | Discipline-layer rule (P·anti-stale-feed) |
 | **Verify Credentials Before Publishing** | Grep source-of-truth profile memory before writing any credential / title / numerical claim | Discipline-layer rule (F·verify-credentials-before-publishing) |
+
+## The taxonomy
+
+See [`failure-mode-taxonomy.md`](./failure-mode-taxonomy.md) for the two-axis taxonomy (closed-set vs open-set anchors × active confabulation vs passive abdication vs format drift) that maps each gate to a specific failure region and surfaces the empty cells that still need coverage (stale-count claims, dangling cross-references, past-tense session fabrications, internal-link-rot).
 
 ## What gets watched
 
