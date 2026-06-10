@@ -54,7 +54,7 @@ glyph ⇒ density↑ × stability↑ × pointer-deref
 ```
 L1  MEMORY.md PRE-FLIGHT → always loaded → HIERO entry
 L2  GKB CODEBOOK → KNOWLEDGE section → HIERO glyph
-L3  PreToolUse hook → Write|Edit → memory-paths → inject HIERO check (PENDING wire)
+L3  PreToolUse hook → Write|Edit → memory-paths → HIERO check (LIVE @ session-chain/hiero-gate.py; blocks at fail-count ≥2/4; long-line ratio >5% OR operator density <0.005)
 L4  recursive → every memory write asks: "would this fail HIERO?"
 ```
 

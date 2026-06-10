@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 """Telemetry log rotation utility for JARVIS hooks.
+
+⚠ tarfile safety: this script CREATES tar.gz archives from local trusted content
+(rotated jsonl files we ourselves wrote). It NEVER extracts tar archives from
+external sources. If you add extraction in the future, use `tarfile.data_filter`
+(Python 3.12+) to prevent path-traversal and absolute-path attacks per CVE-2007-4559.
+Class-eliminated by design: extraction is out of scope for rotation.
+
+
 Per #3 audit suggestion: rotate daily, compact monthly.
 Runnable as cron or standalone. Idempotent. Per [P·class-elimination-not-instance-patch]:
 class-eliminates 'log will grow unbounded and grep becomes slow' for ALL telemetry files.
@@ -41,11 +49,16 @@ def file_mtime(p: Path) -> dt.datetime:
 
 
 def rotate(dry_run: bool = False) -> dict:
-    """Move stale jsonl files into YYYY-MM/ subdirs by mtime."""
-    stats = {'rotated': 0, 'skipped_fresh': 0, 'errors': 0}
+    """Move stale jsonl files into YYYY-MM/ subdirs by mtime.
+
+    Race-safe: skip files modified within last 60s (a gate may be mid-append).
+    Class-eliminates 'in-flight telemetry write lost during rotation.'
+    """
+    stats = {'rotated': 0, 'skipped_fresh': 0, 'skipped_inflight': 0, 'errors': 0}
     if not TELEMETRY_DIR.exists():
         return stats
     cutoff = now() - dt.timedelta(days=ROTATE_AGE_DAYS)
+    inflight_threshold = now() - dt.timedelta(seconds=60)
     for p in TELEMETRY_DIR.glob('*.jsonl'):
         if not p.is_file():
             continue
@@ -54,13 +67,22 @@ def rotate(dry_run: bool = False) -> dict:
             if mt > cutoff:
                 stats['skipped_fresh'] += 1
                 continue
+            if mt > inflight_threshold:
+                # Touched <60s ago — likely mid-append; defer to next rotation tick
+                stats['skipped_inflight'] += 1
+                continue
             bucket = TELEMETRY_DIR / mt.strftime('%Y-%m')
             if not dry_run:
                 bucket.mkdir(parents=True, exist_ok=True)
                 target = bucket / p.name
                 if target.exists():
                     target = bucket / f"{p.stem}.{mt.strftime('%Y%m%d-%H%M%S')}{p.suffix}"
-                shutil.move(str(p), str(target))
+                # os.replace is atomic on same filesystem; shutil.move falls back on cross-fs.
+                # Same-fs rotation is the common case; use os.replace via Path.rename when same-fs.
+                try:
+                    p.rename(target)
+                except OSError:
+                    shutil.move(str(p), str(target))
             stats['rotated'] += 1
             print(f"  rotated: {p.name} -> {bucket.name}/")
         except Exception as e:

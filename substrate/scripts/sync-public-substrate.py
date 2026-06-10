@@ -203,10 +203,16 @@ def check_discretion_frontmatter(content: str) -> str | None:
       discretion: nda           ⇒ never mirror
       discretion: partner-private ⇒ never mirror
       discretion: internal      ⇒ never mirror
-    Returns the discretion value if set, None otherwise."""
+    Returns the discretion value if set, None otherwise.
+
+    Round-5 class-fix: handle unusually long frontmatter. We now look for the
+    closing '---' anywhere in the file, not just within first 2KB. Class-
+    eliminates 'frontmatter > 2KB and discretion line gets missed silently.'
+    """
     if not content.startswith('---'):
         return None
-    end = content.find('---', 3)
+    # Search the entire content for the closing '---' on its own line (or with leading newline)
+    end = content.find('\n---', 3)
     if end < 0:
         return None
     frontmatter = content[3:end]

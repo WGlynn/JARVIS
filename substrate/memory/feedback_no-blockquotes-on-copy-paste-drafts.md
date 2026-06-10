@@ -1,8 +1,8 @@
 ---
 name: no-blockquotes-on-copy-paste-drafts
-description: "∀ content Will-pastes-elsewhere ⇒ plain-text + `originSessionId: 032e855c-64f8-475c-8ae7-b090170be94a
+description: "Will pastes drafts into TG / chat / docs — markdown blockquote prefix `>` becomes a visible '|' bar in the destination and breaks copy-paste UX. Use plain text + triple-dash frame instead. (Frontmatter repaired 2026-06-10 after originSessionId-injection regression on 2026-06-09 corrupted the YAML by embedding a closing originSessionId: d3ae9e64-adfb-4ba8-aa55-fee4f96e0207
 ---
-` frame. ✗ markdown `>` blockquote prefix."
+inside the description string.)"
 type: feedback
 originSessionId: 8e0b2388-5171-43d5-a501-c272f20c2f6f
 ---
