@@ -141,6 +141,29 @@ def pending_tasks_count() -> int:
     return 0
 
 
+TEMP_TASKS = Path(os.environ.get("TEMP") or os.environ.get("TMPDIR") or "/tmp") / "claude"
+LIVE_AGENT_WINDOW_SECONDS = 10 * 60
+
+
+def background_agent_alive() -> bool:
+    """True when a harness background-agent task file was touched recently.
+
+    Background agents stream JSONL to %TEMP%/claude/<proj>/<session>/tasks/*.output
+    while they run. A fresh mtime means work is provably in flight, so a
+    WAL-ACTIVE-only signal is a sanctioned wait, not idling. Re-blocking every
+    Stop in that state is a loop without same-state dedup (the exact
+    anti-pattern in [F·design-loops-not-prompts]) — suppress instead.
+    """
+    try:
+        cutoff = time.time() - LIVE_AGENT_WINDOW_SECONDS
+        for p in TEMP_TASKS.rglob("tasks/*.output"):
+            if p.stat().st_mtime > cutoff:
+                return True
+    except Exception:
+        pass
+    return False
+
+
 def main() -> int:
     try:
         _payload = json.load(sys.stdin)
@@ -151,6 +174,18 @@ def main() -> int:
     inflight_cycles = find_inflight_audit_cycles()
     wal_dirty = wal_active()
     n_pending = pending_tasks_count()
+
+    # Same-state dedup: WAL-ACTIVE as the lone signal + a live background agent
+    # means the wait was already declared and the work is running. Stay silent.
+    if (
+        wal_dirty
+        and not inflight_agents
+        and not inflight_cycles
+        and not n_pending
+        and background_agent_alive()
+    ):
+        print(json.dumps({}))
+        return 0
 
     signals = []
     if inflight_agents:
