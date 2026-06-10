@@ -409,8 +409,10 @@ def recovery_report():
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: api-death-shield.py <event>")
-        print("Events: stop-failure, user-prompt, stop, pre-compact, check-crashes, clear-crashes, report")
+        # Usage goes to stderr: this script runs as a hook, and hook stdout
+        # must be JSON-or-empty (bare invocation otherwise emits non-JSON).
+        print("Usage: api-death-shield.py <event>", file=sys.stderr)
+        print("Events: stop-failure, user-prompt, stop, pre-compact, check-crashes, clear-crashes, report", file=sys.stderr)
         return
 
     event = sys.argv[1]
