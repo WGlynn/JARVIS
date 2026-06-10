@@ -105,6 +105,8 @@ def main() -> int:
         print('{}')
         return 0
     ti = payload.get('tool_input') or payload.get('toolInput') or {}
+    if not isinstance(ti, dict):  # malformed payload (e.g. tool_input as string) must fail-quiet
+        ti = {}
     desc = ti.get('description', '')
     prompt = ti.get('prompt', '')
     subagent_type = ti.get('subagent_type', 'general-purpose')
