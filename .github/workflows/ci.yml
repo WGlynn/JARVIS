@@ -15,8 +15,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate this workflow YAML
-        run: python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml')); print('CI workflow YAML parses clean.')"
+      - name: Validate ALL workflow YAML files
+        run: |
+          python -c "
+          import yaml, pathlib, sys
+          fail = 0
+          for p in sorted(pathlib.Path('.github/workflows').glob('*.yml')):
+              try:
+                  yaml.safe_load(p.read_text())
+                  print(f'  ok: {p.name}')
+              except Exception as e:
+                  print(f'  FAIL: {p.name}: {e}')
+                  fail = 1
+          for p in sorted(pathlib.Path('.github/workflows').glob('*.yaml')):
+              try:
+                  yaml.safe_load(p.read_text())
+                  print(f'  ok: {p.name}')
+              except Exception as e:
+                  print(f'  FAIL: {p.name}: {e}')
+                  fail = 1
+          sys.exit(fail)
+          "
 
   verify-corpus:
     name: Verify primitive corpus
