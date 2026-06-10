@@ -13,8 +13,11 @@ HOOKS_DIR = Path(__file__).parent.parent
 REPO_ROOT = HOOKS_DIR.parent.parent
 
 
-def run_hook(hook_name: str, payload: dict) -> dict:
-    """Spawn a hook with payload on stdin, return parsed JSON output (or {} on parse fail)."""
+def run_hook(hook_name: str, payload: dict, env: dict | None = None) -> dict:
+    """Spawn a hook with payload on stdin, return parsed JSON output (or {} on parse fail).
+
+    env: optional full environment for the subprocess (e.g. to point HOME at a
+    clean tmpdir so hooks that scan live substrate state see a blank slate)."""
     hook_path = HOOKS_DIR / hook_name
     if not hook_path.exists():
         return {"__error__": f"hook not found: {hook_path}"}
@@ -23,7 +26,10 @@ def run_hook(hook_name: str, payload: dict) -> dict:
         input=json.dumps(payload),
         capture_output=True,
         text=True,
+        encoding="utf-8",  # hooks emit UTF-8; Windows default cp1252 kills the reader thread
+        errors="replace",
         timeout=10,
+        env=env,
     )
     if result.returncode != 0:
         return {"__error__": f"nonzero exit: {result.returncode}", "stderr": result.stderr[:200]}
@@ -98,9 +104,19 @@ def test_coordination_gate_ambiguity_flag():
 
 # ============ autonomous-continue specific ============
 
-def test_autonomous_continue_silent_on_clean():
-    """No in-flight signals + no WAL ACTIVE = silent."""
-    out = run_hook("autonomous-continue.py", {"transcript_path": ""})
+def test_autonomous_continue_silent_on_clean(tmp_path):
+    """No in-flight signals + no WAL ACTIVE = silent.
+
+    The hook scans Path.home() for live substrate state (WAL.md, audit indexes,
+    pending-task files). On the dev machine those are often legitimately ACTIVE,
+    so point HOME/USERPROFILE at an empty tmpdir to create a genuinely clean
+    environment instead of asserting against live state."""
+    clean_env = {
+        **os.environ,
+        "HOME": str(tmp_path),
+        "USERPROFILE": str(tmp_path),  # Path.home() on Windows
+    }
+    out = run_hook("autonomous-continue.py", {"transcript_path": ""}, env=clean_env)
     assert out == {} or "decision" not in out
 
 

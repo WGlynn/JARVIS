@@ -47,6 +47,8 @@ def run_hook(hook_path: Path, payload_str: str, timeout: int = 10) -> tuple[int,
         input=payload_str,
         capture_output=True,
         text=True,
+        encoding="utf-8",  # hooks emit UTF-8; Windows default cp1252 kills the reader thread
+        errors="replace",
         timeout=timeout,
     )
     return result.returncode, result.stdout, result.stderr
