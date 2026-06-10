@@ -38,6 +38,8 @@ If `verify` prints `0 errors` you're set. The CLI reads the markdown corpus at `
 
 ## The eight layers (architecture map)
 
+> Canonical layer description lives in [`ARCHITECTURE.md`](./ARCHITECTURE.md). The summary below is a pointer; when the two drift, fix `ARCHITECTURE.md` first then re-sync this section. CI does not enforce sync between them — discipline does.
+
 | # | Layer | What it does |
 |---|---|---|
 | 1 | [Hooks](./01-hooks/) | Deterministic gates on every tool call, session boot, and commit |
