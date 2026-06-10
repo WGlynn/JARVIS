@@ -31,13 +31,8 @@ except ImportError:
 MEMORY_ROOT = Path.home() / '.claude' / 'projects' / 'C--Users-Will' / 'memory'
 CACHE_PATH = MEMORY_ROOT / '_system' / 'corpus.tokens.jsonl'
 
-SOURCES = [
+SOURCES = sorted(MEMORY_ROOT.glob('MEMORY_INDEX_*.md')) + [
     MEMORY_ROOT / 'MEMORY.md',
-    MEMORY_ROOT / 'MEMORY_INDEX_PREFLIGHT.md',
-    MEMORY_ROOT / 'MEMORY_INDEX_CODE.md',
-    MEMORY_ROOT / 'MEMORY_INDEX_COMM.md',
-    MEMORY_ROOT / 'MEMORY_INDEX_SOCIAL_SHIP.md',
-    MEMORY_ROOT / 'MEMORY_INDEX_STATE_PROTOCOL.md',
     MEMORY_ROOT / 'MEMORY_AUDIT_ARSENAL.md',
     MEMORY_ROOT / '_system' / 'wwwd_corpus_priority.json',
 ]
