@@ -51,6 +51,12 @@ TASKS_PENDING = HOME / ".claude" / "state" / "tasks-pending.json"
 # inside it yet.
 IN_FLIGHT_WINDOW_SECONDS = 30 * 60
 
+# Signal sources older than this are treated as stale, not live. Prevents
+# leftover WAL ACTIVE markers and old AUDIT_INDEX 'in-flight' tokens from
+# spamming continue-signals forever. 2026-06-10: caught firing on May 17
+# WAL + May 24 AUDIT_INDEX.
+STALE_SIGNAL_SECONDS = 7 * 24 * 60 * 60
+
 
 def find_inflight_agents() -> list[str]:
     """Scan task-output dirs for agents that look still-running."""
@@ -90,12 +96,17 @@ def find_inflight_agents() -> list[str]:
 
 
 def find_inflight_audit_cycles() -> list[str]:
-    """Look at any AUDIT_INDEX.md files for the literal token 'in-flight'."""
+    """Look at any AUDIT_INDEX.md files for the literal token 'in-flight'.
+    Stale files (mtime > STALE_SIGNAL_SECONDS) are skipped — old completed
+    cycles often retain the token without being live."""
     matches: list[str] = []
     if not AUDIT_ROOT.exists():
         return matches
+    cutoff = time.time() - STALE_SIGNAL_SECONDS
     for idx in AUDIT_ROOT.glob("**/AUDIT_INDEX.md"):
         try:
+            if idx.stat().st_mtime < cutoff:
+                continue
             text = idx.read_text(encoding="utf-8")
         except Exception:
             continue
@@ -108,6 +119,8 @@ def wal_active() -> bool:
     if not WAL_PATH.exists():
         return False
     try:
+        if WAL_PATH.stat().st_mtime < time.time() - STALE_SIGNAL_SECONDS:
+            return False  # WAL hasn't been touched in >7d — stale, not live
         text = WAL_PATH.read_text(encoding="utf-8")
     except Exception:
         return False
