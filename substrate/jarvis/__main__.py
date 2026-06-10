@@ -294,6 +294,8 @@ def main():
 
     subs.add_parser("count", help="count by kind")
 
+    subs.add_parser("hindsight", help="surface primitives that may have been wrong in hindsight")
+
     args = parser.parse_args()
 
     # Find the substrate root by walking up from this file
@@ -313,6 +315,7 @@ def main():
         "verify": cmd_verify,
         "search": cmd_search,
         "count": cmd_count,
+        "hindsight": cmd_hindsight,
     }
     return cmd_handlers[args.cmd](args, registry)
 
