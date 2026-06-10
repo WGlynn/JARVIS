@@ -1,0 +1,28 @@
+[workspace]
+resolver = "2"
+members = [
+    "jarvis-hook",
+    "autonomous-continue",
+    "coordination-mechanism-gate",
+    "em-dash-augmentation-gate",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/wglynn/jarvis-monorepo"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+regex = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+glob = "0.3"
+jarvis-hook = { path = "jarvis-hook" }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true

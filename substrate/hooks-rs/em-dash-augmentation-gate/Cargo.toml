@@ -1,0 +1,13 @@
+[package]
+name = "em-dash-augmentation-gate"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "em-dash-augmentation-gate"
+path = "src/main.rs"
+
+[dependencies]
+jarvis-hook = { workspace = true }
+regex = { workspace = true }

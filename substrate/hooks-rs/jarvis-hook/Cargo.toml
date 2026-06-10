@@ -1,0 +1,10 @@
+[package]
+name = "jarvis-hook"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Shared types + I/O for Claude Code JARVIS hooks (Rust)."
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
