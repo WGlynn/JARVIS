@@ -19,16 +19,21 @@ import pytest
 
 HOOKS_DIR = Path(__file__).parent.parent
 
-# Hooks that need special handling (read network, etc.) — exclude from parametrize
+# Network-touching hooks excluded by name
 SKIP = {
-    "_telemetry.py",  # not a hook, internal utility
     "phone-ping.py",  # makes external API calls
 }
 
 
 def discover_hooks() -> list[Path]:
+    """Discover hooks by convention.
+    - Files starting with `_` are utility/helper modules (e.g., `_telemetry.py`, `_telemetry_rotate.py`), not hooks.
+    - Explicit SKIP set for network-touching hooks.
+    Class-eliminates 'new utility file accidentally tested as a hook' regression."""
     out = []
     for p in HOOKS_DIR.glob("*.py"):
+        if p.name.startswith("_"):
+            continue
         if p.name in SKIP:
             continue
         out.append(p)

@@ -84,6 +84,18 @@ Source: docs.openai.com/codex/hooks and verified against Claude Code hook schema
 
 If your corpus matures enough that you're correcting AI in domain-specific ways the original substrate doesn't address, write your own primitives. Don't fork JARVIS twice; build on the meta-protocols (L5) and let your L4 corpus diverge.
 
+## Known limitation: git-history leakage class
+
+The `discretion: nda | partner-private | internal` frontmatter flag prevents future syncs from mirroring a file to the public substrate. It does NOT scrub git history if a pre-flag version was already pushed to a public remote.
+
+If you add the flag retroactively to a file that was previously public:
+- Future syncs: file is excluded, mirror copy is deleted from the public substrate (good).
+- Git history on the public remote: still retains the pre-flag content (bad).
+
+To fully eliminate the leak, you need a `git filter-branch` / `git filter-repo` rewrite + force-push on the public remote. That is destructive and history-rewriting, so the sync script does not do it automatically.
+
+**Class-mitigation**: tag files with the right discretion flag at creation time, not retroactively. Treat history-leakage as a separate cleanup task that requires explicit operator decision (rewrite vs accept).
+
 ## Cited primitives
 
 - [P·what-would-will-do] — the cognition-gate this guide replaces
