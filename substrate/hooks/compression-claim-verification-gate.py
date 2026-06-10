@@ -91,6 +91,8 @@ def is_target_path(path: str) -> bool:
 
 def get_content(payload: dict) -> tuple[str, str, str]:
     ti = payload.get('tool_input') or payload.get('toolInput') or {}
+    if not isinstance(ti, dict):  # malformed payload (e.g. tool_input as string) must fail-quiet
+        ti = {}
     tool_name = payload.get('tool_name') or payload.get('toolName') or ''
     path = ti.get('file_path', '') or ti.get('filePath', '')
     if tool_name == 'Write':
