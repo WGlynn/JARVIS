@@ -65,9 +65,12 @@ jobs:
           BROKEN_HOOKS=$(grep -oP "Broken hook scripts in settings.json\s*\|\s*\K\d+" report.md || echo "999")
           echo "Layer 8: $BROKEN_REFS broken refs, $BROKEN_HOOKS broken hooks"
           # Hard-fail when refs exceed current baseline (46) — class-elimination requires monotonic decrease
-          # Baseline tracks honest current state; bump only when new primitive churn intentionally adds unresolved
-          # refs to siblings shipped same-session. Goal: monotonic-or-zero regression class-eliminated.
-          BASELINE_REFS=52
+          # baseline-bump-reason: 2026-06-10 14:24 ET — public substrate Layer 8 audit confirms 0/0/0/0/0
+          # after today's renames + substrate-sync scrub. Setting genuine zero baseline.
+          # Note: this CI runs against substrate/ (public mirror), NOT against ~/.claude/projects/.../memory
+          # (Will's private local). Public can be cleaner than local because scrub-list excludes
+          # NDA/partner-private files that may contain unresolved refs to other NDA-locked siblings.
+          BASELINE_REFS=0
           if [ "$BROKEN_REFS" -gt "$BASELINE_REFS" ]; then
             echo "::error::Layer 8 regression: $BROKEN_REFS broken refs > baseline $BASELINE_REFS. Fix or bump baseline with reason."
             head -200 report.md
