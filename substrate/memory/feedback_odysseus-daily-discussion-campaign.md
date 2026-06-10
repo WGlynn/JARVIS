@@ -188,7 +188,7 @@ Proof fails ⇒ swap topic ¬ ship weak.
 
 ## 🎯 Cron substrate
 
-- **daily-cadence cron** — originally `d5b548a5` (9:37 AM ET), retuned 2026-06-08 to `9a756680` w/ 3-commandment architecture per [P·three-commandment-autonomous-loop]
+- **daily-cadence cron** — originally `d5b548a5` (9:37 AM ET), retuned 2026-06-08 to `9a756680` w/ 3-commandment architecture per [P·six-commandment-autonomous-loop]
 - **discovery crons** — originally `3ead2320` (xx:13 + xx:43 hourly = 48x/day, too noisy), retuned 2026-06-08 to `8fa9314f` (11:17 AM ET) + `ad42a42a` (4:47 PM ET) = 2x/day. Self-perpetuating via COMMANDMENT 1.
 - canonical prompts: `~/.claude/cron-prompts/odysseus-daily-cadence.md` + `~/.claude/cron-prompts/odysseus-discovery.md`
 - pointer-prompts in scheduled_tasks.json contain `type:` marker for self-identification

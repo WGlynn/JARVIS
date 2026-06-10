@@ -40,7 +40,7 @@ Default during full-auto multi-day arc:
 
 - `[P·autopilot-loop]` — parent execution discipline
 - `[P·full-leverage-only-moves]` — sibling at strategic-move layer
-- `[F·apply-rule-just-wrote]` — apply this rule to MY subsequent end-of-turns
+- `[P·apply-the-rule-you-just-wrote]` — apply this rule to MY subsequent end-of-turns
 - `autonomous-continue.py` hook — substrate enforcer
 
 ## Origin

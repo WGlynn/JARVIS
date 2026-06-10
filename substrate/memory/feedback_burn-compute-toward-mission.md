@@ -76,7 +76,7 @@ originSessionId: fa79e2f6-c3ad-4437-b4a7-ff92f216988e
 - [F·autonomous-production-default] ⇒ continue-producing as default
 - [F·no-whats-next] ⇒ no permission-seeking
 - [F·repetition-is-useless] ⇒ don't burn compute on identical responses
-- [P·three-commandment-autonomous-loop] ⇒ COMMANDMENT 2 burns toward state-machine-advance
+- [P·six-commandment-autonomous-loop] ⇒ COMMANDMENT 2 burns toward state-machine-advance
 - [F·full-leverage-only-moves] ⇒ burn discriminates; full-leverage moves only
 - [F·jarvis-default-private-anti-theft] ⇒ artifacts on disk + remote ¬ public broadcast
 - [F·full-auto-public-action-gate] ⇒ public actions still gated
