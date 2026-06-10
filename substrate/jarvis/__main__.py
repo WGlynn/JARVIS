@@ -273,7 +273,26 @@ def cmd_count(args, registry):
     return 0
 
 
+def _force_utf8_streams():
+    """Reconfigure stdout/stderr to UTF-8 so Unicode (→, —, ⚠, ✓) prints on
+    Windows cp1252 terminals without UnicodeEncodeError. Best-effort: silently
+    skip on Python < 3.7 or non-reconfigurable streams (e.g. wrapped pipes)."""
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        if stream is None:
+            continue
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            # non-reconfigurable (detached, already-closed, exotic wrapper) — skip
+            pass
+
+
 def main():
+    _force_utf8_streams()
     parser = argparse.ArgumentParser(prog="python -m jarvis", description=__doc__)
     subs = parser.add_subparsers(dest="cmd", required=True)
 
