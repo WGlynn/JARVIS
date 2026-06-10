@@ -222,6 +222,8 @@ def main() -> int:
 
     tool_name = data.get("tool_name") or data.get("toolName") or ""
     tool_input = data.get("tool_input") or data.get("toolInput") or {}
+    if not isinstance(tool_input, dict):  # malformed payload (non-dict tool_input) must fail-quiet
+        tool_input = {}
 
     # Only fire on Write / Edit
     if tool_name not in ("Write", "Edit"):

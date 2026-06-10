@@ -27,6 +27,8 @@ if tool_name not in ("Write", "Edit"):
     sys.exit(0)
 
 tool_input = data.get("tool_input", {})
+if not isinstance(tool_input, dict):  # malformed payload (non-dict tool_input) must fail-quiet
+    tool_input = {}
 file_path = tool_input.get("file_path", "") or ""
 
 # Match memory paths

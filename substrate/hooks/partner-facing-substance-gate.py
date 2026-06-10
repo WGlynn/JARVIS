@@ -265,6 +265,8 @@ def main():
         sys.exit(0)
 
     tool_input = payload.get("tool_input", {})
+    if not isinstance(tool_input, dict):  # malformed payload (non-dict tool_input) must fail-quiet
+        tool_input = {}
     file_path = tool_input.get("file_path", "")
     if not file_path:
         sys.exit(0)

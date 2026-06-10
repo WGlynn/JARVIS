@@ -9,6 +9,16 @@ What's tested universally:
 - non-zero exit codes are forbidden
 
 Per-hook behavioral tests live in test_hook_contract.py (representative samples).
+
+DUPLICATION NOTE (2026-06 refactor finding): the stdin-parse boilerplate
+(`try: json.load(sys.stdin) except: ...`) is duplicated across 34 hooks in ~5
+deliberate variants (silent '{}' gate-exit / continue-with-empty-payload for
+SessionStart loaders / sys.exit(0) / stderr diagnostics). The variants encode
+per-event semantics, and hooks must stay standalone (no cross-file imports),
+so the duplication is load-bearing. The invariants that actually matter are
+enforced HERE instead: fail-quiet on empty/malformed/invalid/hostile-shape
+input, JSON-or-empty stdout, bounded output. Drift in any copy fails these
+parametrized tests, not a sync script.
 """
 import json
 import subprocess
@@ -101,6 +111,36 @@ def test_hook_invalid_json_fails_quiet(hook_name):
     hook_path = HOOKS_DIR / hook_name
     rc, stdout, stderr = run_hook(hook_path, "this is not json {{{")
     assert rc == 0, f"{hook_name} crashed on non-JSON: rc={rc} stderr={stderr[:200]}"
+
+
+# Payload-shape matrix: valid JSON objects whose sub-objects have hostile types.
+# tool_name IS set so hooks route past their early-return into the extraction
+# path — the 2026-06 baseline bug class (tool_input as str crashed three gates
+# with AttributeError) only fires on that path. Tests-enforced contract: this
+# is the standalone-safe substitute for a shared parse helper (cross-file
+# imports would break the hooks' standalone-execution constraint).
+HOSTILE_SHAPE_PAYLOADS = [
+    '{"tool_name": "Write", "tool_input": "not-a-dict"}',
+    '{"tool_name": "Edit", "tool_input": [1, 2, 3], "tool_response": "nope"}',
+]
+
+
+@pytest.mark.parametrize("hook_name", [h.name for h in discover_hooks()])
+def test_hook_hostile_subobject_shapes_fail_quiet(hook_name):
+    """tool_input/tool_response of the wrong TYPE (valid JSON, hostile shape)
+    must not crash any hook, even when tool_name routes into the extraction path."""
+    hook_path = HOOKS_DIR / hook_name
+    for payload_str in HOSTILE_SHAPE_PAYLOADS:
+        rc, stdout, stderr = run_hook(hook_path, payload_str)
+        assert rc == 0, (
+            f"{hook_name} crashed on hostile shape {payload_str}: rc={rc} stderr={stderr[:200]}"
+        )
+        out = stdout.strip()
+        if out:
+            try:
+                json.loads(out)
+            except json.JSONDecodeError as e:
+                pytest.fail(f"{hook_name} emitted invalid JSON on hostile shape: {e}; output={out[:200]}")
 
 
 @pytest.mark.parametrize("hook_name", [h.name for h in discover_hooks()])
