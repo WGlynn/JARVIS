@@ -1,0 +1,39 @@
+name: Layer 8 baseline monotonic-only-decreases
+
+# Class-eliminates 'baseline silently bumped upward to mask regression.'
+# On PRs that change ci.yml, this workflow compares baseline values and FAILS
+# if the new baseline is HIGHER than main without an explicit reason comment.
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ci.yml
+
+jobs:
+  baseline-monotonic-only-decreases:
+    name: Baseline must monotonically decrease (or have explicit reason)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compare baselines
+        run: |
+          MAIN_BASELINE=$(git show origin/main:.github/workflows/ci.yml 2>/dev/null | grep -oP 'BASELINE_REFS=\K\d+' | head -1 || echo "0")
+          NEW_BASELINE=$(grep -oP 'BASELINE_REFS=\K\d+' .github/workflows/ci.yml | head -1 || echo "0")
+          echo "main baseline: $MAIN_BASELINE"
+          echo "PR baseline:   $NEW_BASELINE"
+          if [ "$NEW_BASELINE" -gt "$MAIN_BASELINE" ]; then
+            # Allow bumps only if a "baseline-bump-reason:" comment is in the diff
+            REASON=$(git diff origin/main -- .github/workflows/ci.yml | grep -i 'baseline-bump-reason:' || echo "")
+            if [ -z "$REASON" ]; then
+              echo "::error::Baseline increased from $MAIN_BASELINE to $NEW_BASELINE without baseline-bump-reason comment in the diff. Class-elimination requires monotonic decrease, or an explicit bump-reason."
+              exit 1
+            else
+              echo "Bump approved by reason comment: $REASON"
+            fi
+          elif [ "$NEW_BASELINE" -lt "$MAIN_BASELINE" ]; then
+            echo "✓ Baseline decreased — good progress."
+          else
+            echo "= Baseline unchanged."
+          fi
