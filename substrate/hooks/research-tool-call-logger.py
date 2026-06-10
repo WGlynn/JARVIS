@@ -24,7 +24,9 @@ def main() -> int:
         kind = tool_name.lower()
     elif tool_name == 'Bash':
         cmd = ti.get('command', '')
-        if re.search(r'(?:^|[\s;|&])gh\s+', cmd) or 'gh api' in cmd or 'gh repo' in cmd or 'gh issue' in cmd or 'gh pr' in cmd:
+        # Round-4 class-fix: any gh subcommand counts (api/repo/issue/pr/release/search/workflow/auth/...).
+        # Simpler regex eliminates 'new gh subcommand added by GitHub silently misses logging.'
+        if re.search(r'(?:^|[\s;|&])gh\s+\w+', cmd):
             kind = 'gh'
         else:
             print('{}')

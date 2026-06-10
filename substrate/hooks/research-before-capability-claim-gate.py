@@ -40,6 +40,22 @@ CAPABILITY_PATTERNS = [
     r'\b(anthropic|openai|google|meta|nous)\s*-?\s*(only|specific|locked|bound)\b',
 ]
 
+# Data-driven class-fix from telemetry analysis 2026-06-10: false-positive on partner
+# drafts where the author describes their own just-shipped code. Pattern: draft references
+# "the gate" / "the classifier" / "the hook" / "the regex" etc. with first-person ownership.
+# Such drafts don't need external research; the writer wrote the code.
+SELF_REFERENCE_PATTERNS = [
+    r'\b(the|my|this)\s+(gate|classifier|hook|regex|script|tool|harness|skill|primitive)\b',
+    r'\b(i wrote|i shipped|i built|i made|i added)\s+(this|the|a)\b',
+    r'\b(pushed an upgrade|patched the|updated the)\b',
+]
+
+
+def is_self_reference(text: str) -> bool:
+    """Return True if the text describes the writer's own code (not external products)."""
+    matches = sum(1 for pat in SELF_REFERENCE_PATTERNS if re.search(pat, text, re.IGNORECASE))
+    return matches >= 2  # require ≥2 self-reference hits to flip; one is too weak
+
 
 def get_path_and_content(payload: dict) -> tuple[str, str, str]:
     ti = payload.get('tool_input') or payload.get('toolInput') or {}
@@ -114,6 +130,13 @@ def main() -> int:
 
     hits = capability_hits(content)
     if len(hits) < 2:
+        print('{}')
+        return 0
+
+    # Data-driven false-positive suppression: if draft is self-referential
+    # (writer describing their own code), skip — the writer doesn't need
+    # external research for code they just wrote.
+    if is_self_reference(content):
         print('{}')
         return 0
 
