@@ -150,14 +150,31 @@ function render() {{
   for (const n of NODES) {{
     if (activeType && n.type !== activeType) continue;
     if (term && !((n.name + ' ' + n.slug + ' ' + n.description).toLowerCase().includes(term))) continue;
+    // Round-9 class-fix: build via createElement + textContent. Class-eliminates
+    // HTML injection entirely without HTML-escape gymnastics. Server-side escape
+    // (sanitize_nodes) becomes a belt-and-suspenders defense; this is the suspenders.
     const card = document.createElement('div');
     card.className = 'card type-' + n.type;
-    card.innerHTML = `
-      <h2>${{n.name}}</h2>
-      <div class="meta">${{n.type}} · ${{n.slug}} · <code>${{n.file}}</code></div>
-      <div class="desc">${{n.description || '<i>no description</i>'}}</div>
-      ${{n.refs.length ? '<div class="refs">refs: ' + n.refs.map(r => '<span data-slug="' + r + '">' + r + '</span>').join(' ') + '</div>' : ''}}
-    `;
+    const h2 = document.createElement('h2'); h2.textContent = n.name; card.appendChild(h2);
+    const meta = document.createElement('div'); meta.className = 'meta';
+    meta.textContent = n.type + ' · ' + n.slug + ' · ';
+    const code = document.createElement('code'); code.textContent = n.file; meta.appendChild(code);
+    card.appendChild(meta);
+    const desc = document.createElement('div'); desc.className = 'desc';
+    if (n.description) {{ desc.textContent = n.description; }} else {{ const i = document.createElement('i'); i.textContent = 'no description'; desc.appendChild(i); }}
+    card.appendChild(desc);
+    if (n.refs.length) {{
+      const refsDiv = document.createElement('div'); refsDiv.className = 'refs';
+      refsDiv.appendChild(document.createTextNode('refs: '));
+      for (const r of n.refs) {{
+        const span = document.createElement('span');
+        span.dataset.slug = r;
+        span.textContent = r;
+        refsDiv.appendChild(span);
+        refsDiv.appendChild(document.createTextNode(' '));
+      }}
+      card.appendChild(refsDiv);
+    }}
     grid.appendChild(card);
   }}
 }}
