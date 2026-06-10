@@ -31,7 +31,7 @@ This pattern keeps showing up:
 **When NOT to apply**: sometimes first-available IS best-fit. The test is "did I actually model the threat" — if yes and the ecosystem-default holds up, use it without guilt. The trap is skipping the model, not choosing the common tool.
 
 **Related**:
-- `primitive_path-commitment.md` — two paths, commit to one; this primitive is about HOW to choose
+- `protocol_path-commitment.md` — two paths, commit to one; this primitive is about HOW to choose
 - `primitive_optimize-around-vs-eliminate.md` — eliminate the problem class, don't optimize the instance
 - `feedback_generalize-solutions.md` — solve the class, not the instance
 - `feedback_defend-reasoning-when-wrong.md` — once you've modeled and chosen, defend the choice against ecosystem peer pressure

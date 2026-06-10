@@ -67,7 +67,7 @@ ADD:
 ## Tension (unresolved)
 
 Fate-close ∋ "Ive set out to structurally fix" = ownership-leaning
-conflict ∋ [F·will-open-source-contributor-not-founder]
+conflict ∋ [F·will-identifies-as-open-source-contributor-not-founder]
 Will-call which wins, default contributor-frame
 
 ## Ref

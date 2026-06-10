@@ -55,7 +55,7 @@ The first-principles check exposed UTXO-shaped tokens as the substrate-native al
 
 - `[P·substrate-geometry-match]` — parent principle; AA#0 is the audit-time application
 - `[P·first-available-trap]` — the failure mode AA#0 catches at architectural granularity
-- `[F·fork-loses-hardness]` (AA#1) — sibling, fires AFTER shape-check passes
+- `[P·audit-fork-loses-hardness]` (AA#1) — sibling, fires AFTER shape-check passes
 - `[F·claim-needs-structural-enforcer]` (AA#2) — sibling, fires AFTER shape-check passes
 - `[F·entity-context-cross-reference]` (AA#3) — orthogonal axis (entity-level context)
 - `[P·cross-context-protocol]` — META-parent of audit-arsenal

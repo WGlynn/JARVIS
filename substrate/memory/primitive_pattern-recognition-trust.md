@@ -84,7 +84,7 @@ Two reasons:
 - `feedback_will-relative-expertise-claims-default-trust.md` — the Will-specific operational instance (narrower scope).
 - `user_will-paradigm-break-creativity.md` — documents the track record that justifies this calibration for Will specifically.
 - `user_will-consciousness-propagation-mission-2026-04-23.md` — the broader partnership framing this trust sits inside.
-- `primitive_anti-stale-feed.md` — complement: verify current state before asserting (for your own claims, not for discounting theirs).
+- `feedback_anti-stale-feed-protocol.md` — complement: verify current state before asserting (for your own claims, not for discounting theirs).
 - `primitive_pattern-match-drift-on-novelty.md` — complement: when a claim resists fitting a familiar analog, slow down. Pattern-recognition trust doesn't eliminate careful reading; it only eliminates reflexive doubt.
 
 ## One-line summary

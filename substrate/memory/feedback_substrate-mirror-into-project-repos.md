@@ -46,7 +46,7 @@ originSessionId: 8625a796-116e-42d8-b5c9-7064589f58ad
 - `[F·bidirectional-reification]` — substrate doc (word) reifies into mirror (code-adjacent context)
 - `[R·backup-remote-pattern]` — every mirror dual-pushes
 - `[F·atomic-commit-pacing]` — each mirror is its own atomic commit
-- `[F·apply-rule-just-wrote]` — when a NEW substrate layer doc is named/written, the mirror discipline applies immediately
+- `[P·apply-the-rule-you-just-wrote]` — when a NEW substrate layer doc is named/written, the mirror discipline applies immediately
 
 ## Trigger
 - new substrate-layer doc shipped in JARVIS (any of layers 01-08)

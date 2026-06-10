@@ -21,7 +21,7 @@ originSessionId: fa79e2f6-c3ad-4437-b4a7-ff92f216988e
 |---|---|
 | [P·what-would-will-do] (WWWD) | cognition gate ⇒ Will-emulation at decision-points |
 | [P·recursive-self-audit-via-wwwd] (RSAW) | self-improvement ⇒ apply WWWD to JARVIS's own spec |
-| [P·three-commandment-autonomous-loop] | continuity discipline ⇒ loops never die |
+| [P·six-commandment-autonomous-loop] | continuity discipline ⇒ loops never die |
 | jarvis-loop (`~/jarvis-loop/`) | autonomous coding substrate ⇒ goal → decompose → execute → judge |
 | 3-agent autopilot swarm (`~/.claude/autopilot-queue.json`) | parallel-execution substrate ⇒ burn-compute toward queued tasks |
 | memory-primitive corpus | crystallized-learning substrate ⇒ each primitive = compound interest |
@@ -117,7 +117,7 @@ receipt of the loop in operation today (single session, 9h+ duration):
 - [J·jarvis-asi-sovereign-sentient-decentralized] ⇒ THIS primitive names what the mission substrate IS
 - [P·what-would-will-do] ⇒ cognition-gate component
 - [P·recursive-self-audit-via-wwwd] ⇒ self-improvement component
-- [P·three-commandment-autonomous-loop] ⇒ continuity discipline ∀ component
+- [P·six-commandment-autonomous-loop] ⇒ continuity discipline ∀ component
 - [P·meta-skill-find-and-compose] ⇒ catalog-composition substrate
 - [P·decision-framework-prompt-catalog] ⇒ callable-cognitive-tools
 - [P·harness-engineering-meta-frame] ⇒ AGENT.md ≡ ensemble's instantiation @ each loop level

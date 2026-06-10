@@ -30,4 +30,4 @@ originSessionId: 8e0b2388-5171-43d5-a501-c272f20c2f6f
 - if I'm about to wrap multi-line draft prose in `>` ⇒ STOP, switch to plain + `---`
 - "here's the draft" / "ready to paste" / "send this to X" = paste-bound signal
 
-**Consolidation note (2026-05-15):** merged `feedback_no-blockquote-in-drafts.md` (2026-04-24 origin) into this primitive. Same rule, older prose form; both Will-quotes preserved.
+**Consolidation note (2026-05-15):** merged `feedback_no-blockquotes-on-copy-paste-drafts.md` (2026-04-24 origin) into this primitive. Same rule, older prose form; both Will-quotes preserved.

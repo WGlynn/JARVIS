@@ -47,7 +47,7 @@ originSessionId: 8625a796-116e-42d8-b5c9-7064589f58ad
 - `[F·substrate-mirror-into-project-repos]` — mirror to project repos
 - `[R·backup-remote-pattern]` — dual-push every commit
 - `[F·atomic-commit-pacing]` — analysis paper = 1 commit; mirror = 1 commit each
-- `[F·apply-rule-just-wrote]` — this rule applies to subsequent dumps in the same session
+- `[P·apply-the-rule-you-just-wrote]` — this rule applies to subsequent dumps in the same session
 
 ## Anti-patterns
 - ✗ "Got the content. What do you want me to do with it?" (acknowledgment-as-output-theater)

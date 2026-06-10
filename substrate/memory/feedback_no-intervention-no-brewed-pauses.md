@@ -79,7 +79,7 @@ These directives ¬ override the public-action gate. Distinction:
 - [F·no-whats-next] ⇒ the closer rule
 - [F·full-auto-public-action-gate] ⇒ the boundary on public actions
 - [F·repetition-is-useless] ⇒ don't burn compute on identical responses
-- [P·three-commandment-autonomous-loop] ⇒ structural mechanism for the loop never idling
+- [P·six-commandment-autonomous-loop] ⇒ structural mechanism for the loop never idling
 - [F·act-on-reversible-aligned-moves] ⇒ default-yes on reversible aligned decisions
 - [F·dont-default-concede-verify-first] ⇒ still applies; "no-pauses" ≠ skip-verification
 
