@@ -2,6 +2,8 @@
 
 JARVIS is **eight layers**, all live, all producing artifacts in production today. Last refresh: 2026-06-10.
 
+Substrate layers are orthogonal to the **compression-layer stack (L0..L6)** that runs across all eight. The 8-layer stack describes what JARVIS IS; the L0..L6 stack describes how every byte stored, every token loaded, and every hook fired is compressed. Both ship together in production. See [papers/multiplicative-compression.md](papers/multiplicative-compression.md) for the empirical evidence that the byte-side compression (HIERO++) composes multiplicatively with API-side caching to produce order-of-magnitude session cost cuts.
+
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │ 8. Filesystem-as-substrate                                   │
@@ -57,6 +59,30 @@ JARVIS is **eight layers**, all live, all producing artifacts in production toda
 6 → 7         : agent overlay ⇒ stateful applications
 7 → 8         : ∀ applications run on filesystem substrate
 ```
+
+## Compression-layer stack (orthogonal to the 8 substrate layers)
+
+```
+L0  prose                       (BANNED in memory writes; hiero-gate enforced)
+L1  HIERO Unicode               (operator-density format · R·hiero-dictionary)
+L2  HIERO++ ASCII-tuned         (tokenizer-aware swaps · 4-7% prose, 42% op-set)
+L3  APL-style hot-path ops      (_terse_ops.py · hook-internal scoring)
+L4  Z-token pre-encoded cache   (corpus.tokens.jsonl + corpus-cache-warmer.py)
+L5  Schelling canonical IDs     (P·/F·/R·/J· prefix system · partial deploy)
+L6  SK combinator genome        (bootstrap-only · future for substrate fork)
+```
+
+| Layer | Readability | Win | Status |
+|---|---|---|---|
+| L0 | full | baseline | banned |
+| L1 | high | ~30% vs prose | live |
+| L2 | high | +4-7% on real prose, 42% on operator set | live |
+| L3 | debug-only | up to ~70% src-tok on dot-product call-sites; net-negative on first single-call-site refactor (import boilerplate) | module live, 1 consumer (AA#4); positive once N hooks consume |
+| L4 | machine-only | drift detect + boot-budget visibility today; encode-pass skip future | live (corpus-cache-warmer registered) |
+| L5 | renderer-expanded | port-stable identifiers across substrates | partial |
+| L6 | bootstrap-only | substrate-portable kernel export | future |
+
+See [papers/multiplicative-compression.md](papers/multiplicative-compression.md) for the empirical case that L1/L2 (byte side) × API prompt caching (read side) is multiplicative.
 
 ## The kernel framing
 
