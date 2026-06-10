@@ -1,8 +1,6 @@
 ---
 name: no-blockquotes-on-copy-paste-drafts
-description: ∀ content Will-pastes-elsewhere ⇒ plain-text + `originSessionId: 11acfd9c-9cd2-4e7a-a0c8-59843b5325fb
----
-` frame. ✗ markdown `>` blockquote prefix.
+description: "∀ content Will-pastes-elsewhere ⇒ plain-text + `---` frame. ✗ markdown `>` blockquote prefix."
 type: feedback
 originSessionId: 8e0b2388-5171-43d5-a501-c272f20c2f6f
 ---
