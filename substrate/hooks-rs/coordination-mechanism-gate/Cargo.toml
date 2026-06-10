@@ -1,0 +1,13 @@
+[package]
+name = "coordination-mechanism-gate"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "coordination-mechanism-gate"
+path = "src/main.rs"
+
+[dependencies]
+jarvis-hook = { workspace = true }
+regex = { workspace = true }
