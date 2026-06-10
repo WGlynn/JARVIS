@@ -1,0 +1,64 @@
+name: JARVIS substrate CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-corpus:
+    name: Verify primitive corpus
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify primitive corpus integrity
+        run: python verify/verify_primitive_corpus.py
+      - name: Verify no secrets leaked
+        run: python verify/verify_no_secrets.py
+
+  layer8-audit:
+    name: Layer 8 link-rot audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Layer 8 audit (link-rot detector)
+        run: |
+          cd substrate/hooks/layer8-audit && python layer8_audit.py
+          if grep -q "Broken inter-primitive references *: *0$" report.md && \
+             grep -q "Broken hook scripts in settings.json *: *0$" report.md; then
+            echo "Layer 8 clean."
+          else
+            echo "::warning::Layer 8 audit surfaced findings. Review report.md."
+            head -100 report.md
+          fi
+
+  hook-smoke-tests:
+    name: Python hook smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pytest
+        run: pip install pytest
+      - name: Run hook smoke tests
+        run: cd substrate/hooks && pytest tests/ -v --tb=short
+
+  rust-hooks:
+    name: Rust hooks (hooks-rs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build release
+        run: cd substrate/hooks-rs && cargo build --release
+      - name: Run smoke tests
+        run: cd substrate/hooks-rs && cargo test --release
