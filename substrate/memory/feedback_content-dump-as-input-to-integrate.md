@@ -40,10 +40,10 @@ originSessionId: 8625a796-116e-42d8-b5c9-7064589f58ad
 - Conversational response wastes the opportunity — the substantive value is the cross-substrate analysis through our shared lenses
 - Reified analysis is durable (file-on-disk, mirror-in-project-repo, dual-pushed)
 - Conversational response is ephemeral (chat-context, evaporates on session compression)
-- Pattern matches [F·bidirectional-reification]: external-content (word) → analysis paper (code-adjacent)
+- Pattern matches [P·bidirectional-reification]: external-content (word) → analysis paper (code-adjacent)
 
 ## Composition
-- `[F·bidirectional-reification]` — content dump is a forward-reify trigger
+- `[P·bidirectional-reification]` — content dump is a forward-reify trigger
 - `[F·substrate-mirror-into-project-repos]` — mirror to project repos
 - `[R·backup-remote-pattern]` — dual-push every commit
 - `[F·atomic-commit-pacing]` — analysis paper = 1 commit; mirror = 1 commit each

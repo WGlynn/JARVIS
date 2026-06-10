@@ -78,7 +78,7 @@ Two axes Rick is pointing at:
 ## ↦ Sibling primitives
 
 - [P·adoption-roleplay] — outside-vantage critique that surfaced this as worth capturing
-- [F·optimize-for-llms] — code optimization rule applies to the classifier itself
+- [F·optimize-code-for-llms] — code optimization rule applies to the classifier itself
 - [F·rick-keep-it-simple] — implementation should ship minimal Tier 1 first, ¬ Tier 3 ambitious
 - [J·vibeswap-ckb-sovereign-pivot] (orthogonal) — this is JARVIS, ¬ VibeSwap
 - Hermes architecture reference: side-by-side at `Desktop/jarvis-vs-hermes-side-by-side-2026-06-10.md`

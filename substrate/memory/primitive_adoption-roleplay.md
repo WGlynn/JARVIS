@@ -58,7 +58,7 @@ Integration site: vibeswap/CLAUDE.md WORK chain conditional branches.
 - ∀ public-substrate write (anything ending up in WGlynn/JARVIS public mirror)
 - ∀ primitive at promotion-time (does description read well cold?)
 - ∀ hook design (purpose clear from source alone?)
-- siblings: [P·what-would-will-do], [P·recursive-self-audit-via-wwwd], [F·optimize-for-llms]
+- siblings: [P·what-would-will-do], [P·recursive-self-audit-via-wwwd], [F·optimize-code-for-llms]
 - partner siblings: [P·complete-as-ready-for-critique], [F·advocate-with-receipts]
 
 ## ⊥ Anti-Pattern

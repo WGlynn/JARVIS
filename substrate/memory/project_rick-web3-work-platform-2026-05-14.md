@@ -102,7 +102,7 @@ Rick: USD8 ∨ gov-token (future rev share). Both fit AMD:
 **4. Reserve demo — conversation-to-code pipeline** (Will-added 05:12 ET):
 - TG conv → memory + JARVIS + project commits ∀ JARVIS overlay
 - This session ≡ working proof: ~40 commits × 3 repos ← chat input
-- Connects: `[F·text-code-eternal-loop]` ∧ `[P·code-text-inspiration-loop]` ∧ `[P·chat-to-dag-traceability]`
+- Connects: `[P·bidirectional-reification]` ∧ `[P·code-text-inspiration-loop]` ∧ `[P·chat-to-dag-traceability]`
 - ∀ Rick platform ⇒ ideation/discussion = 1st-class contrib ∈ DAG ∥ code-commits
 - "hard ∀ Shapley/task" softens: chat-contrib gets same attribution scaffold ⇒ fewer special-cases ∧ uniform graph
 - Reserve ⇒ ✗ lead. Pull-triggered only. Lands ∀ Rick-asks-follow-up post-opener.
