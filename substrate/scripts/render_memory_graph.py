@@ -53,14 +53,45 @@ def parse_file(p: Path) -> dict:
 
 
 def build_graph():
+    """Build node list. Skip MEMORY.md + MEMORY_INDEX_*.md + MEMORY_FORMAT_SPEC.md (indexes
+    + format-spec, not primitives). Class-eliminates 'index-files-rendered-as-primitives'
+    confusion in the graph view."""
     nodes = []
     for p in sorted(MEM_DIR.glob('*.md')):
+        # Skip the navigation files; they're index-of-primitives, not primitives themselves
         if p.name.startswith('MEMORY'):
             continue
         info = parse_file(p)
         if info:
             nodes.append(info)
     return nodes
+
+
+def html_escape(s: str) -> str:
+    """Escape HTML-special chars to class-eliminate XSS via primitive bodies (e.g., a
+    description containing `</script>` would otherwise break out of the JSON literal
+    when rendered into the inline JS context)."""
+    return (s
+        .replace('&', '&amp;')
+        .replace('<', '&lt;')
+        .replace('>', '&gt;')
+        .replace('"', '&quot;')
+        .replace("'", '&#39;'))
+
+
+def sanitize_nodes(nodes):
+    """Escape all user-facing string fields before they hit the HTML/JS template."""
+    out = []
+    for n in nodes:
+        out.append({
+            'file': html_escape(n['file']),
+            'slug': html_escape(n['slug']),
+            'name': html_escape(n['name']),
+            'type': html_escape(n['type']),
+            'description': html_escape(n['description']),
+            'refs': [html_escape(r) for r in n['refs']],
+        })
+    return out
 
 
 HTML_TEMPLATE = '''<!doctype html>
@@ -165,10 +196,11 @@ def main() -> int:
     for n in nodes:
         type_counts[n['type']] += 1
     type_summary = ', '.join(f"{t}={c}" for t, c in sorted(type_counts.items()))
+    safe_nodes = sanitize_nodes(nodes)
     html = HTML_TEMPLATE.format(
         n_nodes=len(nodes),
-        type_summary=type_summary,
-        nodes_json=json.dumps(nodes, ensure_ascii=False),
+        type_summary=html_escape(type_summary),
+        nodes_json=json.dumps(safe_nodes, ensure_ascii=False),
     )
     OUT_PATH.write_text(html, encoding='utf-8')
     print(f"rendered {len(nodes)} nodes -> {OUT_PATH}")

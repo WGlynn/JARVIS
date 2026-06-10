@@ -95,3 +95,70 @@ def test_hook_no_unbounded_output(hook_name):
     hook_path = HOOKS_DIR / hook_name
     rc, stdout, _ = run_hook(hook_path, "{}")
     assert len(stdout) < 100_000, f"{hook_name} emitted {len(stdout)} bytes on empty input"
+
+
+# ============ Schema-shape validation (class-eliminates emit-mismatch) ============
+
+PRETOOL_SHAPE_HOOKS = {
+    "coordination-mechanism-gate.py", "wwwd-gate.py", "hiero-gate.py",
+    "research-before-capability-claim-gate.py", "em-dash-augmentation-gate.py",
+    "time-logic-gate.py", "directive-verb-action-class-gate.py",
+    "jarvis-design-goal-gate.py", "entity-context-cross-reference.py",
+    "conflict-detector.py", "partner-draft-formalize-gate.py",
+    "partner-architecture-load-gate.py", "post-generation-recall.py",
+    "thread-resume-detector.py", "atomic-reflection-gate.py",
+}
+
+STOP_SHAPE_HOOKS = {
+    "autonomous-continue.py", "wwwd-correction-detector.py",
+    "post-generation-reflect.py", "decision-capture.py",
+    "self-review-gate.py",
+}
+
+
+def _emits_pretool_shape(payload_str: str, hook_name: str) -> bool:
+    """When a hook surfaces, must use {hookSpecificOutput:{hookEventName,additionalContext}}
+    NOT {decision:'block',reason:...}. PRETOOL_SHAPE_HOOKS must satisfy this."""
+    hook_path = HOOKS_DIR / hook_name
+    rc, stdout, _ = run_hook(hook_path, payload_str)
+    if not stdout.strip() or stdout.strip() == "{}":
+        return True  # silent is always valid
+    try:
+        out = json.loads(stdout)
+    except Exception:
+        return False
+    if "decision" in out and out.get("decision") == "block":
+        return False  # Stop-shape emitted from a PreTool hook
+    return True
+
+
+def _emits_stop_shape(payload_str: str, hook_name: str) -> bool:
+    """Stop-event hooks may emit `{}` (silent) or `{decision:'block',reason:...}`.
+    Must NOT use `hookSpecificOutput.additionalContext` (schema rejects per [P·stop-event-schema-restriction])."""
+    hook_path = HOOKS_DIR / hook_name
+    rc, stdout, _ = run_hook(hook_path, payload_str)
+    if not stdout.strip() or stdout.strip() == "{}":
+        return True
+    try:
+        out = json.loads(stdout)
+    except Exception:
+        return False
+    if "hookSpecificOutput" in out:
+        return False  # PreTool-shape emitted from a Stop hook
+    return True
+
+
+@pytest.mark.parametrize("hook_name", sorted(PRETOOL_SHAPE_HOOKS))
+def test_pretool_hooks_emit_pretool_shape(hook_name):
+    if not (HOOKS_DIR / hook_name).exists():
+        pytest.skip(f"{hook_name} not present in this checkout")
+    assert _emits_pretool_shape("{}", hook_name), \
+        f"{hook_name} emitted Stop-shape from a PreToolUse hook"
+
+
+@pytest.mark.parametrize("hook_name", sorted(STOP_SHAPE_HOOKS))
+def test_stop_hooks_emit_stop_shape(hook_name):
+    if not (HOOKS_DIR / hook_name).exists():
+        pytest.skip(f"{hook_name} not present in this checkout")
+    assert _emits_stop_shape("{}", hook_name), \
+        f"{hook_name} emitted PreTool-shape from a Stop hook (forbidden per [P·stop-event-schema-restriction])"
