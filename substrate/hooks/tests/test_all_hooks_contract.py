@@ -24,17 +24,29 @@ SKIP = {
     "phone-ping.py",  # makes external API calls
 }
 
+# CLI utilities that live in the hooks dir but are NOT stdin-JSON hooks.
+# They are argv-driven (and some have side effects or make API calls), so the
+# universal JSON-in/JSON-out contract does not apply to them.
+CLI_TOOLS = {
+    "chain.py",  # session-chain CLI: `chain.py append|checkpoint|finalize|...`
+    "replay-proposal.py",  # argparse CLI, requires session_id, replays via LLM API
+    "memory-exporter.py",  # manual/scheduled exporter; running it writes MEMORY_EXPORT.json
+}
+
 
 def discover_hooks() -> list[Path]:
     """Discover hooks by convention.
     - Files starting with `_` are utility/helper modules (e.g., `_telemetry.py`, `_telemetry_rotate.py`), not hooks.
-    - Explicit SKIP set for network-touching hooks.
+    - Files ending `.test.py` are self-test scripts (e.g., `proposal-scraper.test.py`), not hooks.
+    - Explicit SKIP set for network-touching hooks; CLI_TOOLS for argv-driven utilities.
     Class-eliminates 'new utility file accidentally tested as a hook' regression."""
     out = []
     for p in HOOKS_DIR.glob("*.py"):
         if p.name.startswith("_"):
             continue
-        if p.name in SKIP:
+        if p.name.endswith(".test.py"):
+            continue
+        if p.name in SKIP or p.name in CLI_TOOLS:
             continue
         out.append(p)
     return sorted(out)
