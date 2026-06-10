@@ -183,12 +183,14 @@ def sync_hooks(apply: bool) -> dict:
     for hook_dir in LOCAL_HOOKS:
         if not hook_dir.exists():
             continue
-        for src in sorted(hook_dir.glob("*.py")):
+        for src in sorted(hook_dir.rglob("*.py")):
             name = src.name
             if name in HOOK_SKIP_LIST:
                 stats["skipped"] += 1
                 continue
-            dest = SUB_HOOKS / name
+            rel = src.relative_to(hook_dir)
+            dest = SUB_HOOKS / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
             if name in HOOK_PRESERVE_IF_PRESENT and dest.exists():
                 stats["skipped"] += 1
                 continue

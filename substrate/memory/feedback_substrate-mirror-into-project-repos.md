@@ -13,7 +13,7 @@ originSessionId: 8625a796-116e-42d8-b5c9-7064589f58ad
 - ∀ mirror = atomic commit + dual-push origin + backup per `[R·backup-remote-pattern]`
 - mirror text ≡ source text (no edits)
 - mirror lives at `<project>/docs/jarvis-substrate/<layer>_<filename>.md`
-- new substrate doc shipped ⇒ mirror in same loop turn (per `[F·bidirectional-reification]`)
+- new substrate doc shipped ⇒ mirror in same loop turn (per `[P·bidirectional-reification]`)
 
 ## Why
 - A: substrate context lives where work happens — readers don't clone separate repo to understand discipline rules
@@ -43,7 +43,7 @@ originSessionId: 8625a796-116e-42d8-b5c9-7064589f58ad
 - ✗ mirror to project repo but skip dual-push — defeats backup-remote-pattern
 
 ## Sibling rules
-- `[F·bidirectional-reification]` — substrate doc (word) reifies into mirror (code-adjacent context)
+- `[P·bidirectional-reification]` — substrate doc (word) reifies into mirror (code-adjacent context)
 - `[R·backup-remote-pattern]` — every mirror dual-pushes
 - `[F·atomic-commit-pacing]` — each mirror is its own atomic commit
 - `[P·apply-the-rule-you-just-wrote]` — when a NEW substrate layer doc is named/written, the mirror discipline applies immediately

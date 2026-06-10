@@ -30,7 +30,7 @@ originSessionId: 8625a796-116e-42d8-b5c9-7064589f58ad
 
 ## Sibling rules
 - `[F·session-state-commit-gate]` — push requires SESSION_STATE/WAL update; combine with this rule = WAL update is ITS OWN commit, not piggy-backed on substantive change
-- `[F·bidirectional-reification]` — word + code reify each other; the COMMIT BOUNDARY is where the reification crosses (commit message = word, diff = code)
+- `[P·bidirectional-reification]` — word + code reify each other; the COMMIT BOUNDARY is where the reification crosses (commit message = word, diff = code)
 - `[F·diagnose-on-stop]` — every stop event diagnosed; combine with this rule = each commit is a natural stop boundary, but autonomous-run continues across boundaries
 
 ## Trigger

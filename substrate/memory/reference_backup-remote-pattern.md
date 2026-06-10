@@ -49,7 +49,7 @@ Correct: `&&` chain in same command, origin first, backup second.
 ## Sibling rules
 - `[F·atomic-commit-pacing]` — combine: each atomic commit dual-pushes
 - `[F·session-state-commit-gate]` — combine: SESSION_STATE/WAL update commits also dual-push
-- `[F·bidirectional-reification]` — JARVIS substrate docs cross-mirror into vibeswap; mirror commits also dual-push to BOTH vibeswap-origin AND vibeswap-backup
+- `[P·bidirectional-reification]` — JARVIS substrate docs cross-mirror into vibeswap; mirror commits also dual-push to BOTH vibeswap-origin AND vibeswap-backup
 
 ## Trigger
 - ∀ `git push` invocation during autonomous-run

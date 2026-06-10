@@ -44,7 +44,7 @@ Pre-ship gate: feature ✓ ship only when every claimed property in the docs has
 ## Sibling lessons
 - [P·structure-does-the-work] (parent meta-pattern) — THIS primitive is the audit-side of "structure does the work"
 - [P·honesty-as-structural-load-bearing-property] — same shape at protocol-honesty layer (dishonesty unprofitable ⇒ honesty-load-bearing)
-- [P·augmented-mechanism-design] — augment-via-math-invariant ¬ replace-via-policy; this is the audit version
+- [F·augmented-mechanism-design-paper] — augment-via-math-invariant ¬ replace-via-policy; this is the audit version
 - [P·audit-fork-loses-hardness] (AA#1) — different audit failure mode (parent rejection-branches lost in fork); THIS is design-time origination class
 - [P·apply-the-rule-you-just-wrote] — apply this rule to future work immediately
 - [P·gate-stacking-asymmetric-cost] — sibling: cost(redundant cap) << cost(missed property)
