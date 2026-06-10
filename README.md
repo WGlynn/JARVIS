@@ -45,10 +45,19 @@ The eight layers above describe the architecture. The modules below are concrete
 - **If you want to verify**: [`verify/`](./verify/) has five reader-runnable checks against the live system.
 - **If you want the kernel framing**: JARVIS is to LLM substrates what an OS is to hardware substrates. The CPU is interchangeable. The kernel is not. The applications run on the kernel.
 
-## What's *not* in this repo
+## What *is* and *isn't* in this repo
 
-- **Code already published in [`vibeswap`](https://github.com/wglynn/vibeswap)** — hooks, jarvis-bot, papers, mechanism-design specs. Linked, not duplicated.
-- **Personal memory and partner-facing artifacts** — these stay private by design. The architecture is shown; the contents are not.
+**In this repo (as of 2026-06-09 merge):**
+- `substrate/` — the live hook + memory + cron-prompt + Python-wrapper substrate, importable as a Python package. Formerly hosted at `WGlynn/jarvis-substrate`.
+- `installer/` — kernel install scripts. Formerly hosted at `WGlynn/jarvis-os`.
+- `papers/` — 125 markdown papers (59 with PDF companions), including all the augmented-X series, the Shapley + fairness math papers, the VibeSwap mechanism-design specs that were here previously, and the canonical-thinking corpus that used to live only in `vibeswap/docs/research/papers/`.
+- `01-08 layer dirs/` — the architecture-description essays per layer.
+- `verify/` — reader-runnable verification scripts.
+
+**Not in this repo (and why):**
+- **VibeSwap product code** — the Solidity contracts, the React frontend, the Python oracle. Those live in [`vibeswap`](https://github.com/wglynn/vibeswap) because they are a separate product, not a JARVIS substrate concern. JARVIS runs against many substrates; VibeSwap is one of them.
+- **The full personal memory store** — the local `~/.claude/projects/.../memory/` has 524 primitive / feedback / project / reference files; 412 are mirrored here via `substrate/memory/` after scrub-list filtering for partner-engagement content, NDA-locked material, personal addresses, and API keys. The 112 filtered files stay local by design.
+- **Hooks with hardcoded personal content** — e.g. partner-name regex lists, personal email in docstrings. Sanitized variants are shipped; the originals stay local.
 - **Secrets** — no tokens, no keys, no fly.io app names that aren't already public.
 
 ## License
