@@ -158,6 +158,17 @@ def sync_memory(apply: bool) -> dict:
             d = check_discretion_frontmatter(head)
             if d:
                 scrubbed_names.append(f"{src.name} (frontmatter: discretion={d})")
+                # Retroactive cleanup: if previously-mirrored copy exists, DELETE it.
+                # Class-eliminates 'flag added after first mirror, leaked copy persists.'
+                # Note: git history on public repo still retains pre-flag content — that's a
+                # separate class documented in substrate/ADOPTION.md (history-leakage).
+                dest = SUB_MEMORY / src.name
+                if dest.exists() and apply:
+                    try:
+                        dest.unlink()
+                        print(f"  retroactive-removed: {src.name} (discretion={d})")
+                    except Exception:
+                        pass
                 continue
         except Exception:
             pass
