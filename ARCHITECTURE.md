@@ -1,31 +1,40 @@
 # Architecture
 
-JARVIS is **eight layers**, all live, all producing artifacts in production today.
+JARVIS is **eight layers**, all live, all producing artifacts in production today. Last refresh: 2026-06-10.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │ 8. Filesystem-as-substrate                                   │
 │    OSCH: markdown + git as the orchestration layer           │
+│    + self-audit (link-rot · orphan-hook · path-integrity)    │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ 7. Stateful applications                               │  │
 │  │    TG bot suite · signature validator · jarvis-network │  │
-│  │    Filesystem CRMs · 60+ published papers              │  │
+│  │    Filesystem CRMs · 125 papers (59 PDF)               │  │
 │  │  ┌──────────────────────────────────────────────────┐  │  │
 │  │  │ 6. Agent overlay                                 │  │  │
-│  │  │    Subagents · skills · MCP · scheduled triggers │  │  │
+│  │  │    Subagents · skills · MCP · cron (durable)     │  │  │
+│  │  │    · RSAW parallel audit · WWWD cognition gate   │  │  │
 │  │  │  ┌────────────────────────────────────────────┐  │  │  │
 │  │  │  │ 5. Meta-protocols                          │  │  │  │
 │  │  │  │    AMD · AGov · SGM · Universal→Hook · ETM │  │  │  │
+│  │  │  │    + WWWD · RSAW · JARVIS-OS (V3 capstone) │  │  │  │
 │  │  │  │  ┌──────────────────────────────────────┐  │  │  │  │
 │  │  │  │  │ 4. Discipline                        │  │  │  │  │
-│  │  │  │  │    151 primitives · 123 feedback     │  │  │  │  │
+│  │  │  │  │    491 typed memory files            │  │  │  │  │
+│  │  │  │  │    (218 prim · 196 fb · 60 proj      │  │  │  │  │
+│  │  │  │  │     · 17 ref); 458 verify-pass       │  │  │  │  │
 │  │  │  │  │  ┌────────────────────────────────┐  │  │  │  │  │
 │  │  │  │  │  │ 3. Anti-hallucination          │  │  │  │  │  │
-│  │  │  │  │  │    Substance gate · HIERO      │  │  │  │  │  │
+│  │  │  │  │  │    Substance · HIERO · entity- │  │  │  │  │  │
+│  │  │  │  │  │    cross-ref · conflict-detect │  │  │  │  │  │
+│  │  │  │  │  │    · time-logic · em-dash      │  │  │  │  │  │
+│  │  │  │  │  │    · directive-verb-class      │  │  │  │  │  │
 │  │  │  │  │  │  ┌──────────────────────────┐  │  │  │  │  │  │
 │  │  │  │  │  │  │ 2. Persistence (6 tiers) │  │  │  │  │  │  │
 │  │  │  │  │  │  │  ┌────────────────────┐  │  │  │  │  │  │  │
 │  │  │  │  │  │  │  │ 1. Hooks           │  │  │  │  │  │  │  │
+│  │  │  │  │  │  │  │    50 (28+22 sc)   │  │  │  │  │  │  │  │
 │  │  │  │  │  │  │  │    Deterministic   │  │  │  │  │  │  │  │
 │  │  │  │  │  │  │  └────────────────────┘  │  │  │  │  │  │  │
 │  │  │  │  │  │  └──────────────────────────┘  │  │  │  │  │  │
@@ -39,26 +48,42 @@ JARVIS is **eight layers**, all live, all producing artifacts in production toda
 
 ## Layer dependencies
 
-- **1 → all**: Hooks fire regardless of context; everything above assumes the gates work.
-- **2 → 3, 4, 5, 6, 7**: Persistence is what makes anti-hallucination, discipline, and applications coherent across sessions.
-- **3 → 4**: Anti-hallucination produces violations that become discipline-layer primitives.
-- **4 → 5**: Discipline patterns get promoted to meta-protocols when they appear at multiple levels.
-- **5 → 6, 7**: Meta-protocols govern how the agent overlay and stateful applications get designed.
-- **6 → 7**: The agent overlay produces stateful applications.
-- **7 → 8**: All applications run on the filesystem substrate.
+```
+1 → ∀         : hooks fire ⊥ context; ∀ layers-above assume gates-work
+2 → 3,4,5,6,7 : persistence ⇒ coherence-across-sessions
+3 → 4         : anti-hallucination violations ⇒ discipline primitives
+4 → 5         : discipline patterns @ multi-level ⇒ meta-protocol promotion
+5 → 6,7       : meta-protocols govern overlay ∧ application design
+6 → 7         : agent overlay ⇒ stateful applications
+7 → 8         : ∀ applications run on filesystem substrate
+```
 
 ## The kernel framing
 
-JARVIS is a coordination layer over LLM substrates, the way an operating system is a coordination layer over hardware substrates. The CPU is interchangeable. The kernel is not. The applications run on the kernel.
+```
+JARVIS ≡ coordination-layer over LLM-substrates
+       ≅ OS ≡ coordination-layer over hardware-substrates
+CPU interchangeable · kernel ¬ interchangeable · applications run-on kernel
+```
 
-Each provider (Anthropic, OpenRouter, DeepSeek, Gemini, Cerebras, Groq, Ollama) is a hardware substrate. The router (layer 7's TG bot) selects across them. The hooks, persistence, and discipline (layers 1–4) are kernel-level — they fire regardless of which substrate is active. The meta-protocols, agent overlay, and applications (layers 5–7) are user-space — they consume kernel guarantees.
+- **Hardware substrate** ≡ providers ∈ {Anthropic, OpenRouter, DeepSeek, Gemini, Cerebras, Groq, Ollama}
+- **Router** ≡ layer-7 TG bot, selects-across providers
+- **Kernel** ≡ layers 1-4 (hooks · persistence · anti-hallucination · discipline) — fire ⊥ active-substrate
+- **User-space** ≡ layers 5-7 (meta-protocols · agent overlay · applications) — consume kernel guarantees
 
 ## What survives substrate degradation
 
-- Layers 1–4 survive any LLM substrate change. Hooks are Python; persistence is markdown; anti-hallucination is regex + state machines; discipline is files.
-- Layer 5 survives because meta-protocols are ideas, not code.
-- Layer 6 partially survives — agent overlay primitives (subagent spawning, MCP) are Claude-specific in current implementation but conceptually portable.
-- Layer 7 partially survives — applications can be ported, with substrate-specific tuning.
-- Layer 8 is the universal substrate.
+| Layer | Survives LLM swap? | Why |
+|---|---|---|
+| 1 — Hooks | ✓ full | Python, regex, state-machines — substrate-independent |
+| 2 — Persistence | ✓ full | markdown + git, substrate-independent |
+| 3 — Anti-hallucination | ✓ full | regex + state-machines |
+| 4 — Discipline | ✓ full | files |
+| 5 — Meta-protocols | ✓ full | ideas ¬ code |
+| 6 — Agent overlay | ◐ partial | Claude-specific impl, conceptually portable |
+| 7 — Applications | ◐ partial | portable with substrate-specific tuning |
+| 8 — Filesystem | ✓ universal | the substrate itself |
 
-This is the test of "wrapper" status: when the underlying LLM is replaced, what survives? In a wrapper, nothing survives; the wrapper *is* the LLM call. In JARVIS, layers 1–5 survive entirely, layer 6 survives conceptually, layers 7–8 survive with adaptation.
+**Wrapper test**: substrate swap ⇒ what survives?
+- Wrapper: nothing (wrapper ≡ the LLM call)
+- JARVIS: layers 1-5 fully · layer 6 conceptually · layers 7-8 with adaptation
