@@ -31,12 +31,19 @@ jobs:
       - name: Layer 8 audit (link-rot detector)
         run: |
           cd substrate/hooks/layer8-audit && python layer8_audit.py
-          if grep -q "Broken inter-primitive references *: *0$" report.md && \
-             grep -q "Broken hook scripts in settings.json *: *0$" report.md; then
-            echo "Layer 8 clean."
-          else
-            echo "::warning::Layer 8 audit surfaced findings. Review report.md."
-            head -100 report.md
+          BROKEN_REFS=$(grep -oP "Broken inter-primitive references\s*\|\s*\K\d+" report.md || echo "999")
+          BROKEN_HOOKS=$(grep -oP "Broken hook scripts in settings.json\s*\|\s*\K\d+" report.md || echo "999")
+          echo "Layer 8: $BROKEN_REFS broken refs, $BROKEN_HOOKS broken hooks"
+          # Hard-fail when refs exceed current baseline (46) — class-elimination requires monotonic decrease
+          BASELINE_REFS=46
+          if [ "$BROKEN_REFS" -gt "$BASELINE_REFS" ]; then
+            echo "::error::Layer 8 regression: $BROKEN_REFS broken refs > baseline $BASELINE_REFS. Fix before merge."
+            head -200 report.md
+            exit 1
+          fi
+          if [ "$BROKEN_HOOKS" -ne "0" ]; then
+            echo "::error::Layer 8: $BROKEN_HOOKS broken hook scripts in settings.json. Must be 0."
+            exit 1
           fi
 
   hook-smoke-tests:
