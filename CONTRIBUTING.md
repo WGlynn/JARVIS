@@ -47,6 +47,48 @@ JARVIS is a personal substrate first. The author runs it as their daily Claude C
 - Compatibility patches (Python version, Windows encoding, etc.).
 - Verify-script additions for already-shipped architectural claims.
 
+## 10-minute recipes (concrete templates)
+
+These are copy-paste starting points so you don't have to figure out the scaffolding.
+
+### Add a PreToolUse hook
+
+```bash
+cd substrate/hooks
+cp templates/hook-pretool-template.py your-hook-name.py
+# edit DETECT_PATTERNS and ADVISORY_MESSAGE inside
+# register in ~/.claude/settings.json under PreToolUse with the right matcher
+# add a payload sample to tests/test_hook_contract.py
+pytest tests/ -k your-hook  # smoke-test
+```
+
+The template handles fail-quiet, telemetry logging, partner-facing path filtering, and the JSON output contract. Fill in three constants.
+
+### Add a Rust hook
+
+```bash
+cd substrate/hooks-rs
+cargo new --bin your-hook-name
+# in your-hook-name/Cargo.toml: add `jarvis-hook = { path = "../jarvis-hook" }`
+# add to workspace members in hooks-rs/Cargo.toml
+# write hook in your-hook-name/src/main.rs (copy from existing 3 for patterns)
+cargo build --release
+```
+
+See `substrate/hooks-rs/ROADMAP.md` for which of the 3 reference shapes (autonomous-continue / coordination-mechanism-gate / em-dash-augmentation-gate) is closest to your hook.
+
+### Run the full test suite
+
+```bash
+cd substrate/hooks && pytest tests/ -v                                   # python hook contract tests (parametrized over all hooks)
+cd substrate/hooks-rs && cargo test --release                            # rust hook tests
+python verify/verify_primitive_corpus.py                                  # corpus integrity
+python verify/verify_no_secrets.py                                        # no leaks
+cd substrate/hooks/layer8-audit && python layer8_audit.py                 # link-rot audit
+```
+
+All five run in CI on push. Layer 8 hard-fails when broken-ref count > baseline (46 as of 2026-06-10).
+
 ## What gets slow-tracked or declined
 
 - Refactors of the existing substrate that don't change behavior. The substrate is shaped by usage, not engineering preference.
