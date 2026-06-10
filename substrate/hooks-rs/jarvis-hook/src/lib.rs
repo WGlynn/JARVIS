@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 
 pub use serde_json::{json, Value};
 
-pub type Err = Box<dyn std::error::Error>;
-pub type R<T> = Result<T, Err>;
+pub type BoxError = Box<dyn std::error::Error>;
+pub type R<T> = Result<T, BoxError>;
 
 // ============ Payload ============
 
@@ -74,7 +74,13 @@ pub fn emit_silent() {
     let _ = writeln!(io::stdout(), "{{}}");
 }
 
+/// PreTool-shaped output only. Stop events use emit_block; this caller-side guard
+/// prevents accidental cross-contamination per [P·stop-event-schema-restriction].
 pub fn emit_additional_context(event: &str, msg: &str) {
+    debug_assert!(
+        event != "Stop" && event != "StopFailure",
+        "Stop events do not support hookSpecificOutput.additionalContext; use emit_block instead"
+    );
     let w = PreToolWrap {
         hook_specific_output: PreToolCtx {
             hook_event_name: event,
@@ -106,7 +112,9 @@ pub fn home() -> PathBuf {
         return PathBuf::from(h);
     }
     if let (Ok(d), Ok(p)) = (env::var("HOMEDRIVE"), env::var("HOMEPATH")) {
-        return PathBuf::from(format!("{}{}", d, p));
+        let mut pb = PathBuf::from(d);
+        pb.push(p.trim_start_matches(['\\', '/']));
+        return pb;
     }
     if let Ok(u) = env::var("USERPROFILE") {
         return PathBuf::from(u);
@@ -127,7 +135,6 @@ pub fn mtime_secs(p: &std::path::Path) -> Option<u64> {
     mt.duration_since(UNIX_EPOCH).ok().map(|d| d.as_secs())
 }
 
-/// Tail-read the last `n` bytes of a file as UTF-8 (lossy on bad bytes).
 /// Used by stop hooks that scan file ends for completion markers.
 pub fn tail_utf8(p: &std::path::Path, n: u64) -> R<String> {
     use std::io::{Seek, SeekFrom};
@@ -135,17 +142,12 @@ pub fn tail_utf8(p: &std::path::Path, n: u64) -> R<String> {
     let len = f.metadata()?.len();
     let start = len.saturating_sub(n);
     f.seek(SeekFrom::Start(start))?;
-    let mut buf = Vec::with_capacity(n as usize);
+    let cap = usize::try_from(n).unwrap_or(usize::MAX);
+    let mut buf = Vec::with_capacity(cap);
     f.take(n).read_to_end(&mut buf)?;
     Ok(String::from_utf8_lossy(&buf).into_owned())
 }
 
 pub fn read_text(p: &std::path::Path) -> R<String> {
     Ok(std::fs::read_to_string(p)?)
-}
-
-// ============ Re-exports (so binaries don't need to depend on serde_json directly) ============
-
-pub mod re {
-    pub use serde_json;
 }
