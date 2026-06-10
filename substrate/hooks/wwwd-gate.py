@@ -217,6 +217,8 @@ def main() -> int:
 
     tool_name = payload.get("tool_name", "")
     tool_input = payload.get("tool_input", {}) or {}
+    if not isinstance(tool_input, dict):  # malformed payload (non-dict tool_input) must fail-quiet
+        tool_input = {}
 
     # WWWD fires on Write|Edit and Agent dispatch per the spec.
     if tool_name not in ("Write", "Edit", "Agent"):

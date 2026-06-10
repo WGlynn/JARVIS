@@ -239,6 +239,8 @@ def main():
         return 0
 
     tool_input = data.get("tool_input") or data.get("toolInput") or {}
+    if not isinstance(tool_input, dict):  # malformed payload (non-dict tool_input) must fail-quiet
+        tool_input = {}
     content = (
         tool_input.get("content")
         or tool_input.get("new_string")

@@ -30,6 +30,8 @@ def main() -> int:
         return 0
 
     ti = payload.get('tool_input') or payload.get('toolInput') or {}
+    if not isinstance(ti, dict):  # malformed payload (non-dict tool_input) must fail-quiet
+        ti = {}
     tool_name = payload.get('tool_name') or payload.get('toolName') or ''
     if tool_name not in ('Write', 'Edit'):
         print('{}')
