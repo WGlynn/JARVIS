@@ -17,6 +17,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Fetch main (for fork-PR safety)
+        run: |
+          # Round-10 class-fix: fork PRs don't auto-fetch origin/main.
+          # Explicit fetch class-eliminates 'baseline check silently passes
+          # because origin/main is unknown reference in fork PRs.'
+          git fetch origin main:refs/remotes/origin/main || git fetch origin main
       - name: Compare baselines
         run: |
           MAIN_BASELINE=$(git show origin/main:.github/workflows/ci.yml 2>/dev/null | grep -oP 'BASELINE_REFS=\K\d+' | head -1 || echo "0")
