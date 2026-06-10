@@ -152,6 +152,15 @@ def sync_memory(apply: bool) -> dict:
     if not LOCAL_MEMORY.exists():
         return stats
     for src in sorted(LOCAL_MEMORY.glob("*.md")):
+        # Explicit frontmatter discretion flag (per #8 audit, class-eliminates paraphrase bypass)
+        try:
+            head = src.read_text(encoding='utf-8', errors='replace')[:2000]
+            d = check_discretion_frontmatter(head)
+            if d:
+                scrubbed_names.append(f"{src.name} (frontmatter: discretion={d})")
+                continue
+        except Exception:
+            pass
         skip, reason = should_scrub_memory(src)
         if skip:
             stats["scrubbed"] += 1
@@ -175,6 +184,28 @@ def sync_memory(apply: bool) -> dict:
             stats["same"] += 1
     stats["scrubbed_names"] = scrubbed_names[:10]
     return stats
+
+
+def check_discretion_frontmatter(content: str) -> str | None:
+    """Per #8 audit suggestion: explicit > implicit. Memory files can opt out of
+    public sync via YAML frontmatter:
+      discretion: nda           ⇒ never mirror
+      discretion: partner-private ⇒ never mirror
+      discretion: internal      ⇒ never mirror
+    Returns the discretion value if set, None otherwise."""
+    if not content.startswith('---'):
+        return None
+    end = content.find('---', 3)
+    if end < 0:
+        return None
+    frontmatter = content[3:end]
+    for line in frontmatter.splitlines():
+        line = line.strip()
+        if line.startswith('discretion:'):
+            val = line.split(':', 1)[1].strip().strip('"').strip("'").lower()
+            if val in ('nda', 'partner-private', 'internal', 'private'):
+                return val
+    return None
 
 
 def sync_hooks(apply: bool) -> dict:
