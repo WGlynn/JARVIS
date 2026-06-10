@@ -43,7 +43,7 @@ Self-perpetuation before any other work. The loop NEVER dies.
 1. **Engagement-aware pause**: for each shipped post (last 14d), query non-WGlynn replies. ANY found → PAUSE: calendar Tomato 1-min `Odysseus paused: reply on #XXXX needs Will review`. Exit. Do NOT duplicate-ping if same state was pinged within 6h.
 2. **Selection (active > new per "almost always tbh")**: pull top-10 most-recently-active discussions. Pull next queued topic. Active-thread overlap → reply. Else cold-start in Ideas category.
 3. **Convergence-proof gate**: VibeSwap artifact + Odysseus-side anchor (live) + structural overlap defensible + substance ADDS to thread. Fails → mark [✗] in queue, advance, retry. 3 fails → halt + ping Will.
-4. **Compute IPT budget**: for REPLY: `python ~/.claude/scripts/odysseus_discovery.py --budget-for <N>`. For NEW: budget=200. Read thread's last 10 comments + OP body.
+4. **Compute IPT budget**: for REPLY: `python C:/Users/Will/.claude/scripts/odysseus_discovery.py --budget-for <N>`. For NEW: budget=200. Read thread's last 10 comments + OP body.
 5. **Draft to disk**: `Desktop/odysseus-day-N-YYYY-MM-DD.md` with metadata.
 6. **AI-tell scrub**: U+2014, U+2013, listicle labels, parallel headers, meta-narration, AI-cadence closers, "worth flagging"/"worth noting", listicle stacks, "this composes with..." bullets, > 1 @-citation.
 7. **IPT word-budget gate**: word_count > budget → rewrite. Default target ≤ 150w. Hard ceiling 300. If cannot achieve ≤ budget → exit silent.
@@ -66,7 +66,7 @@ After COMMANDMENT 2 (whether dispatch happened or not):
 
 Runs every cron fire regardless of dispatch state. Burn-compute compounds into substrate quality per [J·subscription-cancelled-dont-stop].
 
-**Public-propagation requirement** (per [F·advice-mining-must-publish-to-public-graph]): every C2.5 write MUST be mirrored into `./cron-prompts/` and pushed to `WGlynn/jarvis-substrate` within the same cron tick. Scrub-list applies.
+**Public-propagation requirement** (per [F·advice-mining-must-publish-to-public-graph]): every C2.5 write MUST be mirrored into `C:/Users/Will/jarvis-os-public/cron-prompts/` and pushed to `WGlynn/jarvis-substrate` within the same cron tick. Scrub-list applies.
 
 ---
 

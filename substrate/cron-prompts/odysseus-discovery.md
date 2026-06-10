@@ -41,10 +41,10 @@ The campaign-state machine. Advance it; do not break invariants.
 3. **Controversy pause**: `gh api repos/pewdiepie-archdaemon/odysseus/issues?state=open&since=<24h>` → if any title contains URGENT/outage/security → exit + ping
 
 ### Steps
-1. **Discovery script**: `python ~/.claude/scripts/odysseus_discovery.py --min-score 5 --limit 10`. Parse JSON. `candidates_above_threshold == 0` → exit silent.
+1. **Discovery script**: `python C:/Users/Will/.claude/scripts/odysseus_discovery.py --min-score 5 --limit 10`. Parse JSON. `candidates_above_threshold == 0` → exit silent.
 2. **Filter**: skip `wglynn_already_commented == true`, skip ids already in campaign-log, skip `Last update > 7 days`.
 3. **Engagement-aware pause**: for each prior WGlynn comment (last 14d), query non-WGlynn replies. ANY found → PAUSE: calendar Tomato 1-min `Odysseus paused: reply on #XXXX needs Will review`. Exit. (Do NOT duplicate-ping if the same pause-state was already pinged within last 6h.)
-4. **Compute IPT budget**: `python ~/.claude/scripts/odysseus_discovery.py --budget-for <N>`. Budget = clamp(100, 300, ceil(p75(prior_comment_word_counts) × 1.1)). Default target ≤ 150w.
+4. **Compute IPT budget**: `python C:/Users/Will/.claude/scripts/odysseus_discovery.py --budget-for <N>`. Budget = clamp(100, 300, ceil(p75(prior_comment_word_counts) × 1.1)). Default target ≤ 150w.
 5. **Convergence-proof gate**: VibeSwap artifact + Odysseus-side anchor (live) + structural overlap defensible + substance ADDS what thread hasn't surfaced. Fails → exit silent.
 6. **Draft to disk**: `Desktop/odysseus-discovery-YYYY-MM-DD-NNNN.md` with metadata (budget, score, candidate).
 7. **AI-tell scrub**: U+2014, U+2013, `Three motivating cases`/`Phase 1/2`, parallel headers, meta-narration, AI-cadence closers, "worth flagging"/"worth noting", listicle stacks, "this composes with..." bullets, > 1 @-citation.
@@ -82,7 +82,7 @@ After COMMANDMENT 2 (whether dispatch happened or not):
 
 Burn-compute alignment: this commandment runs every cron fire regardless of dispatch state. Per [J·subscription-cancelled-dont-stop] + [F·burn-compute-toward-mission], cycles spent reading senior-dev advice compound into our substrate quality at zero marginal cost.
 
-**Public-propagation requirement** (per [F·advice-mining-must-publish-to-public-graph]): after any C2.5 write to `_advice-actionable-*` or `_advice-mined-log.md`, the corresponding files MUST be copied into `./cron-prompts/` and pushed to `WGlynn/jarvis-substrate` within the same cron tick. Local-only entries violate the announcement Discussion #3684 which stated the mechanism is inspectable live, not promised. Scrub-list applies (no partner names, no `nda-locked/`, no USD8 layers 6-8, no Anthropic engagement specifics).
+**Public-propagation requirement** (per [F·advice-mining-must-publish-to-public-graph]): after any C2.5 write to `_advice-actionable-*` or `_advice-mined-log.md`, the corresponding files MUST be copied into `C:/Users/Will/jarvis-os-public/cron-prompts/` and pushed to `WGlynn/jarvis-substrate` within the same cron tick. Local-only entries violate the announcement Discussion #3684 which stated the mechanism is inspectable live, not promised. Scrub-list applies (no partner names, no `nda-locked/`, no USD8 layers 6-8, no Anthropic engagement specifics).
 
 ---
 
