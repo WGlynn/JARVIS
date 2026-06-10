@@ -56,6 +56,8 @@ originSessionId: d3ae9e64-adfb-4ba8-aa55-fee4f96e0207
 
 > *"look how just a little research literally gave you the opposite of your original answer, this is an anti-hallucination gate worthy finding"* — Will, 2026-06-10
 
+**Credit: Rick Beato (usd8.fi / OpenZeppelin), TG 2026-06-10.** Rick's question — *"how does this work? who is doing the default prompt assessment?"* — exposed the regex-only first-match-wins weakness in coordination-mechanism-gate.py. Three speculative reply-drafts collapsed when actual research (WebSearch) returned the opposite answer (Codex CLI ships claude-compatible hook system w/ CLAUDE_PLUGIN_ROOT env var). The AA#4 anti-hallucination gate exists because Rick poked at it. Attribution holds in the contribution graph: [P·shapley-5-axiom-set] applied to substrate-improvement contributions.
+
 Joins the Audit Arsenal:
 - AA#1 [P·audit-fork-loses-hardness]
 - AA#2 [F·claim-needs-structural-enforcer]

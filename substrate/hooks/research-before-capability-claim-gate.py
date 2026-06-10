@@ -2,7 +2,21 @@
 """AA#4 — Research-Before-Capability-Claim gate.
 PreToolUse Write|Edit. Scans partner-facing draft content for capability-assertion
 patterns. If ≥2 hits AND no WebSearch/WebFetch/gh in last 30 min telemetry, surfaces
-advisory. Augmentation, not block. Per [F·no-bullshit-do-the-research]. Will 2026-06-10."""
+advisory. Augmentation, not block. Per [F·no-bullshit-do-the-research]. Will 2026-06-10.
+
+Credit: Rick Beato (usd8.fi / OpenZeppelin), TG 2026-06-10. His question
+'how does this work? who is doing the default prompt assessment?' exposed
+the regex-only weakness in coordination-mechanism-gate.py; 3 speculative
+drafts collapsed when actual research returned the opposite answer.
+The AA#4 gate exists because Rick poked at it.
+
+⚠ COUPLING DEPENDENCY: this gate reads from research_tool_calls.jsonl
+which is populated by sibling hook ~/.claude/hooks/research-tool-call-logger.py
+(PostToolUse on WebSearch|WebFetch|Bash). If the logger is removed or
+disabled, this gate falls back to 'no recent research' and over-fires.
+The two hooks are coupled via filesystem at:
+  ~/.claude/projects/C--Users-Will/memory/_system/research_tool_calls.jsonl
+Both files reference this path. Removing one breaks the other's signal."""
 
 import json
 import re
