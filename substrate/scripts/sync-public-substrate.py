@@ -419,6 +419,56 @@ def emit_chain_commitment(apply: bool) -> dict:
     return {"ok": True, "head": head, "height": height}
 
 
+def _load_private_patterns():
+    """Block-economy / stealth markers live in a LOCAL-ONLY file (state/, never
+    synced) so the PUBLIC copy of this script carries no codewords. Add/remove
+    patterns there, not here."""
+    fp = Path(HOME) / ".claude" / "state" / "private-leak-patterns.txt"
+    pats = []
+    try:
+        for line in fp.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#"):
+                pats.append(re.compile(line, re.IGNORECASE))
+    except Exception:
+        pass
+    return pats
+
+
+PRIVATE_LEAK_MARKERS = _load_private_patterns()
+# also hold back any memory file whose CONTENT matches a private marker
+SCRUB_CONTENT_PATTERNS += PRIVATE_LEAK_MARKERS
+
+
+def _scan_private_leak():
+    """Fail-closed backstop for the 2026-06-11 stealth decision: scan everything
+    staged in the PUBLIC substrate for block-economy / krabby-patty markers. The
+    structural protection (private files live outside sync dirs) + the scrub-list
+    should already prevent any leak; this makes it un-bypassable. Returns a list of
+    (relpath, marker) offenders -- non-empty => abort the commit/push."""
+    offenders = []
+    if not SUBSTRATE.exists():
+        return offenders
+    for root, dirs, files in os.walk(SUBSTRATE):
+        if ".git" in root:
+            continue
+        for fn in files:
+            if not fn.endswith((".md", ".py", ".json", ".txt")):
+                continue
+            if fn == "sync-public-substrate.py":
+                continue  # this script legitimately references the scan logic
+            p = Path(root) / fn
+            try:
+                txt = p.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            for pat in PRIVATE_LEAK_MARKERS:
+                if pat.search(fn) or pat.search(txt):
+                    offenders.append((str(p.relative_to(SUBSTRATE)), pat.pattern))
+                    break
+    return offenders
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--apply", action="store_true", help="actually copy files (default is dry-run)")
@@ -472,6 +522,13 @@ def main():
         print(f"chain:   {chain_stats.get('reason')}")
 
     if args.apply:
+        leaks = _scan_private_leak()
+        if leaks:
+            print("\n✗ ABORTED — block-economy / krabby-patty markers found in the PUBLIC substrate:")
+            for rel, mk in leaks[:12]:
+                print(f"    {rel}  (matched: {mk})")
+            print("  refusing to commit/push. Move these to ~/jarvis-private or memory/nda-locked.")
+            return 2
         changed, msg = git_commit_and_push(push=not args.no_push)
         print(f"git: {msg}" if changed else f"git: {msg}")
 
