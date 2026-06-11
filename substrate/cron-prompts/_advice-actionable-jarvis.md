@@ -143,3 +143,11 @@ Format same as `_advice-actionable-vibeswap.md`.
 - Our substrate state: JARVIS uses Claude's MCP integrations (Gmail, Calendar, Spotify, Google Drive, Microsoft 365). The auth flow is handled by Claude's own server-side OAuth, not by us configuring an MCP client. The `streamablehttp_client` advice applies to *self-hosted* MCP servers — we don't currently run any. If/when JARVIS adopts a self-hosted MCP server for VibeSwap-specific tools (e.g., contract-query, oracle-status), this advice becomes load-bearing.
 - Suggested action: file under "load when JARVIS adds self-hosted MCP servers"; do not action now. Note the 3-tuple unpacking gotcha for future implementers.
 - Will-triage: pending (deferred — no current MCP server to apply to)
+
+## [2026-06-11 12:55 ET] -- Deterministic post-merge audit lane for speed-priority pipelines
+
+- Source: #3163 comment by @RaresKeY 2026-06-10T00:23Z (https://github.com/pewdiepie-archdaemon/odysseus/discussions/3163)
+- Their advice (paraphrase): audited 70 fast open-to-merge merged PRs against current dev; 48 of 70 (~69%) have at least one source-backed follow-up bug note (55 notes total). Conclusion: when merge speed is prioritized, a deterministic post-merge audit lane (re-check merged work against current state, file follow-ups) is the correction mechanism, and the follow-up ratio is the measurable quality signal for the pipeline.
+- Our substrate state: JARVIS cron loops auto-commit and push to WGlynn/jarvis-substrate (substrate-sync every 2h, advice-mirror per fire) with zero post-hoc review lane. Same shape: speed-priority unattended writes, no measured follow-up ratio. VibeSwap dual-remote pushes share the shape when sessions move fast.
+- Suggested action: small audit cron (weekly) that samples recent auto-commits in jarvis-substrate, re-checks them against current substrate state (broken links, stale pointers, scrub-list violations), and files notes to _primitives-pending.md. Track the follow-up ratio over time as the pipeline quality metric.
+- Will-triage: pending
