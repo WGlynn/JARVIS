@@ -194,11 +194,14 @@ def cmd_hindsight(args, registry):
             if t in registry:
                 in_count[t] = in_count.get(t, 0) + 1
 
-    # Patterns suggesting hindsight-mistake
+    # Relational contradiction markers only — bare correction-genre lexemes
+    # (drift, mistake, misread, ...) were the 7/10 FP root cause in the
+    # 2026-06-11 triage; a primitive ABOUT mistakes is not itself mistaken.
+    # Known follow-up: pairwise primitive comparison — regex only catches
+    # contradictions that self-declare (found-by-coincidence limitation).
     contradiction_pat = re.compile(
-        r"\b(supersed(es|ed by)|replac(es|ed by)|wrong, fixed|"
-        r"actually wrong|in hindsight|on reflection|that's a hallucination|"
-        r"category error|misread|drift|reverted|mistake)\b",
+        r"(\bsuperseded[ -]by\b|\breplaced by\b|\binvalidated[_ ]by\b|"
+        r"\bcontradicts\b|\breverted\b|\bno longer true\b|outdated:)",
         re.IGNORECASE,
     )
     stale_promise_pat = re.compile(
@@ -215,12 +218,17 @@ def cmd_hindsight(args, registry):
 
     for ref, p in registry.items():
         body_lower = p.body.lower()
-        # Contradiction markers
-        if contradiction_pat.search(body_lower):
-            snippet_m = contradiction_pat.search(body_lower)
+        # Contradiction markers — exempt quoted Will-corrections (lines
+        # starting with > *"), which cite a correction without being one.
+        scan_lower = "\n".join(
+            ln for ln in body_lower.splitlines()
+            if not ln.lstrip().startswith('> *"')
+        )
+        snippet_m = contradiction_pat.search(scan_lower)
+        if snippet_m:
             start = max(0, snippet_m.start() - 30)
-            end = min(len(body_lower), snippet_m.end() + 50)
-            candidates["contradicted"].append((ref, body_lower[start:end].strip()))
+            end = min(len(scan_lower), snippet_m.end() + 50)
+            candidates["contradicted"].append((ref, scan_lower[start:end].strip()))
         # Orphan (nothing cites it, AND it's not a project / user / reference tier where standalone is fine)
         if ref not in in_count and p.kind in ("primitive", "feedback"):
             candidates["orphan"].append((ref, p.kind))
