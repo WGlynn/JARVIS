@@ -191,7 +191,7 @@ def cmd_hindsight(args, registry):
     if args.pairwise:
         return _hindsight_pairwise(args, registry)
 
-    candidates = {"contradicted": [], "orphan": [], "stale_partner": [],
+    candidates = {"contradicted": [], "resolved": [], "orphan": [], "stale_partner": [],
                   "stale_promise": [], "all_refs_dead": []}
 
     # Build out-degree to detect orphans (primitives nothing references)
@@ -206,9 +206,16 @@ def cmd_hindsight(args, registry):
     # 2026-06-11 triage; a primitive ABOUT mistakes is not itself mistaken.
     # The found-by-coincidence limitation (regex only catches contradictions
     # that self-declare) is closed by `hindsight --pairwise` below.
+    #
+    # `replaced by` / `reverted` require a primitive-ref anchor within ~60
+    # chars on the same line: a [X·...]/[[...]] bracket ref, a `*.md` tick,
+    # or a feedback_/primitive_/project_ slug. Without an anchor these words
+    # collide with design-rationale prose, EVM revert narration, and
+    # state-machine labels (4/6 false positives, 2026-06-11 triage).
+    _REF_ANCHOR = r"(?=.{0,60}(?:\[[\w·\-]+\]|\[\[.*?\]\]|`[^`]+\.md`|(?:feedback|primitive|project)_\w+))"
     contradiction_pat = re.compile(
-        r"(\bsuperseded[ -]by\b|\breplaced by\b|\binvalidated[_ ]by\b|"
-        r"\bcontradicts\b|\breverted\b|\bno longer true\b|outdated:)",
+        r"(\bsuperseded[ -]by\b|\breplaced by\b" + _REF_ANCHOR + r"|\binvalidated[_ ]by\b|"
+        r"\bcontradicts\b|\breverted\b" + _REF_ANCHOR + r"|\bno longer true\b|outdated:)",
         re.IGNORECASE,
     )
     stale_promise_pat = re.compile(
@@ -235,7 +242,16 @@ def cmd_hindsight(args, registry):
         if snippet_m:
             start = max(0, snippet_m.start() - 30)
             end = min(len(scan_lower), snippet_m.end() + 50)
-            candidates["contradicted"].append((ref, scan_lower[start:end].strip()))
+            snippet = scan_lower[start:end].strip()
+            # Self-documented supersessions: if the primitive declares its own
+            # invalidated_by: frontmatter it has already been audited and
+            # intentionally superseded — route to resolved, not contradicted.
+            # Use _invalidated_by() which reads the frontmatter section; p.body
+            # is post-frontmatter content and will never contain this key.
+            if _invalidated_by(p):
+                candidates["resolved"].append((ref, snippet))
+            else:
+                candidates["contradicted"].append((ref, snippet))
         # Orphan (nothing cites it, AND it's not a project / user / reference tier where standalone is fine)
         if ref not in in_count and p.kind in ("primitive", "feedback"):
             candidates["orphan"].append((ref, p.kind))
