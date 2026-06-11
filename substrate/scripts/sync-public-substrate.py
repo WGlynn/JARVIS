@@ -49,6 +49,7 @@ LOCAL_MEMORY = HOME / ".claude" / "projects" / "C--Users-Will" / "memory"
 LOCAL_HOOKS = [HOME / ".claude" / "hooks", HOME / ".claude" / "session-chain"]
 LOCAL_CRON = HOME / ".claude" / "cron-prompts"
 LOCAL_SCRIPTS = HOME / ".claude" / "scripts"
+LOCAL_CHAIN_INDEX = HOME / ".claude" / "session-chain" / "index.json"
 
 MONOREPO = HOME / "jarvis-monorepo"
 SUBSTRATE = MONOREPO / "substrate"
@@ -56,6 +57,7 @@ SUB_MEMORY = SUBSTRATE / "memory"
 SUB_HOOKS = SUBSTRATE / "hooks"
 SUB_CRON = SUBSTRATE / "cron-prompts"
 SUB_SCRIPTS = SUBSTRATE / "scripts"
+SUB_CHAIN = SUBSTRATE / "_chain"
 
 # Scrub patterns for memory files. Any file whose CONTENT matches one of these
 # stays local.
@@ -386,6 +388,37 @@ def _write_defer_count(n: int) -> None:
         pass
 
 
+def emit_chain_commitment(apply: bool) -> dict:
+    """Unified persistence framework: the session-chain stays LOCAL (its blocks
+    hold raw prompt/response content that must not leak), but it is a hash-chain,
+    so its HEAD HASH cryptographically commits to every block. Publish only that
+    commitment -- tamper-evident, zero content. Same off-chain-storage +
+    public-commitment pattern as integrity-attest over governed files. A future
+    shard node verifies a chain replica against this public head. This is the
+    'local authority -> public commitment -> shard replication' framework that
+    unifies substrate-sync (full content) and the session-chain (commitment only)."""
+    import json
+    import time as _t
+    try:
+        idx = json.loads(LOCAL_CHAIN_INDEX.read_text(encoding="utf-8"))
+    except Exception as e:
+        return {"ok": False, "reason": f"no local chain index ({e})"}
+    head = idx.get("head")
+    height = len(idx.get("blocks", []))
+    commitment = {
+        "head_hash": head,
+        "height": height,
+        "committed_at": int(_t.time()),
+        "framework": "local-authority -> public-commitment -> shard-replication",
+        "note": "blocks stay local (raw prompt/response); this head hash commits the full chain.",
+    }
+    if apply:
+        SUB_CHAIN.mkdir(parents=True, exist_ok=True)
+        (SUB_CHAIN / "commitment.json").write_text(
+            json.dumps(commitment, indent=2) + "\n", encoding="utf-8")
+    return {"ok": True, "head": head, "height": height}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--apply", action="store_true", help="actually copy files (default is dry-run)")
@@ -430,6 +463,13 @@ def main():
     script_stats = sync_dir(LOCAL_SCRIPTS, SUB_SCRIPTS, "*.py", args.apply)
     print(f"scripts: +{script_stats['copied']} added  ~{script_stats['updated']} updated  "
           f"={script_stats['same']} same")
+
+    chain_stats = emit_chain_commitment(args.apply)
+    if chain_stats.get("ok"):
+        print(f"chain:   commitment head={str(chain_stats['head'])[:12]}... "
+              f"height={chain_stats['height']} (blocks stay local, head goes public)")
+    else:
+        print(f"chain:   {chain_stats.get('reason')}")
 
     if args.apply:
         changed, msg = git_commit_and_push(push=not args.no_push)
