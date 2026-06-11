@@ -7,6 +7,7 @@ Usage:
     python -m jarvis verify              # check substrate health (dangling refs, frontmatter, link rot)
     python -m jarvis search <pattern>    # grep across primitive bodies (regex)
     python -m jarvis count               # count by kind
+    python -m jarvis hindsight [--pairwise]  # single-file markers | cross-file opposing directives
 """
 from __future__ import annotations
 
@@ -183,7 +184,13 @@ def cmd_hindsight(args, registry):
     Catches stale patterns, contradiction markers, orphan primitives, and
     deprecated targets. Output is candidate-for-revision, not a verdict —
     Will-triage decides which to actually rewrite, supersede, or archive.
+
+    With --pairwise, runs the cross-file opposing-directive scan instead
+    (closes the found-by-coincidence limitation noted below).
     """
+    if args.pairwise:
+        return _hindsight_pairwise(args, registry)
+
     candidates = {"contradicted": [], "orphan": [], "stale_partner": [],
                   "stale_promise": [], "all_refs_dead": []}
 
@@ -197,8 +204,8 @@ def cmd_hindsight(args, registry):
     # Relational contradiction markers only — bare correction-genre lexemes
     # (drift, mistake, misread, ...) were the 7/10 FP root cause in the
     # 2026-06-11 triage; a primitive ABOUT mistakes is not itself mistaken.
-    # Known follow-up: pairwise primitive comparison — regex only catches
-    # contradictions that self-declare (found-by-coincidence limitation).
+    # The found-by-coincidence limitation (regex only catches contradictions
+    # that self-declare) is closed by `hindsight --pairwise` below.
     contradiction_pat = re.compile(
         r"(\bsuperseded[ -]by\b|\breplaced by\b|\binvalidated[_ ]by\b|"
         r"\bcontradicts\b|\breverted\b|\bno longer true\b|outdated:)",
@@ -270,6 +277,200 @@ def cmd_hindsight(args, registry):
     return 0
 
 
+# Tokens that are corpus-furniture, not topic signal. Polarity markers
+# (always/never/must) live here too — they mark a directive, they are not
+# its object, so they must not count toward object-token overlap.
+_PAIRWISE_STOPWORDS = frozenset((
+    "about", "above", "after", "again", "also", "always", "another",
+    "because", "been", "before", "being", "between", "both", "claude",
+    "could", "does", "doing", "down", "during", "each", "either", "entry",
+    "even", "ever", "every", "file", "from", "have", "having", "here",
+    "instead", "into", "itself", "just", "like", "memory", "more", "most",
+    "must", "never", "only", "onto", "other", "over", "primitive", "rule",
+    "same", "should", "side", "some", "still", "such", "than", "that",
+    "their", "them", "then", "there", "these", "they", "thing", "this",
+    "those", "through", "under", "until", "upon", "very", "wait", "were",
+    "what", "when", "where", "which", "while", "will", "with", "within",
+    "without", "would", "your",
+))
+
+# Mandate directives: "always X", "∀ X ⇒/→/->", "push every commit", MUST,
+# "✓ Y". Counter directives: "don't X", "do not X", "never X", "¬ X",
+# "✗ Y", "every ~N" (throttle). A contradiction is a mandate in one file
+# whose object tokens overlap a counter in another.
+_MANDATE_PAT = re.compile(
+    # ✓ only in endorsement position (line start, list marker, ⇒/→/:) —
+    # table-cell ✓ is a status mark, not a directive. don[’']?t(?!-) on
+    # the counter side keeps slug refs ([F·dont-default-...]) from firing.
+    r"(?i:\balways\b)|∀[^\n⇒→]{0,60}(?:⇒|→|->)|\bMUST\b|"
+    r"(?i:\b(?:push|commit|sync|update|run)\s+every\b)|"
+    r"(?:^\s*|[⇒→:]\s*|[-*+]\s+)✓"
+)
+_COUNTER_PAT = re.compile(
+    # ¬/✗ only in prohibition position (line start, after a list marker,
+    # or after ⇒/→/:) — hiero uses mid-clause ¬ as contrastive "rather
+    # than" ("hook ¬ memory-suggestion"), trailing ✗ as a verdict, and
+    # table-cell ✗ as a status mark; none is a directive. 2026-06-11
+    # calibration: whole-line tokens + bare markers = 614 pairs; windowed
+    # objects + positional markers brought it under review threshold.
+    r"(?i:\bnever\b|\bdon[’']?t\b(?!-)|\bdo not\b|\bevery\s+~?\d)|"
+    r"(?:^\s*|[⇒→:]\s*|[-*+]\s+)[¬✗]"
+)
+
+
+def _topic_tokens(text):
+    """Lowercase topic tokens: alpha-led, length > 3, stopword-stripped,
+    crude plural-strip so commit/commits land in the same bucket."""
+    tokens = set()
+    for tok in re.findall(r"[a-z][a-z0-9]{3,}", text.lower()):
+        if len(tok) > 4 and tok.endswith("s") and not tok.endswith("ss"):
+            tok = tok[:-1]
+        if tok not in _PAIRWISE_STOPWORDS:
+            tokens.add(tok)
+    return tokens
+
+
+def _object_tokens(line, pat):
+    """Object tokens of a directive: tokens within 30 chars after each
+    polarity-marker match, unioned. ∀⇒ and ✗ are ubiquitous in hiero
+    notation — whole-line tokens were the 614-pair FP root cause in the
+    2026-06-11 calibration; the directive's object lives next to its
+    marker ("don't push every commit"), not anywhere on the line."""
+    tokens = set()
+    for m in pat.finditer(line):
+        tokens |= _topic_tokens(line[m.start():m.end() + 30])
+    return tokens
+
+
+def _invalidated_by(p):
+    """Return the primitive's `invalidated_by:` frontmatter value
+    (lowercased), or "". Primitive doesn't carry arbitrary frontmatter,
+    so re-read the file the same way Primitive.from_file splits it."""
+    try:
+        _, fm, _ = p.path.read_text(encoding="utf-8").split("---", 2)
+    except (ValueError, OSError):
+        return ""
+    for line in fm.strip().splitlines():
+        key, _, value = line.partition(":")
+        if key.strip() == "invalidated_by":
+            return value.strip().lower()
+    return ""
+
+
+def _opposing_lines(dir_a, dir_b, shared_topics):
+    """First (line_a, line_b) where one file mandates what the other
+    counters: object-token overlap >= 2 AND the overlap touches the pair's
+    shared topic (keeps 'always X about apples' from colliding with
+    'never Y about oranges' on incidental tokens)."""
+    for pos_lines, neg_lines, swapped in (
+        (dir_a[0], dir_b[1], False),
+        (dir_b[0], dir_a[1], True),
+    ):
+        for line_p, toks_p in pos_lines:
+            for line_n, toks_n in neg_lines:
+                if line_p == line_n:
+                    continue  # shared boilerplate, not a contradiction
+                overlap = toks_p & toks_n
+                if len(overlap) >= 2 and overlap & shared_topics:
+                    return (line_n, line_p) if swapped else (line_p, line_n)
+    return None
+
+
+def _hindsight_pairwise(args, registry):
+    """Cross-file contradiction scan.
+
+    1. tokenize slug + title + frontmatter description into topic tokens
+    2. bucket pairs sharing >= 2 topic tokens (commit+push, boot+session)
+    3. within a bucket, flag pairs where a mandate line in one file shares
+       object tokens with a counter line in the other
+    4. exempt pairs already resolved via invalidated_by frontmatter, and
+       quoted lines (citing a directive is not issuing one)
+
+    Positive control (run with --include-resolved): atomic-commit-pacing
+    vs commit-cadence-restore-2026-04-21 (push-per-commit vs push-every-~10).
+    """
+    refs = sorted(registry)
+
+    # topic tokens per primitive (slug split on hyphens — CamelCase names
+    # like AtomicCommitPacing don't tokenize on their own)
+    topics = {}
+    for ref in refs:
+        p = registry[ref]
+        topics[ref] = _topic_tokens(
+            f"{p.slug.replace('-', ' ')} {p.name} {p.description}"
+        )
+
+    # bucket via inverted index; tokens in >40 files are corpus-generic
+    # noise, not topic signal
+    by_token = {}
+    for ref in refs:
+        for t in topics[ref]:
+            by_token.setdefault(t, []).append(ref)
+    pair_shared = {}
+    for t, members in by_token.items():
+        if len(members) > 40:
+            continue
+        for i, a in enumerate(members):
+            for b in members[i + 1:]:
+                pair_shared[(a, b)] = pair_shared.get((a, b), 0) + 1
+    buckets = sorted(pair for pair, n in pair_shared.items() if n >= 2)
+
+    # directive lines per primitive — skip quoted lines (> *"...) and
+    # lines without >= 2 object tokens (nothing to overlap on)
+    directives = {}
+    for ref in refs:
+        pos, neg = [], []
+        for line in registry[ref].body.splitlines():
+            stripped = line.strip()
+            # quoted lines cite a directive without issuing one; headings
+            # name a topic ("# Context Is ALWAYS Load-Bearing"), same deal
+            if stripped.startswith((">", "#")):
+                continue
+            if _MANDATE_PAT.search(line):
+                toks = _object_tokens(line, _MANDATE_PAT)
+                if len(toks) >= 2:
+                    pos.append((stripped, toks))
+            if _COUNTER_PAT.search(line):
+                toks = _object_tokens(line, _COUNTER_PAT)
+                if len(toks) >= 2:
+                    neg.append((stripped, toks))
+        directives[ref] = (pos, neg)
+
+    flagged = []
+    exempted = 0
+    for a, b in buckets:
+        pa, pb = registry[a], registry[b]
+        if not args.include_resolved:
+            inv_a, inv_b = _invalidated_by(pa), _invalidated_by(pb)
+            if (inv_a and pb.slug in inv_a) or (inv_b and pa.slug in inv_b):
+                exempted += 1
+                continue
+        hit = _opposing_lines(directives[a], directives[b], topics[a] & topics[b])
+        if hit:
+            flagged.append((a, b, hit[0], hit[1]))
+
+    print(f"hindsight pairwise: {len(refs)} primitives, "
+          f"{len(buckets)} bucketed pair(s) scanned")
+    print()
+    for a, b, line_a, line_b in flagged:
+        print(f"[pair] {a} <-> {b}")
+        print(f"  {registry[a].path.name}: {line_a[:110]}")
+        print(f"  {registry[b].path.name}: {line_b[:110]}")
+        print()
+    if exempted:
+        print(f"exempted {exempted} resolved pair(s) via invalidated_by "
+              f"(--include-resolved to show)")
+    if not flagged:
+        print("clean.")
+    else:
+        print(f"total contradiction pair(s): {len(flagged)}")
+        print()
+        print("These are candidates for Will-triage, not a verdict. A flagged")
+        print("pair issues opposing directives about the same objects; resolve")
+        print("by superseding one (invalidated_by frontmatter) or reconciling.")
+    return 0
+
+
 def cmd_count(args, registry):
     counts = {}
     for p in registry.values():
@@ -321,7 +522,12 @@ def main():
 
     subs.add_parser("count", help="count by kind")
 
-    subs.add_parser("hindsight", help="surface primitives that may have been wrong in hindsight")
+    p_hind = subs.add_parser("hindsight", help="surface primitives that may have been wrong in hindsight")
+    p_hind.add_argument("--pairwise", action="store_true",
+                        help="cross-file opposing-directive scan (mandate in one file vs counter in another)")
+    p_hind.add_argument("--include-resolved", action="store_true",
+                        help="disable the invalidated_by exemption (calibration / positive control)")
+    p_hind.add_argument("--root", help="alternate corpus root (dir containing memory/, or the memory/ dir itself)")
 
     args = parser.parse_args()
 
@@ -329,6 +535,10 @@ def main():
     here = Path(__file__).resolve().parent
     # substrate root is parent of the jarvis/ package
     root = here.parent
+    if getattr(args, "root", None):
+        root = Path(args.root)
+        if root.name == "memory":  # accept the memory/ dir itself
+            root = root.parent
 
     registry = load_registry(root)
     if not registry:
