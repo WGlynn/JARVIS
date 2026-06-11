@@ -51,11 +51,13 @@ def extract_top_epoch(path: str) -> tuple[str, bool]:
         out.append(line.rstrip())
 
     text = "\n".join(out)
-    is_active = False
-    upper = text.upper()
-    if "ACTIVE" in upper and "CLEAN" not in upper.split("ACTIVE", 1)[0][-30:]:
-        if "EPOCH - ACTIVE" in upper or "EPOCH -- ACTIVE" in upper or "— ACTIVE" in text.upper():
-            is_active = True
+    # Title line is the canonical epoch status by convention:
+    # "# Write-Ahead Log — ACTIVE (...)" vs "— CLEAN (...)". Historical epochs
+    # in the body keep their own ACTIVE headers and prose may mention ACTIVE;
+    # only the title reflects the live epoch (heuristic scan false-fired on a
+    # freshly CLOSED WAL, 2026-06-10).
+    title = lines[0] if lines else ""
+    is_active = "ACTIVE" in title.upper()
     return text.strip(), is_active
 
 

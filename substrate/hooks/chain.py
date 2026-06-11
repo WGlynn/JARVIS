@@ -22,17 +22,6 @@ Usage:
 """
 
 import sys
-
-# Force UTF-8 stdout/stderr on Windows: the usage text (__doc__) and log lines
-# contain non-cp1252 chars; without this `python chain.py` tracebacks on
-# UnicodeEncodeError instead of printing usage.
-for _stream in (sys.stdout, sys.stderr):
-    if hasattr(_stream, "reconfigure"):
-        try:
-            _stream.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
-
 import json
 import hashlib
 import os
