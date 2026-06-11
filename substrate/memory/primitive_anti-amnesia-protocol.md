@@ -1,7 +1,10 @@
 ---
-name: Anti-Amnesia Protocol (AAP) — Write-Ahead Log for Crash Recovery
-description: Third and final layer of the three-layer persistence architecture. WAL.md captures live execution state (task manifest, progress, intent) so crashes don't cause amnesia. Check WAL FIRST on every session start.
-type: feedback
+name: anti-amnesia-protocol-aap-write-ahead-log-for-crash-recovery
+description: "Third and final layer of the three-layer persistence architecture. WAL.md captures live execution state (task manifest, progress, intent) so crashes don't cause amnesia. Check WAL FIRST on every session start."
+metadata: 
+  node_type: memory
+  type: feedback
+  originSessionId: 8f988124-8197-4f80-8a59-217ae187c3ef
 ---
 
 # Anti-Amnesia Protocol (AAP)
@@ -20,6 +23,9 @@ The final piece of the three-layer mind:
 
 ## Session Start — Step 0 (BEFORE EVERYTHING)
 Check `.claude/WAL.md`. If status == ACTIVE → crash detected → run recovery protocol before anything else.
+
+> **Reconciliation (2026-06-11, vs `boot-session-state-over-rsi`)**: merged boot order — WAL crash-check (`status ACTIVE?`) = step 0 (crash detection); SESSION_STATE = step 1 and the authoritative DIRECTIVE source; RSI files only when SESSION_STATE points at them.
+> The two entries govern different axes (crash-detection vs directive-priority) and are compatible under this ordering.
 
 ## Pre-Flight (before autopilot/multi-agent work)
 1. Write WAL.md: status=ACTIVE, full task manifest (all QUEUED), parent commit, intent

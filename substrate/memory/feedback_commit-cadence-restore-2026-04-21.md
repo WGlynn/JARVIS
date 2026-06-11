@@ -3,6 +3,7 @@ name: Commit Cadence Restore 2026-04-21
 description: Will called out that recent commit cadence has dropped from "hundreds a day" to single-digit per cycle. Restore atomic-commit rhythm — skeleton, fill, polish — instead of one big commit per cycle close.
 type: feedback
 originSessionId: c14b7c38-1d7d-4550-9588-2dbd1e7c40ec
+invalidated_by: atomic-commit-pacing
 ---
 # Commit Cadence Restore — 2026-04-21
 
@@ -21,7 +22,7 @@ A secondary contributor was the NDA-gate incident: each commit became a "NDA-sca
 3. **Polish commits** for NatSpec, formatting, lint cleanup — separate from the substantive change. Easier to review, easier to revert.
 4. **Test-side commits** separately from contract-side when tests can land first (regression-anchor pattern) or after (test-after-fix). One commit per test file is fine.
 5. **Memory commits** atomic per primitive / feedback / project entry. Don't batch primitives; each is a separate semantic addition to the library.
-6. **Push cadence**: every ~10 commits OR phase boundary. Pushes still go through hooks, so don't push every commit (hook overhead × push), but don't queue more than ~10 either (lose the velocity-visibility property Will is asking for).
+6. **Push cadence**: every ~10 commits OR phase boundary. Pushes still go through hooks, so don't push every commit (hook overhead × push), but don't queue more than ~10 either (lose the velocity-visibility property Will is asking for). (invalidated_by: atomic-commit-pacing 2026-06-11 — push-per-commit wins; commit-granularity discipline in this entry remains valid)
 
 **What this is NOT**:
 - Not commit-theater. Don't split a 5-line typo into 5 commits to inflate the count. The granularity is *natural work-unit*, not "as small as possible."
