@@ -153,6 +153,7 @@ Falsifiable framing:
 - RSAW that batches all fixes to end → cycle 2 audits stale spec, wastes the second cycle's signal
 - RSAW skipped because "the spec is fresh, it must be correct" → exactly the failure mode RSAW exists to prevent (15 findings in 12 minutes on a 30-minute-old spec)
 - WWWD orchestration replaced by Claude-default agent dispatch → loses the Will-projection-aware lens calibration
+  - *Runtime-enforcement note (2026-06-11 triage)*: partially enforced since 2026-06-10 — wwwd-gate.py + coordination-mechanism-gate.py both fire PreToolUse on Agent spawns. Residual gap: the gates advise lens calibration but don't verify the dispatched prompt actually encodes Will-projection lenses; spec-vs-runtime audit of RSAW dispatches remains open.
 - **Recurrence-class blindness** (C2B): same fix-class × 3+ cycles × ¬ structural fix ⇒ RSAW × same insight × N ¬ substrate change ⇒ fix-class itself = new RSAW failure. Fix: track fix-class identity across cycles ⇒ escalate recurrent → Will-decision ¬ re-audit
 - **Lens-set homogenization** (C2B): multi-cycle agent findings overlap > 30% across lens-scopes ⇒ lens narrowed ⇒ missing other things. Fix: rotate 1 lens out / cycle + introduce 1 cycle-specific lens ⇒ prevent ossification
 - **Agent-finding convergence** (C2B): 3+ agents same-cycle × functionally identical findings ⇒ parallel capacity wasted. Fix: tighten non-overlapping-scope contract Phase 2 ⇒ each agent's prompt disclaims others' scope
