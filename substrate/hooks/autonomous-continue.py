@@ -161,9 +161,15 @@ def background_agent_alive() -> bool:
     anti-pattern in [F·design-loops-not-prompts]) — suppress instead.
     """
     try:
-        cutoff = time.time() - LIVE_AGENT_WINDOW_SECONDS
+        now = time.time()
         for p in TEMP_TASKS.rglob("tasks/*.output"):
-            if p.stat().st_mtime > cutoff:
+            st = p.stat()
+            # Streaming harness: fresh mtime = live. Write-on-completion
+            # harness: the file is created 0-byte at spawn and stays empty
+            # until the agent finishes, so empty+recent = still running.
+            if st.st_mtime > now - LIVE_AGENT_WINDOW_SECONDS:
+                return True
+            if st.st_size == 0 and st.st_mtime > now - 6 * 3600:
                 return True
     except Exception:
         pass
