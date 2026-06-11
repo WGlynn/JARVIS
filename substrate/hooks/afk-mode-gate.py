@@ -26,7 +26,7 @@ HOME = os.path.expanduser("~")
 FLAG = os.path.join(HOME, ".claude", "state", "afk-mode.flag")
 SIG_DIR = os.path.join(HOME, ".claude", "projects", "C--Users-Will", "memory",
                        "_system", "afk_signatures")
-USER = "will"
+USER = os.environ.get("AFK_USER", "will")
 
 
 def main() -> int:
