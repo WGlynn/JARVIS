@@ -8,6 +8,9 @@ originSessionId: 4899906e-3d10-4dd4-92f3-80428df0a47a
 
 **Rule**: On boot, SESSION_STATE.md is the authoritative next-step source. Do not open the RSI file to reconcile apparent label conflicts unless SESSION_STATE itself points there.
 
+> **Reconciliation (2026-06-11, vs `anti-amnesia-protocol`)**: merged boot order — WAL crash-check (`status ACTIVE?`) = step 0 (crash detection); SESSION_STATE = step 1 and the authoritative DIRECTIVE source; RSI files only when SESSION_STATE points at them.
+> The two entries govern different axes (crash-detection vs directive-priority) and are compatible under this ordering.
+
 **Why**: Will ended the prior session with SESSION_STATE "Next Session — TOP PRIORITY" written explicitly for the first turn of the next session. The RSI file is a history log, not a forward plan. When the SessionStart hook appends an "RSI CHECK" summary to boot context, the summary is informational — it does NOT demand a reconciliation dive. I read the RSI file to understand a "Cycle 38 [PENDING]" label that SESSION_STATE already superseded (the ETM Alignment Audit that was "pending" in the RSI log had been done during the prior session, and SESSION_STATE accurately reflected C40 — NCI convex retention — as the next target). Burning context on that reconciliation was drift.
 
 **How to apply**:

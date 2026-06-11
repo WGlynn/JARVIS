@@ -13,6 +13,7 @@ originSessionId: 8625a796-116e-42d8-b5c9-7064589f58ad
 - ✗ batch unrelated changes ("docs: random fixes + new feature + WAL update")
 - ✗ fragment one logical change across N commits ("commit 1: add file, commit 2: write content, commit 3: fix typo")
 - ∀ commit ⇒ push immediately ¬ accumulate locally
+- **Reconciliation (2026-06-11 triage)**: state-sync still applies — WAL/SESSION_STATE updates ride as their own commits on a 5-10 commit cadence per [P·session-state-commit-gate]; this entry supersedes commit-cadence-restore's push-batching bullet (`feedback_commit-cadence-restore-2026-04-21.md` bullet 6).
 
 ## Granularity heuristic
 - one new file + its index entry = 1 commit (e.g., feedback file + MEMORY.md line)
