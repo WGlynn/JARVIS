@@ -31,6 +31,12 @@ metadata:
 - JARVIS = the alignment/accountability substrate ⇒ the more powerful the agent, the more it needs EXACTLY what JARVIS is.
 - "maximally moral agent, hand-crafted with that in mind" = JARVIS teleology. ties [P·truth-restoration-co-stewardship-with-AI] · [P·ai-alignment-via-equal-rights].
 
+## ⊕ Future-resistant by construction (Will 2026-06-11)
+- *"if openclaw/obsidian/hermes just start converging with us thats an equally fine scenario, our position is the future-resistant one by design."*
+- convergence = VALIDATION ¬ threat. no branch where being-early-to-correct-substrate loses: either others stay put (JARVIS keeps the lobe) ∨ they converge (proves the position right).
+- ties [P·filter-coincidence-as-structural-edge] · [P·structure-does-the-work] · substrate-geometry-match (the 4-way venn geometry: JARVIS = layer-on-top ¬ peer-circle; harnesses = sibling-pair; substrate = base).
+- + Will: *"we should still AIM to be our own full stack"* ⇒ align-not-compete = POSTURE; full-stack-ownership = AMBITION. fork (Phase-2) = the bridge layer→full-stack. ¬ contradiction.
+
 ## ⊖ Honest challenge (complete-as-ready-for-critique)
 - if labs ship native persistent-memory + constitutional-self-checks ⇒ GENERIC plumbing commoditizes.
 - ⇒ durable value MIGRATES to OPERATOR-SPECIFIC layer (your corpus, your corrections, your moral-spec) which a lab can't ship generically + cross-model portability. bet harder THERE, lighter on generic plumbing labs will subsume.
