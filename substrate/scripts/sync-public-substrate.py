@@ -258,13 +258,28 @@ def sync_hooks(apply: bool) -> dict:
     return stats
 
 
-def sync_dir(src_dir: Path, dest_dir: Path, glob: str, apply: bool) -> dict:
-    stats = {"copied": 0, "updated": 0, "same": 0}
+def sync_dir(src_dir: Path, dest_dir: Path, glob: str, apply: bool,
+             content_scrub: bool = False) -> dict:
+    stats = {"copied": 0, "updated": 0, "same": 0, "scrubbed": 0}
     if not src_dir.exists():
         return stats
     dest_dir.mkdir(parents=True, exist_ok=True)
     for src in sorted(src_dir.glob(glob)):
         dest = dest_dir / src.name
+        if content_scrub:
+            # Same conservative rule as the memory mirror: a content match
+            # keeps the whole file local. Cron-prompt state files (queues,
+            # logs) accumulate partner context exactly like memory does.
+            try:
+                body = src.read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                stats["scrubbed"] += 1
+                continue
+            hit = next((pat.pattern for pat in SCRUB_CONTENT_PATTERNS if pat.search(body)), None)
+            if hit:
+                stats["scrubbed"] += 1
+                print(f"    scrub: {src.name} (content-match: {hit})")
+                continue
         if not apply:
             if not dest.exists():
                 stats["copied"] += 1
@@ -341,9 +356,9 @@ def main():
     print(f"hooks:   +{hook_stats['copied']} added  ~{hook_stats['updated']} updated  "
           f"={hook_stats['same']} same  -{hook_stats['skipped']} skipped")
 
-    cron_stats = sync_dir(LOCAL_CRON, SUB_CRON, "*.md", args.apply)
+    cron_stats = sync_dir(LOCAL_CRON, SUB_CRON, "*.md", args.apply, content_scrub=True)
     print(f"crons:   +{cron_stats['copied']} added  ~{cron_stats['updated']} updated  "
-          f"={cron_stats['same']} same")
+          f"={cron_stats['same']} same  -{cron_stats['scrubbed']} scrubbed")
 
     script_stats = sync_dir(LOCAL_SCRIPTS, SUB_SCRIPTS, "*.py", args.apply)
     print(f"scripts: +{script_stats['copied']} added  ~{script_stats['updated']} updated  "

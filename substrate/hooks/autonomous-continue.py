@@ -121,10 +121,16 @@ def wal_active() -> bool:
     try:
         if WAL_PATH.stat().st_mtime < time.time() - STALE_SIGNAL_SECONDS:
             return False  # WAL hasn't been touched in >7d — stale, not live
-        text = WAL_PATH.read_text(encoding="utf-8")
+        with WAL_PATH.open(encoding="utf-8") as f:
+            title = f.readline()
     except Exception:
         return False
-    return "ACTIVE" in text[:2000]  # first 2KB only
+    # Title line is the canonical epoch status by convention:
+    # "# Write-Ahead Log — ACTIVE (...)" vs "— CLEAN (...)". The body keeps
+    # historical epochs with their own ACTIVE headers, and closure notes may
+    # mention ACTIVE in prose — a substring scan of the first 2KB false-fired
+    # on a freshly CLOSED WAL (2026-06-10).
+    return "ACTIVE" in title.upper()
 
 
 def pending_tasks_count() -> int:
