@@ -4,6 +4,21 @@
 
 An agent overlay architecture for Claude Code. Eight layers of hooks, persistence, anti-hallucination gates, and meta-protocols that survive session boundaries and compose into something more durable than a chat wrapper.
 
+## Official links
+
+- **JARVIS vs OpenClaw — an honest comparison:** https://vibeswap-app.vercel.app/jarvis-vs-openclaw.html — why JARVIS is a governance + persistence *layer*, not a harness; concedes every axis OpenClaw wins, and leads with the underrated artifact: a **23,462-block tamper-evident session hash-chain** (downloadable commitment).
+- **JARVIS ∩ OpenClaw — Venn:** https://vibeswap-app.vercel.app/jarvis-openclaw-venn.html — where the two genuinely overlap, where they don't, and where the integration boundary forces a fork.
+
+## Current design (2026-06)
+
+Three things define the system as it runs today, on top of the eight-layer map below:
+
+- **Session hash-chain — 23,462 blocks.** Every checkpoint is a block linked to its parent by hash (`{id, parent, timestamp, prompt, response, hash}`) — the agent's tamper-evident long-term memory of its own history. Blocks stay local (raw content); the **head hash is published** as a commitment, so the chain is verifiable without leaking a word.
+- **Merkle self-attestation over 624 governed files.** A Merkle root over every hook, primitive, and session-chain script is committed at session boot; an unsanctioned change to a governed file flags drift on the next boot. "Provably just files" — inspectable by design, kernel rejected on purpose.
+- **One persistence framework: local authority → public commitment → shard replication.** Substrate content syncs in full (scrubbed); chain content stays local with only its head committed; both are designed to become nodes in a future shard network.
+
+On top of these sit the operator-cognition gates: **WWWD** (a Will-emulation gate on consequential actions), **AFK mode** (predicted-reply menus for single-keystroke steering), and **RSAW** (recursive self-audit).
+
 ## Quickstart
 
 ```bash
@@ -29,9 +44,9 @@ If `verify` prints `0 errors` you're set. The CLI reads the markdown corpus at `
 
 | Artifact | Where | What it does |
 |---|---|---|
-| **47 Claude Code hooks** | `substrate/hooks/` | Drop-in `PreToolUse` / `SessionStart` / `Stop` gates. Each is a self-contained Python script that reads a JSON payload from stdin and emits an `additionalContext` block. Wire into `~/.claude/settings.json`. |
-| **468 markdown primitives** | `substrate/memory/` | The discipline corpus. Each file is a pattern, feedback rule, project, or reference. Importable as Python objects; greppable as files. |
-| **8 cron canonicals** | `substrate/cron-prompts/` | Slash-command prompts scheduled via Claude Code's scheduling layer. Examples: substrate sync, advice mining, link-rot detection. |
+| **62 hook + session-chain scripts** | `substrate/hooks/` | Drop-in `PreToolUse` / `SessionStart` / `Stop` gates (42 hooks) plus the session-chain persistence scripts. Each is a self-contained Python script that reads a JSON payload from stdin and emits an `additionalContext` block. Wire into `~/.claude/settings.json`. |
+| **500 markdown files** | `substrate/memory/` | The discipline corpus: 213 primitives + 185 feedback rules + 57 projects + 17 references (+ indexes). Each file is one pattern. Importable as Python objects; greppable as files. |
+| **12 cron canonicals** | `substrate/cron-prompts/` | Slash-command prompts scheduled via Claude Code's scheduling layer. Examples: substrate sync (+ chain commitment), advice mining, skill mining, link-rot detection. |
 | **`jarvis` Python package** | `substrate/jarvis/` | CLI + library for `show / list / graph / verify / search / count / hindsight` over the corpus. |
 | **Installer** | `installer/` | `absorb.sh` reads other Claude substrates and migrates patterns into your `~/.claude/` with namespace-collision handling. `install.sh` for fresh installs. |
 | **Verification guides + scripts** | `verify/` | Five prose-based check guides + 2 fresh-clone-runnable Python scripts (`verify_primitive_corpus.py`, `verify_no_secrets.py`). Falsifiable, no trust required. |
@@ -45,7 +60,7 @@ If `verify` prints `0 errors` you're set. The CLI reads the markdown corpus at `
 | 1 | [Hooks](./01-hooks/) | Deterministic gates on every tool call, session boot, and commit |
 | 2 | [Persistence](./02-persistence/) | Six tiers of state that survive session boundaries |
 | 3 | [Anti-hallucination](./03-anti-hallucination/) | Substance gate, HIERO format, time-logic gate, claim-level discipline |
-| 4 | [Discipline](./04-discipline/) | Pattern capture into reusable primitives — 216 primitives + 194 feedback rules + 59 projects + 17 references in the live corpus (see [`substrate/memory/`](./substrate/memory/) for the public slice) |
+| 4 | [Discipline](./04-discipline/) | Pattern capture into reusable primitives — 213 primitives + 185 feedback rules + 57 projects + 17 references in the public slice (561 files in the full local corpus; see [`substrate/memory/`](./substrate/memory/)) |
 | 5 | [Meta-protocols](./05-meta-protocols/) | How design decisions get made: AMD, AGov, Substrate-Geometry Match, Universal-Coverage → Hook, ETM |
 | 6 | [Agent overlay](./06-agent-overlay/) | Subagent spawning, slash commands as skills, MCP connectors, remote scheduled triggers |
 | 7 | [Stateful applications](./07-stateful-applications/) | Telegram bot suite, standalone signature validator, jarvis-network OSS, filesystem-native CRMs, 120+ published papers (see [`papers/`](./papers/)) |
@@ -66,16 +81,17 @@ The eight layers above describe the architecture. The modules below are concrete
 
 ## What *is* and *isn't* in this repo
 
-**In this repo (as of 2026-06-09 merge):**
+**In this repo (as of 2026-06-11):**
 - `substrate/` — the live hook + memory + cron-prompt + Python-wrapper substrate, importable as a Python package. Formerly hosted at `WGlynn/jarvis-substrate`.
 - `installer/` — kernel install scripts. Formerly hosted at `WGlynn/jarvis-os`.
-- `papers/` — 125 markdown papers (59 with PDF companions), including all the augmented-X series, the Shapley + fairness math papers, the VibeSwap mechanism-design specs that were here previously, and the canonical-thinking corpus that used to live only in `vibeswap/docs/research/papers/`.
+- `papers/` — 126 markdown papers (with PDF companions for many), including all the augmented-X series, the Shapley + fairness math papers, the VibeSwap mechanism-design specs that were here previously, and the canonical-thinking corpus that used to live only in `vibeswap/docs/research/papers/`.
 - `01-08 layer dirs/` — architecture-description essays per layer.
 - `verify/` — reader-runnable verification scripts.
 
 **Not in this repo (and why):**
 - **VibeSwap product code** — the Solidity contracts, the React frontend, the Python oracle. Those live in [`vibeswap`](https://github.com/wglynn/vibeswap) because they are a separate product, not a JARVIS substrate concern. JARVIS runs against many substrates; VibeSwap is one of them.
-- **The full personal memory store** — the local `~/.claude/projects/.../memory/` has 524 primitive / feedback / project / reference files; 412 are mirrored here via `substrate/memory/` after scrub-list filtering for partner-engagement content, NDA-locked material, personal addresses, and API keys. The 112 filtered files stay local by design.
+- **The full personal memory store** — the local `~/.claude/projects/.../memory/` has 561 primitive / feedback / project / reference files; 500 are mirrored here via `substrate/memory/` after scrub-list filtering for partner-engagement content, NDA-locked material, personal addresses, and API keys. The ~61 filtered files stay local by design.
+- **The session-chain blocks** — the 23,462-block hash-chain stays local (the blocks hold raw prompt/response content); only its head-hash commitment is published, at [`substrate/_chain/commitment.json`](./substrate/_chain/commitment.json).
 - **Hooks with hardcoded personal content** — e.g. partner-name regex lists, personal email in docstrings. Sanitized variants are shipped; the originals stay local.
 - **Secrets** — no tokens, no keys, no fly.io app names that aren't already public.
 
