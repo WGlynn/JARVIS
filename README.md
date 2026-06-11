@@ -4,6 +4,8 @@
 
 An agent overlay architecture for Claude Code. Eight layers of hooks, persistence, anti-hallucination gates, and meta-protocols that survive session boundaries and compose into something more durable than a chat wrapper.
 
+> **Full feature surface + the moat:** [`FEATURES.md`](./FEATURES.md) — the honest inventory. The running system has **64 enforcement scripts**, a **23,462-block session hash-chain**, and a **1,263-proposal self-improvement loop**. This README documents a fraction of it.
+
 ## Official links
 
 - **JARVIS vs OpenClaw — an honest comparison:** https://vibeswap-app.vercel.app/jarvis-vs-openclaw.html — why JARVIS is a governance + persistence *layer*, not a harness; concedes every axis OpenClaw wins, and leads with the underrated artifact: a **23,462-block tamper-evident session hash-chain** (downloadable commitment).
