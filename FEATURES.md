@@ -53,9 +53,29 @@ tamper-evident long-term memory of its own history. Because it's a hash-chain, a
 single **head hash commits all 23,462 blocks** — published as
 [`substrate/_chain/commitment.json`](./substrate/_chain/commitment.json), so the
 chain is verifiable without leaking a word of content (blocks stay local). On top,
-a **Merkle root over 624 governed files** is checked at every boot: change a hook
+a **Merkle root over 631 governed files** is checked at every boot: change a hook
 or primitive outside the sanctioned flow and the next boot flags drift. "Provably
 just files" — and provably *unaltered* files.
+
+**Tamper-evidence → tamper-resistance.** The Merkle root is now **Ed25519-signed**
+(standard `ssh-keygen` signatures, key held outside the governed tree, public key
+published for anyone to verify). Evidence alone is defeatable — an attacker could
+re-run the attestation to re-baseline a modified tree and silence the drift.
+Signing the root makes re-baselining require a key they don't have, so the drift
+becomes **un-silenceable**: a manifest re-attested without the key fails signature
+verification at boot. Demonstrated, not asserted.
+
+### 3b. Per-block ownership — Bitcoin-shaped
+Each session-chain block can be **locked to an owner public key**: only the
+current owner's key produces a valid block-attestation, and ownership is
+**transferable** — the current owner signs a reassignment to a new key, exactly
+like spending a UTXO. Current ownership is derived by folding a signed transfer
+log over a genesis owner (the UTXO set as a fold over transaction history), so
+there is no mutable ownership table to forge. Transferring a block voids the prior
+owner's attestation; the new owner must re-sign. Today there is one owner (single
+genesis key); the model already supports many. The chain is **append-only**
+(additivity over replacement); a multiplicative, pairwise-elicited value model
+over owned blocks is the next layer.
 
 ### 4. Operator-intent persistence (WWWD / AFK / autonomous-continue)
 - **WWWD** gates consequential actions through a Will-emulation projection, and
