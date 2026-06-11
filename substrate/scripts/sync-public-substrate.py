@@ -337,24 +337,53 @@ def git_commit_and_push(push: bool) -> tuple[bool, str]:
         return False, f"git op failed: {e.stderr.decode('utf-8', errors='replace')[:200]}"
 
 
+DEFER_STATE = Path(os.environ.get("TEMP") or "/tmp") / "claude" / ".substrate-sync-defer-count"
+MAX_DEFERS = 3
+
+
 def _background_agent_alive() -> bool:
     """A 0-byte, recent task-output file means a harness background agent is
     mid-run (write-on-completion). Syncing then risks sweeping its half-applied
     edits into a public auto-commit (git add -A). Self-defer instead of relying
-    on operator vigilance -- 3 manual deferrals on 2026-06-11 motivated this."""
+    on operator vigilance -- 3 manual deferrals on 2026-06-11 motivated this.
+
+    Window tightened 2026-06-11 (6h -> 15m for the 0-byte case): an *aborted*
+    task leaves a 0-byte stub with the SAME signature as a pending agent, and the
+    old 6h window kept that orphan flagged 'live' for hours, false-deferring
+    unattended cron ticks (the guard the loop relies on was eating the loop).
+    A genuinely pending agent is freshly spawned; 15m covers it. Anything longer
+    is handled by the bounded-defer safety valve in main() so we can never get
+    permanently stuck behind a lingering stub."""
     import time as _time
     temp = Path(os.environ.get("TEMP") or "/tmp") / "claude"
     try:
         now = _time.time()
         for p in temp.rglob("tasks/*.output"):
             st = p.stat()
-            if st.st_size == 0 and st.st_mtime > now - 6 * 3600:
+            # pending/streaming agent: 0-byte but freshly spawned (not a stale stub)
+            if st.st_size == 0 and st.st_mtime > now - 15 * 60:
                 return True
+            # any task output touched very recently = active completion write
             if st.st_mtime > now - 10 * 60:
                 return True
     except Exception:
         pass
     return False
+
+
+def _read_defer_count() -> int:
+    try:
+        return int(DEFER_STATE.read_text().strip())
+    except Exception:
+        return 0
+
+
+def _write_defer_count(n: int) -> None:
+    try:
+        DEFER_STATE.parent.mkdir(parents=True, exist_ok=True)
+        DEFER_STATE.write_text(str(n))
+    except Exception:
+        pass
 
 
 def main():
@@ -365,9 +394,20 @@ def main():
     args = parser.parse_args()
 
     if args.apply and not args.force and _background_agent_alive():
-        print("sync-public-substrate: DEFERRED -- live background agent detected "
-              "(0-byte task output). Re-run after agents land, or --force.")
-        return 0
+        n = _read_defer_count() + 1
+        if n <= MAX_DEFERS:
+            _write_defer_count(n)
+            print(f"sync-public-substrate: DEFERRED ({n}/{MAX_DEFERS}) -- live background "
+                  "agent detected (0-byte task output). Re-run after agents land, or --force.")
+            return 0
+        # bounded-defer safety valve: a real agent would have landed in MAX_DEFERS
+        # ticks; a lingering 0-byte stub is almost certainly orphaned. Proceed so
+        # an unattended cron can't drift forever behind a dead stub. The sync only
+        # mirrors memory/hooks/crons/scripts, not task-output files.
+        print(f"sync-public-substrate: defer limit reached ({MAX_DEFERS}); proceeding "
+              "past a likely-orphaned 0-byte stub (bounded-defer safety valve).")
+    # any path that reaches a real sync resets the counter
+    _write_defer_count(0)
 
     print(f"sync-public-substrate ({'apply' if args.apply else 'dry-run'})")
     print("=" * 60)
