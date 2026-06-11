@@ -1,0 +1,18 @@
+{
+  "user": "TEMPLATE — copy to memory/_system/afk_signatures/<user>.json and derive from THEIR history",
+  "derived_from": "seed: replace examples with the user's actual recurring replies from session transcripts",
+  "signature_moves": [
+    {"key": "approve_and_continue", "examples": ["yes", "go", "approve", "run it"], "weight": 0.18},
+    {"key": "approve_plus_scope_escalation", "examples": ["yes and also do X", "ship it everywhere"], "weight": 0.12},
+    {"key": "adjust_one_axis", "examples": ["yes but shorter", "change X only"], "weight": 0.12},
+    {"key": "formalize_or_hookify", "examples": ["make this permanent", "automate it"], "weight": 0.08},
+    {"key": "push_public", "examples": ["publish it", "push to the repo"], "weight": 0.08},
+    {"key": "honesty_probe", "examples": ["is this actually good?", "what's the weakness?"], "weight": 0.08},
+    {"key": "absorb_or_remember", "examples": ["remember this", "learn from this"], "weight": 0.07},
+    {"key": "status_pivot", "examples": ["what's pending", "show status"], "weight": 0.08},
+    {"key": "draft_for_review", "examples": ["draft it, I'll review"], "weight": 0.07},
+    {"key": "strategic_inference", "examples": ["what does this mean for X"], "weight": 0.06},
+    {"key": "hold_or_defer", "examples": ["wait", "later", "hold"], "weight": 0.06}
+  ],
+  "menu_rules": "7 context-specific items shaped to the live decision + 3 standing moves. Rank by probability. Each item <= 10 words, executable from its number alone."
+}
