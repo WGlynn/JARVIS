@@ -48,3 +48,8 @@ Format per row:
 | 2026-06-09 | Discussion #3651 | various | cloudflare tunnels Q&A | c-neutral |
 | 2026-06-09 | Discussion #3655 | various | cookbook downloads stuck — Q&A | c-neutral |
 | 2026-06-09 | Discussion #3554 | various | STT/TTS local setup Q&A | c-neutral |
+| 2026-06-11 | Discussion #551 | @pewdiepie-archdaemon | GitHub personal-account repos reject triage/maintain collaborator roles; Felix forced to grant write + verbal "treat as triage" convention. Relevant constraint if VibeSwap (also personal-account repos) ever grants contributor triage | c-neutral |
+| 2026-06-11 | Discussion #3868 | @Andrarch / @CWhitlockOfficial | injected harness context (skill files, memory) can corrupt model self-report and behavior; clean-session reset as diagnostic. Same shape as JARVIS boot-injection drift risk, diagnosis not action | c-neutral |
+| 2026-06-11 | Discussion #3163 | @RaresKeY | #3694 risky-merge re-review rules (when new commits invalidate prior review) -- process shape, no current JARVIS/VibeSwap multi-reviewer surface | c-neutral |
+| 2026-06-11 | Discussion #929 | @Dafodilrat | frontend is one 4000-line js file -- monolith maintainability complaint; VibeSwap already componentized React, no action | c-neutral |
+| 2026-06-11 | Discussion #3932 | various | Odysseus feature-appeal feedback thread (deep-research praised, mobile UX weak, per-message cost N/A on OpenRouter) -- product-specific | d-skip |

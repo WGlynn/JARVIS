@@ -36,6 +36,7 @@ changed, nothing commits.
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -336,11 +337,37 @@ def git_commit_and_push(push: bool) -> tuple[bool, str]:
         return False, f"git op failed: {e.stderr.decode('utf-8', errors='replace')[:200]}"
 
 
+def _background_agent_alive() -> bool:
+    """A 0-byte, recent task-output file means a harness background agent is
+    mid-run (write-on-completion). Syncing then risks sweeping its half-applied
+    edits into a public auto-commit (git add -A). Self-defer instead of relying
+    on operator vigilance -- 3 manual deferrals on 2026-06-11 motivated this."""
+    import time as _time
+    temp = Path(os.environ.get("TEMP") or "/tmp") / "claude"
+    try:
+        now = _time.time()
+        for p in temp.rglob("tasks/*.output"):
+            st = p.stat()
+            if st.st_size == 0 and st.st_mtime > now - 6 * 3600:
+                return True
+            if st.st_mtime > now - 10 * 60:
+                return True
+    except Exception:
+        pass
+    return False
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--apply", action="store_true", help="actually copy files (default is dry-run)")
     parser.add_argument("--no-push", action="store_true", help="skip git push after commit")
+    parser.add_argument("--force", action="store_true", help="sync even while background agents are live")
     args = parser.parse_args()
+
+    if args.apply and not args.force and _background_agent_alive():
+        print("sync-public-substrate: DEFERRED -- live background agent detected "
+              "(0-byte task output). Re-run after agents land, or --force.")
+        return 0
 
     print(f"sync-public-substrate ({'apply' if args.apply else 'dry-run'})")
     print("=" * 60)
