@@ -53,3 +53,5 @@ Format per row:
 | 2026-06-11 | Discussion #3163 | @RaresKeY | #3694 risky-merge re-review rules (when new commits invalidate prior review) -- process shape, no current JARVIS/VibeSwap multi-reviewer surface | c-neutral |
 | 2026-06-11 | Discussion #929 | @Dafodilrat | frontend is one 4000-line js file -- monolith maintainability complaint; VibeSwap already componentized React, no action | c-neutral |
 | 2026-06-11 | Discussion #3932 | various | Odysseus feature-appeal feedback thread (deep-research praised, mobile UX weak, per-message cost N/A on OpenRouter) -- product-specific | d-skip |
+
+- [2026-06-12 11:49 ET] #4089 + #4084 (@SynapticSmith): comprehensive PR-taxonomy + issue-taxonomy/triage-strategy docs (667 PRs / 576 issues). Shape overlaps JARVIS contribution-graph + DRI + taxonomize-everything. Deep-mine DEFERRED (rest posture, Will-active in-session); flagged for next-fire C2.5 deep pass.

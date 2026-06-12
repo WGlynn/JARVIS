@@ -134,3 +134,21 @@ Entries appended by skill-mining sweeps (`skill-mining.md`). Promote → work on
 - Suggested action: queue-rule for future sweeps: mine the CSV not the README until restructure lands; parry (hook injection-scan) = the one genuinely novel capability — candidate for a dedicated fetch next sweep
 - Verifier (self, rubric 4-pt): 1 PASS (both URLs fetched, dry README honestly reported) | 2 PASS (no numbers claimed) | 3 PASS (vein-map class honest) | 4 PASS. VERDICT: PASS
 - Will-triage: pending
+
+## [2026-06-12 11:54 ET] — parry-guard non-ML layers → pure-Python PostToolUse output scanner (tool-output injection/secret gap) [FETCH-VERIFIED]
+- Source: https://github.com/vaporif/parry-guard (Rust, 95.6%). WebFetch this sweep confirmed verbatim: "these detection mechanisms are separable from ML models" + the non-ML layers "run before ML classification in the detection pipeline."
+- Technique: PreToolUse/PostToolUse/UserPromptSubmit hooks. PostToolUse scans TOOL OUTPUT for injection+secrets, auto-taints project on hit. UserPromptSubmit audits .claude/ for dangerous perms + injected hook commands. Separable non-ML layers: unicode-invisible/PUA/homoglyph/RTL; Aho-Corasick known-injection-phrases; 40+ credential regexes (AWS/GitHub/cloud/DB-URI/keys); tree-sitter bash-exfil AST (base64/hex/ROT13/network-sink). Fail-closed.
+- Port class: REINTERPRET — re-implement the PATTERN CONCEPTS in Python, NOT extract Rust. DROP the ML half (DeBERTa/Llama via ONNX/Candle, HF-gated models, Rust binary) = local-transformer infra we reject for a hook. The 3 light layers (invisible-unicode + injection-phrase Aho-Corasick + secret-regex) are trivially portable; the tree-sitter bash-AST layer is the heavier one.
+- Our substrate state: fail-closed privacy leak-gate + NDA gate + NoCredsInChat all govern what WE EMIT. We do NOT scan INCOMING tool output for injection/secrets — real gap, cf. anthropics/claude-code#22915 ("prompt injection appended to every Read tool output").
+- Suggested action: zero-risk local experiment — prototype tool-output-scan.py (PostToolUse) with the 3 light layers on a SCRATCH copy; benchmark false-positive rate on our own recent tool outputs before any live wire. Will-triage to go live.
+- Verifier (sonnet subagent): REVISE → applied (tagged FETCH-VERIFIED, added separability quote, softened port to concept-reimpl).
+- Will-triage: pending
+
+## [2026-06-12 11:54 ET] — session-FTS recall: 3rd–4th convergence sighting [SEARCH-VERIFIED]
+- Source: https://github.com/zippoxer/recall (Rust TUI) + samzong/Recall (hybrid FTS+semantic) + arjunkmrm/recall (SQLite FTS5 skill). SEARCH-level only — repos NOT WebFetched this sweep; treat detail as snippet-inference.
+- Technique: full-text index over raw session JSONL; exact-string search + resume; agent-callable, no MCP.
+- Port class: REINTERPRET (low priority). We have semantic deep-recall + BPE cache; gap = EXACT-string recall over session transcripts. SQLite FTS5 over JSONL = liftable shape (arjunkmrm proves FTS5-as-skill).
+- Our substrate state: deep-recall = semantic embeddings; session-chain = 23k blocks; NO exact-string FTS over transcripts.
+- Suggested action: convergence = real capability class (now 3rd–4th sighting incl. prior hermes FTS5). Source-fetch zippoxer/arjunkmrm next sweep, then evaluate a sqlite FTS5 index over session JSONL as exact-match complement to deep-recall. Will-triage.
+- Verifier (sonnet subagent): REVISE → applied (tagged SEARCH-VERIFIED, lowered confidence).
+- Will-triage: pending

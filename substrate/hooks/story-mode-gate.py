@@ -64,6 +64,34 @@ def main() -> int:
         with open(FLAG, "w") as f:
             f.write(str(time.time()))
 
+    # story loop N  /  story loop off  -- arm/disarm the autonomous self-play loop
+    lm = re.fullmatch(r"story\s+loop\s+(off|\d{1,2})", p)
+    if lm:
+        LOOP = os.path.join(HOME, ".claude", "state", "story-loop.json")
+        arg = lm.group(1)
+        if arg == "off":
+            try:
+                os.remove(LOOP)
+            except OSError:
+                pass
+            print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit",
+                "additionalContext": "[STORY MODE] Loop disarmed. Back to manual picks."}}))
+            return 0
+        n = max(1, min(int(arg), 20))  # hard cap 20 iterations
+        os.makedirs(os.path.dirname(FLAG), exist_ok=True)
+        with open(FLAG, "w") as f:
+            f.write(str(time.time()))   # loop implies Story Mode on
+        with open(LOOP, "w", encoding="utf-8") as f:
+            json.dump({"remaining": n}, f)
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit",
+            "additionalContext": (f"[STORY MODE] Autonomous loop ARMED for {n} iterations. At each "
+            "turn's end, self-select the single highest-WWWD-confidence menu item and execute it "
+            "(self-play autopilot). GUARDRAILS: stop + hand back on an ambiguous fork, an "
+            "irreversible/outward-facing action (send/publish/deploy/delete/push/message), or a "
+            "repeat. 'story loop off' disarms. Begin now: do the work the top item of your last "
+            "menu implies, then show a fresh menu.")}}))
+        return 0
+
     if not os.path.exists(FLAG):
         print(json.dumps({}))
         return 0
@@ -122,7 +150,10 @@ def main() -> int:
            "they can pick more than one. List the 10 most probable next replies from this "
            "user, derived from their signature-response corpus and the live decision at hand. "
            "Most-likely first. Each item must be a complete actionable instruction (<= 10 "
-           "words) executable when the user replies with just its number(s)."
+           "words) executable when the user replies with just its number(s). LOOP-SUGGESTION: "
+           "when the next several moves are high-confidence, low-risk, and same-thread, include "
+           "ONE item offering to run them as an autonomous loop (e.g. 'Loop the next N "
+           "autonomously') -- the user arms it by replying 'story loop N'."
            + sig_rules + sel_note)
     print(json.dumps({"hookSpecificOutput": {
         "hookEventName": "UserPromptSubmit", "additionalContext": ctx}}))
