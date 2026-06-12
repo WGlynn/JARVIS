@@ -114,3 +114,7 @@ The full essay is at [`papers/jarvis-is-not-a-wrapper.md`](./papers/jarvis-is-no
 ## License
 
 MIT. See [`LICENSE`](./LICENSE).
+
+## Story Mode
+
+The AFK interface — operate the agent by picking numbered branches like a pick-your-own-adventure. See [STORY-MODE.md](STORY-MODE.md).
