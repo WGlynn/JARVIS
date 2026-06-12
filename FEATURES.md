@@ -77,12 +77,12 @@ genesis key); the model already supports many. The chain is **append-only**
 (additivity over replacement); a multiplicative, pairwise-elicited value model
 over owned blocks is the next layer.
 
-### 4. Operator-intent persistence (WWWD / AFK / autonomous-continue)
+### 4. Operator-intent persistence (WWWD / Story Mode / autonomous-continue)
 - **WWWD** gates consequential actions through a Will-emulation projection, and
   *learns from corrections* — when the human overrides it, the corpus reweights.
 - **`autonomous-continue`** turns the default from "idle when done" to "pick up
   the pending work," so the system is proactive across session boundaries.
-- **AFK mode** collapses steering to a single keystroke (predicted-reply menus)
+- **Story Mode** collapses steering to a single keystroke (predicted-reply menus; formerly "AFK mode")
   for low-bandwidth operation.
 
 The system carries forward what the operator *meant*, across context limits and

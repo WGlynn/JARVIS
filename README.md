@@ -19,7 +19,7 @@ Three things define the system as it runs today, on top of the eight-layer map b
 - **Merkle self-attestation over 624 governed files.** A Merkle root over every hook, primitive, and session-chain script is committed at session boot; an unsanctioned change to a governed file flags drift on the next boot. "Provably just files" — inspectable by design, kernel rejected on purpose.
 - **One persistence framework: local authority → public commitment → shard replication.** Substrate content syncs in full (scrubbed); chain content stays local with only its head committed; both are designed to become nodes in a future shard network.
 
-On top of these sit the operator-cognition gates: **WWWD** (a Will-emulation gate on consequential actions), **AFK mode** (predicted-reply menus for single-keystroke steering), and **RSAW** (recursive self-audit).
+On top of these sit the operator-cognition gates: **WWWD** (a Will-emulation gate on consequential actions), **Story Mode** (predicted-reply menus for single-keystroke steering; formerly "AFK mode"), and **RSAW** (recursive self-audit).
 
 ## Quickstart
 
