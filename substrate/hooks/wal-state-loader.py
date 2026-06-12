@@ -24,6 +24,7 @@ except Exception:
     pass
 
 WAL_PATH = os.path.expanduser("~/vibeswap/.claude/WAL.md")
+JARVIS_WAL_PATH = os.path.expanduser("~/.claude/WAL.md")
 MAX_LINES = 35
 
 
@@ -69,19 +70,31 @@ def main() -> int:
         except Exception:
             pass
 
-    summary, is_active = extract_top_epoch(WAL_PATH)
+    proj_summary, proj_active = extract_top_epoch(WAL_PATH)
+    jarvis_summary, jarvis_active = extract_top_epoch(JARVIS_WAL_PATH)
+    is_active = proj_active or jarvis_active
 
     if is_active:
+        which = []
+        if proj_active:
+            which.append("vibeswap")
+        if jarvis_active:
+            which.append("JARVIS-wide")
         header = (
-            "[WAL.md ACTIVE -- prior session did not close cleanly]\n"
+            f"[WAL ACTIVE ({' + '.join(which)}) -- prior session did not close cleanly]\n"
             "CLAUDE.md CRASH-recovery path required. Run AAP "
             "(cross-ref WAL manifest vs git log, auto-commit orphans) "
             "before resuming work.\n\n"
         )
     else:
-        header = "[WAL.md status -- latest epoch]\n"
+        header = "[WAL status -- latest epoch (two-tier: project + JARVIS-wide)]\n"
 
-    context = header + summary + "\n\nFull file: vibeswap/.claude/WAL.md"
+    context = (
+        header
+        + "## vibeswap/.claude/WAL.md\n" + proj_summary
+        + "\n\n## ~/.claude/WAL.md (JARVIS-wide)\n" + jarvis_summary
+        + "\n\nFull files: vibeswap/.claude/WAL.md + ~/.claude/WAL.md"
+    )
 
     out = {
         "hookSpecificOutput": {

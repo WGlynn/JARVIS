@@ -45,4 +45,6 @@ Check `.claude/WAL.md`. If status == ACTIVE → crash detected → run recovery 
 3. Present recovery report immediately
 4. Await user decision
 
-Full spec: `vibeswap/docs/ANTI_AMNESIA_PROTOCOL.md`
+Full spec: `vibeswap/docs/_meta/protocols/ANTI_AMNESIA_PROTOCOL.md` · retention audit: `ANTI_AMNESIA_RETENTION_SCORECARD.md`
+
+**Scope (2026-06-12)**: WAL is now TWO-tier — project work → `vibeswap/.claude/WAL.md`; cross-repo / JARVIS-wide work → `~/.claude/WAL.md`. Closes the "WAL is vibeswap-scoped" coupling-drift from the scorecard. FOLLOW-UP (pending): the SessionStart WAL-status hook still reads only the vibeswap WAL — generalize it to also read `~/.claude/WAL.md`.
