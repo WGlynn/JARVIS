@@ -22,7 +22,7 @@ at a time.
 
 ## How it works
 
-At the end of each turn the agent appends a menu titled **AFK** — ten options, ranked by
+At the end of each turn the agent appends a menu titled **Story Mode** — ten options, ranked by
 probability, each a complete instruction short enough to execute when you reply with just its
 number. No re-typing. The menu is built from two things: the user's own signature-response
 patterns (how this person actually decides) and the live decision on the table (what the next move

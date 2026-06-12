@@ -1,5 +1,5 @@
 {
-  "user": "TEMPLATE — copy to memory/_system/afk_signatures/<user>.json and derive from THEIR history",
+  "user": "TEMPLATE — copy to memory/_system/story_signatures/<user>.json and derive from THEIR history",
   "derived_from": "seed: replace examples with the user's actual recurring replies from session transcripts",
   "signature_moves": [
     {"key": "approve_and_continue", "examples": ["yes", "go", "approve", "run it"], "weight": 0.18},
