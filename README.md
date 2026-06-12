@@ -117,4 +117,4 @@ MIT. See [`LICENSE`](./LICENSE).
 
 ## Story Mode
 
-The AFK interface — operate the agent by picking numbered branches like a pick-your-own-adventure. See [STORY-MODE.md](STORY-MODE.md).
+**Gamified vibe coding** — the original game-AI loop, on an LLM. Operate the agent by picking numbered branches like a pick-your-own-adventure, except the branches are generated live and the choices do real work. See [STORY-MODE.md](STORY-MODE.md).
