@@ -8,6 +8,16 @@ end of every turn it hands you a short numbered menu of the most likely next mov
 a single number. The session branches forward like a pick-your-own-adventure novel, except the
 branches are real work and you are the one choosing the path.
 
+## It is the original game AI, on an LLM
+
+The first things ever called game AI were branch trees. Zork, the dungeon dialogue, choose your
+own adventure. You typed a choice, the world responded, you chose again. Story Mode is that exact
+loop with two changes. The branches are generated live by a language model instead of written in
+advance, and the choices do real work instead of advancing a plot. The dungeon master went from a
+lookup table to a mind, and the dungeon became your actual project. That is gamified vibe coding:
+the loose, intuition-led way of building with an AI, turned into a game you navigate one keystroke
+at a time.
+
 ## How it works
 
 At the end of each turn the agent appends a menu titled **AFK** — ten options, ranked by
