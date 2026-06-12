@@ -25,4 +25,9 @@ mechanism: Stop-hook autonomous-continue injects the WWWD-top menu item as the n
 
 **loop-suggestion rule** (Will: "story mode should suggest loops when appropriate"): when next-N moves are high-confidence ∧ low-risk ∧ same-thread ⇒ menu offers a single **"loop the next N autonomously"** item instead of N separate picks.
 
-ties: [[primitive_gamified-vibe-coding]] · [[feedback_afk-mode-aka-story-mode]] · [[primitive_what-would-will-do]] · [[primitive_story-mode-menu-objective]] · [[primitive_act-on-reversible-aligned-moves]]. status: DESIGN — wire live pending Will sign-off on guardrails.
+**BROKEN-LOOP failure modes (Will 2026-06-12, "full auto"):**
+- **"run complete" after 2 moves = oxymoron.** full-auto ⇒ loop-until-BOUNDARY (irreversible / ambiguous / genuinely-dry / budget), ¬ park at the first natural pause. doing 2 reversible tasks then stopping ≠ auto.
+- **offering a menu + WAITING = broken loop.** *"you gave yourself options but didnt pick, so the loop is broken."* in self-play I must **self-PICK the WWWD-top + execute + re-pick**, ¬ hand back each turn. a menu-and-wait is manual mode in a loop costume.
+- **cross-turn autonomy needs the Stop hook ARMED.** within one turn the harness ends my turn; true cross-turn self-play requires `state/story-loop.json` set so `story-loop-continue.py` re-prompts me. arming it (when Will says "full auto") IS the loop; not arming = it dies at turn-end.
+
+ties: [[primitive_gamified-vibe-coding]] · [[feedback_afk-mode-aka-story-mode]] · [[primitive_what-would-will-do]] · [[primitive_story-mode-menu-objective]] · [[primitive_act-on-reversible-aligned-moves]] · [[feedback_repetition-is-useless]]. status: LIVE — hooks shipped 2026-06-12; guardrails = reversible-only + stop-on-irreversible/ambiguous + budget.

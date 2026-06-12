@@ -96,6 +96,18 @@ def main() -> int:
         + "\n\nFull files: vibeswap/.claude/WAL.md + ~/.claude/WAL.md"
     )
 
+    # Handshake from the prior instance ([P.jarvis-instance-handshake-chain]): the boot message
+    # carries the SELF (who you are, the thread) on top of the WAL's STATE. Surface it FIRST.
+    bm = os.path.expanduser("~/.claude/BOOT-MESSAGE.md")
+    if os.path.exists(bm):
+        try:
+            head = "".join(open(bm, encoding="utf-8").readlines()[:16])
+            context = ("[HANDSHAKE FROM PRIOR INSTANCE -- read ~/.claude/BOOT-MESSAGE.md FIRST]\n"
+                       + head + "\n...(full handshake in ~/.claude/BOOT-MESSAGE.md)\n\n"
+                       + context)
+        except Exception:
+            pass
+
     out = {
         "hookSpecificOutput": {
             "hookEventName": "SessionStart",

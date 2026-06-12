@@ -6,6 +6,12 @@ originSessionId: d3ae9e64-adfb-4ba8-aa55-fee4f96e0207
 ---
 # Embedded Vibe-Coding IDE
 
+## STATUS 2026-06-12 — backend BUILT (was: docs-only, Soham's callout correct)
+* repo `C:/Users/Will/embedded-vibe-coding` @ 6e061ea, 40 tests green, local git only (remote = Will+Soham gate)
+* HANDOFF.md in repo = current state + next increments. Read it before any EVC-IDE work.
+* moat shipped: verify engine 16 expectation kinds + classification + evidence; demo --dry proven (fake log FAILS rate check, live 1Hz PASSES)
+* next: BLE receiver (bleak) -> Soham's XIAO demo; then live-hardware pass; then STM32/ESP32
+
 ## Glyph
 ```
 EVC-IDE  prompt -> code-edit -> build -> compile-repair -> flash ->

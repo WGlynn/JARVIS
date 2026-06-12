@@ -71,6 +71,25 @@ def main() -> int:
         pass
     catch = (on_menu / impressions) if impressions else None
 
+    # ORDER-AWARENESS ([P.will-choice-ordering-priority-function]): when the user multi-picks,
+    # ascending order means they took the menu top-to-bottom (ranking trusted); a reorder encodes
+    # their own priority (the menu mis-ranked). Rate of ascending multi-picks = ranking-alignment.
+    multi, ascending = 0, 0
+    try:
+        for line in open(impp, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            r = json.loads(line)
+            pk = r.get("picked") or []
+            if r.get("kind") == "pick" and isinstance(pk, list) and len(pk) > 1:
+                multi += 1
+                if pk == sorted(pk):
+                    ascending += 1
+    except Exception:
+        pass
+    ranking_alignment = (ascending / multi) if multi else None
+
     sig["_reweight"] = {
         "selections_consumed": n,
         # PRIMARY
