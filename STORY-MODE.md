@@ -5,8 +5,10 @@ Story Mode is how you operate an autonomous agent without becoming a passenger.
 Most "autonomous AI" puts you in one of two bad seats: you either babysit every step, or you
 hand over the wheel and watch. Story Mode is a third option. The agent does the work, and at the
 end of every turn it hands you a short numbered menu of the most likely next moves. You reply with
-a single number. The session branches forward like a pick-your-own-adventure novel, except the
-branches are real work and you are the one choosing the path.
+a number, or chain several at once like `5,4,1` to run them in order. The session branches forward
+like a pick-your-own-adventure novel, except the branches are real work and you are the one
+choosing the path. That multi-pick is the whole trick: one reply can queue a sequence of moves, so
+you are not clicking through a wizard, you are directing.
 
 ## It is the original game AI, on an LLM
 
