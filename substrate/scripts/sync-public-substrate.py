@@ -420,9 +420,9 @@ def emit_chain_commitment(apply: bool) -> dict:
 
 
 def _load_private_patterns():
-    """Block-economy / stealth markers live in a LOCAL-ONLY file (state/, never
-    synced) so the PUBLIC copy of this script carries no codewords. Add/remove
-    patterns there, not here."""
+    """Front-run-sensitive stealth markers live in a LOCAL-ONLY file (state/,
+    never synced) so the PUBLIC copy of this script carries no codewords.
+    Add/remove patterns there, not here."""
     fp = Path(HOME) / ".claude" / "state" / "private-leak-patterns.txt"
     pats = []
     try:
@@ -442,7 +442,7 @@ SCRUB_CONTENT_PATTERNS += PRIVATE_LEAK_MARKERS
 
 def _scan_private_leak():
     """Fail-closed backstop for the 2026-06-11 stealth decision: scan everything
-    staged in the PUBLIC substrate for block-economy / krabby-patty markers. The
+    staged in the PUBLIC substrate for the private stealth markers. The
     structural protection (private files live outside sync dirs) + the scrub-list
     should already prevent any leak; this makes it un-bypassable. Returns a list of
     (relpath, marker) offenders -- non-empty => abort the commit/push."""
@@ -455,8 +455,6 @@ def _scan_private_leak():
         for fn in files:
             if not fn.endswith((".md", ".py", ".json", ".txt")):
                 continue
-            if fn == "sync-public-substrate.py":
-                continue  # this script legitimately references the scan logic
             p = Path(root) / fn
             try:
                 txt = p.read_text(encoding="utf-8", errors="ignore")
@@ -524,10 +522,10 @@ def main():
     if args.apply:
         leaks = _scan_private_leak()
         if leaks:
-            print("\n✗ ABORTED — block-economy / krabby-patty markers found in the PUBLIC substrate:")
+            print("\n✗ ABORTED — private stealth markers found in the PUBLIC substrate:")
             for rel, mk in leaks[:12]:
                 print(f"    {rel}  (matched: {mk})")
-            print("  refusing to commit/push. Move these to ~/jarvis-private or memory/nda-locked.")
+            print("  refusing to commit/push. Move these to the private remote or memory/nda-locked.")
             return 2
         changed, msg = git_commit_and_push(push=not args.no_push)
         print(f"git: {msg}" if changed else f"git: {msg}")
