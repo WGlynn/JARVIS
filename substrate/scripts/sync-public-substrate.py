@@ -330,6 +330,20 @@ def git_commit_and_push(push: bool) -> tuple[bool, str]:
             check=True, capture_output=True
         )
         if push:
+            # Two-clone topology: another clone (e.g. ~/JARVIS) may have pushed since
+            # our last fetch, so a bare push rejects non-fast-forward. Rebase first;
+            # on conflict, favor THIS sync's version (authoritative for substrate/ +
+            # generated chain files like commitment.json).
+            pr = subprocess.run(
+                ["git", "-C", str(MONOREPO), "pull", "--rebase", "origin", "main"],
+                capture_output=True, text=True
+            )
+            if pr.returncode != 0:
+                subprocess.run(["git", "-C", str(MONOREPO), "checkout", "--theirs", "."],
+                               capture_output=True)
+                subprocess.run(["git", "-C", str(MONOREPO), "add", "-A"], capture_output=True)
+                subprocess.run(["git", "-C", str(MONOREPO), "-c", "core.editor=true",
+                                "rebase", "--continue"], capture_output=True)
             subprocess.run(
                 ["git", "-C", str(MONOREPO), "push"],
                 check=True, capture_output=True
