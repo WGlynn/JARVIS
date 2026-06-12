@@ -55,3 +55,10 @@ acts for you" and becomes "the agent proposes, you author, at the speed of a sin
 It reads like a game because it is one, in the good sense: the kind where the choices are yours and
 they matter, and the world is rendered for you the moment you choose. Build with an agent long
 enough and you stop wanting any other interface.
+
+## Runs anywhere
+
+The above is the full version: a set of local hooks, so it runs where Claude Code can reach your
+filesystem (terminal, desktop app, IDE). For the web app, where hooks can't run, there's a hookless
+drop-in that keeps the menu and the number-replies, just without the learning loop:
+[STORY-MODE-LITE.md](STORY-MODE-LITE.md).
