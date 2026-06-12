@@ -62,4 +62,27 @@ So the honest summary: ChatGPT can do nearly all of Story Mode. It just assemble
 parts, memory plus Code Interpreter plus Actions, instead of local hooks. The copy-paste is the front
 door; the machinery is there if you want to go deeper.
 
+## Building the fuller version (a sketch)
+
+If you want the near-complete Story Mode on ChatGPT, the same self-tuning loop the hook version runs,
+here is the architecture using only ChatGPT-native parts:
+
+- **Custom GPT instructions** carry the rules above: end every turn with the ranked menu, interpret
+  number replies, allow chaining. This is the deterministic-enough surface.
+- **Code Interpreter** is the program running underneath. Have the GPT keep a small log of every pick
+  in the sandbox during the session, then compute the real catch-rate (how often your move was in the
+  ten) and the rank it landed at. That is the exact metric the hook computes, in real Python.
+- **An Action to a tiny backend** is what makes it persist and learn across sessions. The sandbox
+  resets between chats, so on each turn the GPT calls an Action: read the user's pick history, rank
+  the menu using it, and after the user picks, write the new pick back. That backend is the corpus.
+  A dozen lines of serverless code plus a key-value store is enough.
+- **Persistent memory** is the zero-effort fallback: even with no backend, ChatGPT memory will softly
+  remember the kinds of moves you pick and lean the menu that way.
+
+The only piece that stays out of reach on the consumer chat surface is unattended self-driving, the
+agent re-prompting itself turn after turn while you are away. That lives at the platform layer
+(the Assistants / Agents API), not in a chat window. Everything else, the menu, the chaining, the
+real catch-rate, the cross-session learning, is buildable today with a Custom GPT, Code Interpreter,
+and one Action.
+
 Full version and the story behind it: [STORY-MODE.md](./STORY-MODE.md).
