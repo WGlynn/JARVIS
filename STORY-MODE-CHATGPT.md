@@ -38,12 +38,28 @@ labeled "How would you like ChatGPT to respond?" and save. Now every new chat is
 Open a new chat and paste the instruction as your first message. That chat will run Story Mode until
 you close it.
 
-## What it is and is not
+## How far ChatGPT can actually take it
 
-This is the *experience* of Story Mode: the menu, the number-replies, the chaining. It is not the
-full machinery. The full Claude Code version learns which options you actually pick and gets better
-at predicting you over time, and it can even run itself. ChatGPT cannot do those parts (they need a
-real program running underneath). But the part that makes people fall in love with it, ending every
-turn with a menu you steer by number, works exactly the same here.
+The copy-paste above is the simplest version: the menu, the number-replies, the chaining, by
+instruction alone. But it would be wrong to stop there and treat ChatGPT like a dumb terminal. It has
+real machinery that can carry Story Mode most of the way to the full thing:
+
+- **Persistent memory.** ChatGPT remembers facts and preferences across your chats. That alone gives
+  a soft version of learning your hand: it can notice the kinds of moves you tend to pick and lean the
+  menu toward them, with no code at all.
+- **Code Interpreter (Advanced Data Analysis).** It runs real Python in a sandbox. Within a session it
+  can keep a log of every pick and compute the actual catch-rate, the same metric the hook version
+  tracks. That is a program running underneath, not a chatbot guessing.
+- **Custom GPT + Actions.** A Custom GPT can call an external API. Point it at a small backend and you
+  have the full persistent, self-tuning corpus, the same as the local hook version, just hosted instead
+  of sitting on your disk.
+
+The one thing the consumer ChatGPT chat genuinely cannot do is drive itself turn after turn while you
+are away. There is no equivalent of the Stop-hook that re-prompts it. And even that has a platform
+answer: the Assistants / Agents API can run autonomous multi-step loops.
+
+So the honest summary: ChatGPT can do nearly all of Story Mode. It just assembles it from different
+parts, memory plus Code Interpreter plus Actions, instead of local hooks. The copy-paste is the front
+door; the machinery is there if you want to go deeper.
 
 Full version and the story behind it: [STORY-MODE.md](./STORY-MODE.md).
