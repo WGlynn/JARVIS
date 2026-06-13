@@ -9,6 +9,9 @@ desktop.ini
 *.swp
 *.swo
 
+# Logs
+*.log
+
 # Local-only / private
 *.local.md
 private/
