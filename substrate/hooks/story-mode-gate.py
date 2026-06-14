@@ -127,9 +127,35 @@ def main() -> int:
             except Exception:
                 pass
             items = ", ".join(str(x) for x in picks)
-            sel_note = (f"\nUSER PICKED MENU ITEM(S) {items}: execute item(s) {items} from the "
-                        "numbered menu at the end of YOUR PREVIOUS response, in order, exactly "
-                        "as written. Do not ask for confirmation.")
+            multi = len(picks) > 1
+            if multi:
+                sel_note = (
+                    f"\nUSER PICKED MENU ITEM(S) {items}: execute them as a CHAIN from the numbered "
+                    f"menu at the end of YOUR PREVIOUS response, per the Story-Mode chained-pick "
+                    f"contract:\n"
+                    f"1. ORDER IS LITERAL: run in the typed sequence ({items}), not numeric order -- "
+                    f"order encodes intent.\n"
+                    f"2. CONTRADICTION: if two picked items are mutually exclusive (an action and its "
+                    f"hold/negation, or two divergent pivots), the LATER item in the chain wins; skip "
+                    f"the earlier one and state in ONE line what you dropped and why. Never execute both.\n"
+                    f"3. TERMINAL: if a picked item is a hold/stop/react-first item, execute everything "
+                    f"before it, then STOP and hand back; drop and note any items after it.\n"
+                    f"4. DEPENDENCY: keep the typed order; only if that order makes an item impossible "
+                    f"(it needs an earlier item's result that won't exist yet) run the prerequisite "
+                    f"first and note the reorder.\n"
+                    f"5. PARTIAL FAILURE: if an item fails, STOP the chain, report what completed, "
+                    f"surface the failure, show a fresh menu -- do not blind-continue past a broken premise.\n"
+                    f"6. NO-OP/REPEAT: skip an item already satisfied this session and note it "
+                    f"(repetition-is-useless).\n"
+                    f"7. CONFIRMATION: an explicitly-picked item IS authorization -- do not re-ask, even "
+                    f"for irreversible/outward actions. EXCEPTION: if contradiction/dependency resolution "
+                    f"would route you into an irreversible/outward action that was NOT cleanly chosen, "
+                    f"pause and confirm.\n"
+                    f"Then show a fresh menu.")
+            else:
+                sel_note = (f"\nUSER PICKED MENU ITEM(S) {items}: execute item {items} from the numbered "
+                            f"menu at the end of YOUR PREVIOUS response, exactly as written. An explicit "
+                            f"pick IS authorization -- do not ask for confirmation. Then show a fresh menu.")
 
     sig_rules = ""
     try:

@@ -425,9 +425,20 @@ def _background_agent_alive() -> bool:
     permanently stuck behind a lingering stub."""
     import time as _time
     temp = Path(os.environ.get("TEMP") or "/tmp") / "claude"
+    # Exclude THIS session's own task output. substrate-sync usually runs INSIDE a
+    # live interactive session (the cron prompt fires in-session), whose own
+    # .output file is continuously rewritten as the turn streams. Without this it
+    # self-trips the guard on every interactive run -- a false-positive self-
+    # detection that burned 2 defer ticks before the valve every time (diagnosed
+    # 2026-06-14: the "live agent" was always febb23..., the running session). A
+    # genuine peer background agent lives in a DIFFERENT session dir; our own
+    # session is not a threat to a sync we are deliberately invoking.
+    self_sid = os.environ.get("CLAUDE_CODE_SESSION_ID") or ""
     try:
         now = _time.time()
         for p in temp.rglob("tasks/*.output"):
+            if self_sid and self_sid in p.parts:
+                continue
             st = p.stat()
             # pending/streaming agent: 0-byte but freshly spawned (not a stale stub)
             if st.st_size == 0 and st.st_mtime > now - 15 * 60:
@@ -546,7 +557,7 @@ def main():
         if n <= MAX_DEFERS:
             _write_defer_count(n)
             print(f"sync-public-substrate: DEFERRED ({n}/{MAX_DEFERS}) -- live background "
-                  "agent detected (0-byte task output). Re-run after agents land, or --force.")
+                  "agent detected (fresh task output, peer session). Re-run after agents land, or --force.")
             return 0
         # bounded-defer safety valve: a real agent would have landed in MAX_DEFERS
         # ticks; a lingering 0-byte stub is almost certainly orphaned. Proceed so
