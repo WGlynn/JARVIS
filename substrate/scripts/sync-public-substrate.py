@@ -43,6 +43,15 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Windows consoles default to cp1252, which crashes on the non-ASCII glyphs in this script's
+# leak-gate abort messages — exactly when we MOST need the output. Force UTF-8 so the gate can
+# always report: a gate that crashes before naming the leak is no gate.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except (AttributeError, ValueError):
+        pass
+
 
 HOME = Path.home()
 LOCAL_MEMORY = HOME / ".claude" / "projects" / "C--Users-Will" / "memory"
@@ -76,6 +85,24 @@ SCRUB_CONTENT_PATTERNS = [
     ]
 ]
 
+# Single source of truth for private codenames: merge ~/.claude/state/private-leak-patterns.txt
+# into the scrub-list so the two can never drift. Each non-comment line is a literal codename,
+# matched case-insensitively with word boundaries. The disconnect between this hardcoded list and
+# the leak-patterns file was a real leak vector (2026-06-13): the private codenames were in the patterns
+# file but NOT scrubbed by the sync. FAIL-CLOSED — if the codename list can't be read, refuse to
+# sync rather than under-scrub (a leak is unrecoverable; over-scrub is not).
+_LEAK_PATTERNS_FILE = Path.home() / ".claude" / "state" / "private-leak-patterns.txt"
+try:
+    for _line in _LEAK_PATTERNS_FILE.read_text(encoding="utf-8", errors="replace").splitlines():
+        _t = _line.strip()
+        if not _t or _t.startswith("#"):
+            continue
+        SCRUB_CONTENT_PATTERNS.append(re.compile(r"\b" + re.escape(_t) + r"\b", re.IGNORECASE))
+except OSError as _e:
+    raise SystemExit(
+        f"LEAK-GATE: cannot read {_LEAK_PATTERNS_FILE} ({_e}); refusing to sync (fail-closed)."
+    )
+
 # Memory filename patterns that always stay local
 SCRUB_FILENAME_PATTERNS = [
     re.compile(p) for p in [
@@ -92,6 +119,7 @@ SCRUB_FILENAME_PATTERNS = [
 HOOK_SKIP_LIST = {
     "phone-ping.py",                   # personal email in docstring
     "partner-architecture-load-gate.py",  # partner-specific embedded content
+    "private-handoff-loader.py",       # surfaces the private stealth handoff — NEVER public
 }
 
 # Hooks where the em-dash gate is special — we keep a sanitized version that
@@ -434,7 +462,7 @@ def emit_chain_commitment(apply: bool) -> dict:
 
 
 def _load_private_patterns():
-    """Front-run-sensitive stealth markers live in a LOCAL-ONLY file (state/,
+    """Private stealth markers live in a LOCAL-ONLY file (state/,
     never synced) so the PUBLIC copy of this script carries no codewords.
     Add/remove patterns there, not here."""
     fp = Path(HOME) / ".claude" / "state" / "private-leak-patterns.txt"
