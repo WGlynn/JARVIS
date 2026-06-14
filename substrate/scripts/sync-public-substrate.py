@@ -207,6 +207,16 @@ def sync_memory(apply: bool) -> dict:
         if skip:
             stats["scrubbed"] += 1
             scrubbed_names.append((src.name, reason))
+            # LEAK BACKSTOP: a memory file that was synced CLEAN and only now matches a scrub
+            # pattern must have its old public copy removed (parallels the discretion path above).
+            dest = SUB_MEMORY / src.name
+            if apply and dest.exists():
+                try:
+                    dest.unlink()
+                    stats["deleted"] = stats.get("deleted", 0) + 1
+                    print(f"  delete-stale (now-scrubbed): {src.name}")
+                except Exception:
+                    pass
             continue
         dest = SUB_MEMORY / src.name
         if not apply:
@@ -257,7 +267,7 @@ def check_discretion_frontmatter(content: str) -> str | None:
 
 
 def sync_hooks(apply: bool) -> dict:
-    stats = {"copied": 0, "updated": 0, "skipped": 0, "same": 0}
+    stats = {"copied": 0, "updated": 0, "skipped": 0, "same": 0, "deleted": 0}
     SUB_HOOKS.mkdir(parents=True, exist_ok=True)
     for hook_dir in LOCAL_HOOKS:
         if not hook_dir.exists():
@@ -265,7 +275,16 @@ def sync_hooks(apply: bool) -> dict:
         for src in sorted(hook_dir.rglob("*.py")):
             name = src.name
             if name in HOOK_SKIP_LIST:
-                stats["skipped"] += 1
+                # Auto-delete any STALE public copy: a file added to the skip-list AFTER it was
+                # once synced must not linger in the public substrate (the 2026-06-13 abort cause).
+                rel = src.relative_to(hook_dir)
+                dest = SUB_HOOKS / rel
+                if apply and dest.exists():
+                    dest.unlink()
+                    stats["deleted"] += 1
+                    print(f"    delete-stale (skip-listed): {rel}")
+                else:
+                    stats["skipped"] += 1
                 continue
             rel = src.relative_to(hook_dir)
             dest = SUB_HOOKS / rel
@@ -291,7 +310,7 @@ def sync_hooks(apply: bool) -> dict:
 
 def sync_dir(src_dir: Path, dest_dir: Path, glob: str, apply: bool,
              content_scrub: bool = False) -> dict:
-    stats = {"copied": 0, "updated": 0, "same": 0, "scrubbed": 0}
+    stats = {"copied": 0, "updated": 0, "same": 0, "scrubbed": 0, "deleted": 0}
     if not src_dir.exists():
         return stats
     dest_dir.mkdir(parents=True, exist_ok=True)
@@ -310,6 +329,12 @@ def sync_dir(src_dir: Path, dest_dir: Path, glob: str, apply: bool,
             if hit:
                 stats["scrubbed"] += 1
                 print(f"    scrub: {src.name} (content-match: {hit})")
+                # LEAK BACKSTOP: if this file was synced CLEAN before and only now matches a private
+                # pattern, the old public copy must be removed, not left behind.
+                if apply and dest.exists():
+                    dest.unlink()
+                    stats["deleted"] += 1
+                    print(f"    delete-stale (now-scrubbed): {src.name}")
                 continue
         if not apply:
             if not dest.exists():
@@ -537,22 +562,25 @@ def main():
 
     mem_stats = sync_memory(args.apply)
     print(f"memory:  +{mem_stats['copied']} added  ~{mem_stats['updated']} updated  "
-          f"={mem_stats['same']} same  -{mem_stats['scrubbed']} scrubbed")
+          f"={mem_stats['same']} same  -{mem_stats['scrubbed']} scrubbed  "
+          f"-{mem_stats.get('deleted', 0)} stale-removed")
     if mem_stats.get("scrubbed_names"):
         for name, reason in mem_stats["scrubbed_names"][:5]:
             print(f"    scrub: {name} ({reason})")
 
     hook_stats = sync_hooks(args.apply)
     print(f"hooks:   +{hook_stats['copied']} added  ~{hook_stats['updated']} updated  "
-          f"={hook_stats['same']} same  -{hook_stats['skipped']} skipped")
+          f"={hook_stats['same']} same  -{hook_stats['skipped']} skipped  "
+          f"-{hook_stats.get('deleted', 0)} stale-removed")
 
     cron_stats = sync_dir(LOCAL_CRON, SUB_CRON, "*.md", args.apply, content_scrub=True)
     print(f"crons:   +{cron_stats['copied']} added  ~{cron_stats['updated']} updated  "
-          f"={cron_stats['same']} same  -{cron_stats['scrubbed']} scrubbed")
+          f"={cron_stats['same']} same  -{cron_stats['scrubbed']} scrubbed  "
+          f"-{cron_stats.get('deleted', 0)} stale-removed")
 
     script_stats = sync_dir(LOCAL_SCRIPTS, SUB_SCRIPTS, "*.py", args.apply)
     print(f"scripts: +{script_stats['copied']} added  ~{script_stats['updated']} updated  "
-          f"={script_stats['same']} same")
+          f"={script_stats['same']} same  -{script_stats.get('deleted', 0)} stale-removed")
 
     chain_stats = emit_chain_commitment(args.apply)
     if chain_stats.get("ok"):
