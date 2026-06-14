@@ -107,9 +107,29 @@ def main() -> int:
         if cand and all(1 <= x <= 10 for x in cand):
             picks = cand
 
+    # Inline modifier: "N: <instruction>" (also N. / N -) runs a SINGLE item with a
+    # short tweak, e.g. "3: only the auth part" or "3 - use sonnet". Case-preserved
+    # from the raw prompt. Only fires when the bare-number parse above didn't match.
+    modifier = ""
+    if not picks:
+        mod_m = re.match(r"\s*(\d{1,2})\s*[:.\-]\s+(.+)", prompt.strip(), re.DOTALL)
+        if mod_m and 1 <= int(mod_m.group(1)) <= 10:
+            picks = [int(mod_m.group(1))]
+            modifier = mod_m.group(2).strip()
+
     is_toggle = p in ON_CMDS
+    # Cron-injection guard: a prompt that begins "type: <marker>" is an autonomous
+    # cron pointer, not a human reply to a menu. Logging it as off-menu pollutes the
+    # catch-rate denominator with turns no menu could anticipate. Skip the impression.
+    is_cron_injection = bool(re.match(r"\s*type:\s*\S", prompt))
+    # Meta/activation guard: bare "story mode" / "story" / "menu" are activation or
+    # meta phrases, NOT a human reply to a menu. (ON_CMDS requires "... on"; bare
+    # "story mode" fell through to off_menu and polluted the catch-rate denominator
+    # with a turn no menu could anticipate -- same class as the cron-injection guard.
+    # The menu still renders below; only the impression log is skipped.)
+    is_meta = p in ("story mode", "story", "menu", "story status", "story mode status")
     sel_note = ""
-    if not is_toggle:
+    if not is_toggle and not is_cron_injection and not is_meta:
         kind = "pick" if picks else "off_menu"
         try:
             with open(os.path.join(SIG_DIR, f"{USER}_impressions.jsonl"), "a",
@@ -126,6 +146,18 @@ def main() -> int:
                         f.write(json.dumps({"t": time.time(), "picked": x}) + "\n")
             except Exception:
                 pass
+        else:
+            # Off-menu regret mining: the freetext typed INSTEAD of a menu item is the
+            # highest-signal training data -- it's exactly what the 10 items failed to
+            # anticipate. Capture it so menu-gen / the reweighter can learn the miss.
+            try:
+                with open(os.path.join(SIG_DIR, f"{USER}_offmenu.jsonl"), "a",
+                          encoding="utf-8") as f:
+                    f.write(json.dumps({"t": time.time(),
+                                        "prompt": prompt.strip()[:500]}) + "\n")
+            except Exception:
+                pass
+        if picks:
             items = ", ".join(str(x) for x in picks)
             multi = len(picks) > 1
             if multi:
@@ -153,8 +185,10 @@ def main() -> int:
                     f"pause and confirm.\n"
                     f"Then show a fresh menu.")
             else:
+                mod_clause = (f" MODIFIER -- apply this tweak to how you execute it: "
+                              f"\"{modifier}\"." if modifier else "")
                 sel_note = (f"\nUSER PICKED MENU ITEM(S) {items}: execute item {items} from the numbered "
-                            f"menu at the end of YOUR PREVIOUS response, exactly as written. An explicit "
+                            f"menu at the end of YOUR PREVIOUS response, exactly as written.{mod_clause} An explicit "
                             f"pick IS authorization -- do not ask for confirmation. Then show a fresh menu.")
 
     sig_rules = ""
@@ -179,7 +213,14 @@ def main() -> int:
            "words) executable when the user replies with just its number(s). LOOP-SUGGESTION: "
            "when the next several moves are high-confidence, low-risk, and same-thread, include "
            "ONE item offering to run them as an autonomous loop (e.g. 'Loop the next N "
-           "autonomously') -- the user arms it by replying 'story loop N'."
+           "autonomously') -- the user arms it by replying 'story loop N'. "
+           "QUALITY: the 10 items must span at least 5 distinct signature-move classes and "
+           "contain NO near-duplicates -- no two items may be paraphrases of the same action. "
+           "SAFETY: prefix any item that performs an irreversible or outward-facing action "
+           "(send / publish / deploy / delete / push / message / email / post) with a leading "
+           "'⚠ ' marker so a phone-tapper sees the consequence before tapping. "
+           "MODIFIERS: a user may also reply 'N: <tweak>' to run item N with a small adjustment "
+           "(e.g. '3: only the auth part')."
            + sig_rules + sel_note)
     print(json.dumps({"hookSpecificOutput": {
         "hookEventName": "UserPromptSubmit", "additionalContext": ctx}}))
