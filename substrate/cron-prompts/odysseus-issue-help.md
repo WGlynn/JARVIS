@@ -8,7 +8,7 @@ The 4th Odysseus loop, beside discovery (broadcast) + daily-cadence + advice-min
 
 **‼ REPO POLICY (verified 2026-06-14, CONTRIBUTING.md L77):** Odysseus explicitly names LLM agents — *"Devin, Cursor, OpenHands, Claude Code, etc."* — and asks them to **open an issue first, not a PR**; bulk agent-generated contributions "closed without review even when the underlying fix is correct." Consequences for THIS loop:
 - **NEVER open a PR autonomously.** PRs are Will-only, and even then follow the issue-first norm.
-- **Issue comments** that genuinely help (diagnosis / repro / root-cause) are within community norms IF they read as a knowledgeable human, not a bot. But given the repo actively scrutinizes AI output and posts go out under Will's WGlynn identity, autonomous overnight posting is HELD until Will has reviewed at least one batch of drafts and calibrated the voice. Default = prep-not-delivery. Re-open autonomous posting only on explicit Will go-ahead AFTER a calibration batch.
+- **Issue comments** that genuinely help (diagnosis / repro / root-cause) are within community norms IF they read as a knowledgeable human, not a bot. **Autonomous posting AUTHORIZED (Will 2026-06-15:** *"you can post on your own anywhere you want as long as you follow my rules"* + *"keep croning on there for opportunities to help with valid gate-approved solutions"*). The hold is LIFTED. The rules ARE the gate: post ONLY through the C2.5 confidence floor (conf ≥ 0.85, top-decile cap, settlement-verifier over sniper, never a PR, AI-tell-clean, wglynn-not-already-commented). A "valid gate-approved solution" = reproduced or genuinely-resolving, not merely relevant. See [F·autonomous-posting-grant-rule-bound].
 - AI-tell scrub is not optional here — it is the difference between contribution and reputational damage.
 
 ---
@@ -40,7 +40,7 @@ Two-phase: TRIAGE all open issues (autonomous), then DRAFT help on the resolvabl
 ### Hard caps (check EVERY fire, before work)
 1. **Halt-flag**: grep `MEMORY.md` for `ODYSSEUS_CAMPAIGN_HALT` → exit + calendar-ping.
 2. **Draft daily cap**: count `odysseus-issue-help-log.md` rows with `Type=draft` from today → ≥ 5 → stop drafting (triage may continue).
-3. **No-post invariant**: this loop NEVER calls `addComment` / `gh issue comment` / any write API. If a step would post, STOP and ping instead.
+3. **Post-only-through-the-gate invariant**: posting happens ONLY in C2.5, ONLY for drafts clearing every pre-post gate (conf ≥ 0.85, top-decile cap, ≤ 2/fire, AI-tell-clean, no competing-with-live-PR, wglynn-not-already-commented). Any draft that fails a gate STAYS a Desktop draft. Never a PR. When in doubt, draft + ping instead of posting.
 
 ### Phase 1 — TRIAGE (autonomous, comprehensive ATTENTION)
 1. Page all open issues: `gh api repos/pewdiepie-archdaemon/odysseus/issues?state=open&per_page=100` (follow pagination). ~609 at scout-time 2026-06-13.
