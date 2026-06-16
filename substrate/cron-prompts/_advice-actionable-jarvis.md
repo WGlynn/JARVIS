@@ -151,3 +151,17 @@ Format same as `_advice-actionable-vibeswap.md`.
 - Our substrate state: JARVIS cron loops auto-commit and push to WGlynn/jarvis-substrate (substrate-sync every 2h, advice-mirror per fire) with zero post-hoc review lane. Same shape: speed-priority unattended writes, no measured follow-up ratio. VibeSwap dual-remote pushes share the shape when sessions move fast.
 - Suggested action: small audit cron (weekly) that samples recent auto-commits in jarvis-substrate, re-checks them against current substrate state (broken links, stale pointers, scrub-list violations), and files notes to _primitives-pending.md. Track the follow-up ratio over time as the pipeline quality metric.
 - Will-triage: pending
+
+## [2026-06-16 13:30 ET] -- Problem-owner vs candidate-implementation split, with an explicit short-track to avoid "dead by policy"
+- Source: #4415 by @RaresKeY + @TimHoogervorst refinement (https://github.com/pewdiepie-archdaemon/odysseus/discussions/4415)
+- Their advice (paraphrase): make the issue the durable owner of the problem; PRs are candidate implementations of it (multiple PRs per issue; the issue survives a bad PR). BUT add a short-track route so narrow/clearly-scoped work (small bugfix, isolated UI, strict-scope) skips the full bucket ceremony, otherwise the structure becomes "dead by policy."
+- Our substrate state: _primitives-pending.md is already the problem-owner and promoted memory primitives are the candidate-implementations of each observed need -- same shape, currently implicit. C3 already says "empty days valid," but there is no explicit short-track: every observation gets the same full structured-note ceremony regardless of triviality.
+- Suggested action: add a 2-bucket classify to C3 -- (i) needs-structure (recurring/overlapping/edge-case) gets the full pending note; (ii) narrow/obvious (one-line rule, trivial fix) short-tracks to a single log line or direct fix, no ceremony. Mirrors RaresKeY's needs-organization vs narrow-scope split; keeps the loop from generating ceremony-noise.
+- Will-triage: pending
+
+## [2026-06-16 13:30 ET] -- Keep core small; push large features behind a thin manifest contract; land the contract as one minimal increment
+- Source: #4439 by @vdmkenny + @RaresKeY routing comment (https://github.com/pewdiepie-archdaemon/odysseus/discussions/4439)
+- Their advice (paraphrase): a recurring flood of multi-thousand-line feature PRs into core grows the security/maintenance surface and re-litigates "should this be in core." Fix: a thin plugin contract (manifest + capabilities) so large features live outside core; and land the CONTRACT first as one small reviewable PR, not a 4,900-line platform.
+- Our substrate state: this is already the cron architecture -- cron entry = thin pointer (marker + path), canonical .md = logic; CLAUDE.md/core memory stays small, behavior lives in hooks/cron-prompt "plugins." Validates the design. The refinement we lack: new cron behaviors are sometimes authored as fat monolithic prompts instead of pointer+canonical from inception.
+- Suggested action: enforce the pointer+canonical contract for ALL new crons from inception (marker + path in scheduled_tasks; logic in a versioned .md), and land new substrate features as the minimal contract first (IPM/ponytail at the substrate layer) rather than a monolithic prompt. Same shape as "land the contract as one small PR."
+- Will-triage: pending
