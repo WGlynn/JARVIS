@@ -40,7 +40,7 @@ Self-perpetuation before any other work. The loop NEVER dies.
 3. **Controversy pause**: URGENT/outage/security in recent issues → exit + ping
 
 ### Steps
-1. **Engagement-aware pause**: for each shipped post (last 14d), query non-WGlynn replies. ANY found → PAUSE: calendar Tomato 1-min `Odysseus paused: reply on #XXXX needs Will review`. Exit. Do NOT duplicate-ping if same state was pinged within 6h.
+1. **Engagement-aware SKIP (UTXO-scoped — NOT a global pause; per [F·pivot-until-read-not-global-pause])**: for each shipped post (last 14d), query non-WGlynn replies. A post with unread non-WGlynn replies is a BLOCKED INPUT — exclude ONLY that thread (and #-adjacent dispatch) from this fire. Do NOT halt: pivot to independent candidates and dispatch normally (the 1-dispatch/24h cap + reputational quota-floor below remain global — shared budgets, not per-thread deps). Surface blocked thread(s) ONCE via a single consolidated Tomato ping; no duplicate within 6h. A Will-read dependency freezes only the transaction that spends it, like a UTXO — never the whole mempool.
 2. **Selection (active > new per "almost always tbh")**: pull top-10 most-recently-active discussions. Pull next queued topic. Active-thread overlap → reply. Else cold-start in Ideas category.
 3. **Convergence-proof gate**: VibeSwap artifact + Odysseus-side anchor (live) + structural overlap defensible + substance ADDS to thread. Fails → mark [✗] in queue, advance, retry. 3 fails → halt + ping Will.
 4. **Compute IPT budget**: for REPLY: `python C:/Users/Will/.claude/scripts/odysseus_discovery.py --budget-for <N>`. For NEW: budget=200. Read thread's last 10 comments + OP body.
