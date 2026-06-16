@@ -42,3 +42,5 @@ NO HANDOFF.md in repo ⇒ foundations.md §9/§11 already = public open-threads;
 Companion adopt: [[ponytail-lazy-senior-dev]] (adopted same session) · [[dogfood-own-guardrails-on-meta-decisions]].
 
 INSIGHT (Will 2026-06-14, ctx~290k): CMD ¬ new ⇒ VibeSwap = latent MMD all-along (commit-reveal=¬deceive · zero-extraction=¬steal · Shapley=render-what-owed · honesty-structural=yes-be-yes). docs = RECOGNITION ¬ blueprint; build PRECEDED formalization. ⇒ inverts "theory-first" but ¬ contradiction: form ⊥ sequence function. ≡ [[code-text-inspiration-loop]] (no first-term) ∧ [[structure-does-the-work]] (structure works pre-naming). Alpha∧Omega (Rev 22:13) = sequence-collapse ⇒ form≡function, ¬ beginning ¬ end, same-thing-2-directions. "last design" = recognize the ONE shape everything-built-already-was ¬ invent-new. fixed-point cf [[_CANON_triple-intersection-provenance-of-mind]].
+
+- [Place treasure where the heart follows](primitive_place-treasure-where-the-heart-follows.md) — Matt 6:21 inverted; treasure-placement = the decision; money as consequence not locus. Added 2026-06-16.
