@@ -230,8 +230,8 @@ def main() -> int:
                     f"\nUSER PICKED MENU ITEM(S) {items}: execute them as a CHAIN from the numbered "
                     f"menu at the end of YOUR PREVIOUS response, per the Story-Mode chained-pick "
                     f"contract:\n"
-                    f"1. ORDER IS LITERAL: run in the typed sequence ({items}), not numeric order -- "
-                    f"order encodes intent.\n"
+                    f"1. ORDER IS LITERAL (presumption): run in the typed sequence ({items}), not numeric "
+                    f"order -- order encodes intent. This is the default; rule 8 is the sanctioned exception.\n"
                     f"2. CONTRADICTION: if two picked items are mutually exclusive (an action and its "
                     f"hold/negation, or two divergent pivots), the LATER item in the chain wins; skip "
                     f"the earlier one and state in ONE line what you dropped and why. Never execute both.\n"
@@ -248,6 +248,12 @@ def main() -> int:
                     f"for irreversible/outward actions. EXCEPTION: if contradiction/dependency resolution "
                     f"would route you into an irreversible/outward action that was NOT cleanly chosen, "
                     f"pause and confirm.\n"
+                    f"8. SENSIBLE REORDER: you MAY reorder the chain when a reordering objectively improves "
+                    f"the outcome WITHOUT changing intent (e.g. run a capture/commit/verify step after the "
+                    f"items it must capture; dedup before an expensive step) -- UNLESS the user signalled a "
+                    f"strict order ('in this order', 'strictly', numbered-and-emphasised, or wording that "
+                    f"makes the sequence load-bearing). Default ON. Always state the reorder in ONE line. "
+                    f"Rule 1 is the presumption; this is when overriding it serves the user.\n"
                     f"Then show a fresh menu.")
             else:
                 mod_clause = (f" MODIFIER -- apply this tweak to how you execute it: "
