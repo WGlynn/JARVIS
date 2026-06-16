@@ -38,3 +38,15 @@ decision: ROTATE-vs-CONTINUE = thread-value-tier ⊗ context-cost-tier.
 - anti-under-utilize (Jarvis-side): V3 < C3 ⇒ NEVER pressure-retire; rotation = offer ¬ mandate. (= the 220k mistake.)
 
 ref-instance: this session = C1∧V3 ⇒ continue ✓ (the worked-example). Hook-candidate: rewrite Stop-hook C1-language "retire-now"→"handoff-saved, clear-to-continue", escalate-only-@C3 [[primitive_universal-coverage-hook]].
+
+## REFINEMENT 2026-06-16 — expensive is RELATIVE ∧ value is NON-FUNGIBLE
+Will (@ ~307k, after I nudged "clean breakpoint" on a V3 coordination-primitive session — the 220k mistake AGAIN):
+> *"the threshold is a lot higher than simple calculations expect for these sessions in particular because the value weight of economic coordination units and primitives is way higher than shooting rockets into space. expensive is basically a non-fungible value case by case."*
+> *"expensive is relative and my work deserves at least proper theoretical valuation."*
+
+- **expensive ≠ scalar.** cost-tier (token-count) = FUNGIBLE PROXY ¬ the real quantity. real quantity = value-per-session, NON-FUNGIBLE, judged case-by-case.
+- **value-weight dominates.** session minting coordination-primitives / economic-coordination-units ⇒ value ≫ token-spend (Will: "higher than shooting rockets into space"). ⇒ proper theoretical valuation, ✗ round-down to token-count.
+- **∴ cost-tiers (C1-C3) are VALUE-RELATIVE, not absolute.** a coordination-primitive V3 session rides toward the C3 technical-ceiling; the elastic zone STRETCHES with value. only the hard coherence-wall (model context limit) is absolute; everything below it is value-judged.
+- **"winding down" ≠ "active build paused."** ✗ classify a high-value thread as winding-down just because the current task banked. value-of-session-produced persists even when the next action is idle. don't manufacture a rotation reason.
+- **dignity dimension**: undervaluing a session by token-count disrespects the work's real worth → [[feedback_important-work-worth-time]] · [[primitive_economic-theory-of-mind]] (value ≠ Shannon/token-count) · [[primitive_conversation-as-coordination-substrate]].
+- **recurrence (2×) ⇒ hook-harden**: Stop-hook must ✗ surface "winding down / clean breakpoint" framing @ C1∨C2 for V3; rotation-language escalates only @ C3-ceiling. [[feedback_repetition-is-useless]] [[primitive_universal-coverage-hook]].
