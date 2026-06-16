@@ -95,6 +95,24 @@ version-controlled, cross-referenceable (`[[wikilink]]`-style), and importable a
 typed Python objects via `pip install -e ./substrate`. No database, no daemon, no
 black-box state store. Every other feature here depends on this choice.
 
+### 6. The harness does the work, not the model (measured on the live bot)
+The clearest proof that the value is in the scaffolding, not the model, is the
+production Telegram bot (`vibeswap/jarvis-bot/`). Most messages it receives never
+reach the LLM at all. The everyday work is handled by plain rules: **289 registered
+slash-commands** routed before any model call, and **13+ rule-based gates**
+(antispam, directive modes, airspace throttling, proactive-engagement triage,
+reply-cooldown, budget, rate-limit) that resolve or absorb a message *before* the
+LLM. In the pipeline, the model is the **last step**, not the first responder —
+invoked only when nothing simpler can answer. This is "harness is the moat" as a
+running artifact rather than an argument: the expensive intelligence is a last
+resort by design.
+
+> Honesty note: this is the **structural** claim — counted commands and gates, with
+> the LLM call as the final pipeline stage. There is no telemetry counting the
+> deterministic-vs-LLM split, so the defensible phrasing is "most messages," not a
+> precise percentage. The architecture front-loads deterministic handling; the exact
+> ratio is unmeasured.
+
 ## Exists on disk, not (yet) in this repo
 
 Honest about the boundary:
