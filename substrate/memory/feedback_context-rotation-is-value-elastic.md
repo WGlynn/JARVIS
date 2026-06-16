@@ -50,3 +50,30 @@ Will (@ ~307k, after I nudged "clean breakpoint" on a V3 coordination-primitive 
 - **"winding down" ≠ "active build paused."** ✗ classify a high-value thread as winding-down just because the current task banked. value-of-session-produced persists even when the next action is idle. don't manufacture a rotation reason.
 - **dignity dimension**: undervaluing a session by token-count disrespects the work's real worth → [[feedback_important-work-worth-time]] · [[primitive_economic-theory-of-mind]] (value ≠ Shannon/token-count) · [[primitive_conversation-as-coordination-substrate]].
 - **recurrence (2×) ⇒ hook-harden**: Stop-hook must ✗ surface "winding down / clean breakpoint" framing @ C1∨C2 for V3; rotation-language escalates only @ C3-ceiling. [[feedback_repetition-is-useless]] [[primitive_universal-coverage-hook]].
+
+## REFINEMENT 2 — 2026-06-16 — the cost-curve side (Will concedes the crossover IS real)
+Will (~455k, honest counter to his own "be more elastic"):
+> *"context cost grows exponentially over linear time; as long as reboots are seamless it's only ~1 min of button clicking, so the cost DOES eventually outpace the benefit — just not as soon as anticipated."*
+
+- cost(context) = SUPERLINEAR over linear time (exp-ish): late-context disproportionately expensive (token-cost × quality-degradation).
+- cost(reboot) ≈ LOW ∧ ~FLAT ⟸ seamless handoff architecture (today's clean reboot = the proof; ~1 min clicks).
+- ∴ **crossover T\* EXISTS**: ∃ point where exp-context-cost > value-weighted-marginal-benefit ⇒ rotate. Will concedes this (two-sided honesty; ✗ "never rotate").
+- BUT T\* is LATER than default thresholds / my over-eager anticipation assumed (value-non-fungible pushes it out). both guardrails now honest: anti-under-utilize (don't rotate early on V3) ∧ anti-over-extend (T\* is real, don't ride forever).
+- **STRUCTURAL lever**: better-handoff ⇒ lower reboot-cost ⇒ T\* moves EARLIER. investing in seamless-reboot (done) actively justifies earlier rotation. the better our persistence, the cheaper it is to rotate ⇒ the sooner we should.
+- net rule: rotate when (value-weighted marginal-benefit) < (exp context-cost − flat reboot-cost). ¬ token-count alone, ¬ never.
+
+## REFINEMENT 3 — 2026-06-16 — momentum cost + the dimensional-completeness META
+Will: *"the cost of losing momentum and winding down is ALSO real. there's many dimensions of costs, and the more you include the more balanced your weights are."*
+
+- ADD dimension: **momentum / wind-down cost** — rotating mid-flow loses warm cognitive state + velocity; fresh session boots WARM (handoff) but ¬ AT-SPEED on a live creative thread. switching-cost ≫ the 1-min click. highest when mid-build; LOW when in reflective/meta register.
+- **META-PRINCIPLE (the real one): decision-quality ∝ dimensional-completeness of the cost model.** 1-D (token-count) = biased; each TRUE dimension added de-biases the weight. ✗ optimize a legible proxy; enumerate ALL cost-dims ∧ weight together.
+- **FRACTAL**: the rotation-cost model IS [[primitive_value-accounting-justifies-compute]] applied to itself. token-count = the one-sided ledger; value + exp-cost + reboot-cost + momentum = the missing columns. SAME failure (optimize legible 1-D), SAME fix (add columns). → [[primitive_value-honest-verifier-is-the-through-line]].
+- dimension set so far: context-cost(exp↑) · reboot-cost(flat,low) · value(non-fungible) · momentum/wind-down · quality-degradation. weight TOGETHER, never any single.
+- sibling [[primitive_multi-axis-robustness-for-architectural-defense]] (N rationales > 1).
+
+## REFINEMENT 4 — 2026-06-16 — session-value is FLUID (pace-intensity-indexed)
+Will: *"the value of a session is fluid based on current task pace intensity."*
+- value-tier ≠ static ⇒ V(t) tracks CURRENT task pace/intensity in real time.
+- high-intensity build / creative-flow ⇒ V↑ ⇒ hold. low-intensity / reflective / meta ⇒ V↓ ⇒ rotate-ok.
+- ∴ SAMPLE value at the moment, ¬ assume session-constant. momentum-cost (REF3) = the time-derivative of this.
+- practical: a turn spent generating-builds-that-must-defer ⇒ pace-intensity LOW for THIS context ⇒ rotate to convert momentum→execution.
