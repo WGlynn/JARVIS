@@ -137,6 +137,12 @@ for f in hiero-gate.py partner-facing-substance-gate.py partner-facing-additive-
   install_file "$INSTALLER_DIR/templates/hooks/$f" "$HOOKS_DIR/$f"
 done
 
+# ============ Hooks: Layer 2 (persistence gate) ============
+
+echo
+echo "Installing Layer 2 — context-rotation elasticity gate..."
+install_file "$INSTALLER_DIR/templates/hooks/context-rotation-hook.py" "$HOOKS_DIR/context-rotation-hook.py"
+
 # ============ Memory seed ============
 
 echo
@@ -257,6 +263,9 @@ add_hook("PreToolUse",   "Agent",             "atomic-reflection-gate.py",      
 add_hook("PostToolUse",  "Write|Edit|NotebookEdit", "em-dash-augmentation-gate.py",   "Em-dash augmentation gate...", timeout=5)
 add_hook("PostToolUse",  None,                "atomic-reflection-gate.py",           "Atomic reflection: error/timeout check...", timeout=5)
 
+# Layer 2 — persistence: context-rotation elasticity (Stop, fires on every turn end)
+add_hook("Stop",         None,                "context-rotation-hook.py",            "Context-rotation elasticity (tiered handoff)...", timeout=5)
+
 # Layer 4 — Stage 1 MindMesh federation (opt-in via --mesh)
 if mesh_enabled:
     add_hook("SessionStart", None,            "mesh-status-refresh.py",       "MESH status refresh...", timeout=5)
@@ -283,10 +292,10 @@ echo "  JARVIS-OS installed for $USER_NAME"
 echo "============================================================"
 echo
 if [[ "$MESH" == "1" ]]; then
-  echo "  14 hooks registered across 4 events (incl. Stage 1 MindMesh)."
+  echo "  15 hooks registered across 4 events (incl. Stage 1 MindMesh)."
   echo "  Mesh dir bootstrapped at $MESH_USER_DIR — edit peers.yaml + deny-list.yaml."
 else
-  echo "  12 hooks registered across 4 events."
+  echo "  13 hooks registered across 4 events."
   echo "  MindMesh: OFF (pass --mesh to enable Stage 1 federation)."
 fi
 echo "  3 core primitives + seed MEMORY.md in your memory dir."
