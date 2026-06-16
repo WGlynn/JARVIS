@@ -36,6 +36,53 @@ ON_CMDS = ("story on", "story mode on", "activate story mode",
 OFF_CMDS = ("story off", "story mode off", "afk off", "afk mode off")
 
 
+def last_menu_lettered(tp: str) -> bool:
+    """True if the previous assistant turn rendered the Story Mode menu with
+    letter keys (a-j). Collision-resistance-by-construction (Will's ECDSA frame):
+    when a content list and the menu coexist, the menu lives in the LETTER
+    keyspace and content in the NUMBER keyspace -- disjoint alphabets, so a bare
+    token decodes to exactly one namespace. This check is the parse-side recovery
+    for the rare case the render side forgot to switch."""
+    if not tp or not os.path.exists(tp):
+        return False
+    try:
+        with open(tp, "rb") as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - 300_000))
+            chunk = f.read().decode("utf-8", "replace")
+        last_text = None
+        for line in reversed(chunk.splitlines()):
+            if '"assistant"' not in line:
+                continue
+            try:
+                j = json.loads(line)
+            except Exception:
+                continue
+            if j.get("type") != "assistant":
+                continue
+            c = (j.get("message") or {}).get("content")
+            text = ""
+            if isinstance(c, str):
+                text = c
+            elif isinstance(c, list):
+                for part in c:
+                    if isinstance(part, dict) and part.get("type") == "text":
+                        text += part.get("text", "")
+            if text.strip():
+                last_text = text
+                break
+        if not last_text:
+            return False
+        idx = last_text.find("Story Mode -- reply")
+        if idx < 0:
+            return False
+        tail = last_text[idx:]
+        return bool(re.search(r"(?m)^\s*\*{0,2}[a-j][).]\s", tail))
+    except Exception:
+        return False
+
+
 def main() -> int:
     try:
         payload = json.load(sys.stdin)
@@ -48,6 +95,7 @@ def main() -> int:
     if not isinstance(prompt, str):
         prompt = ""
     p = prompt.strip().lower()
+    tp = payload.get("transcript_path") or ""
 
     # toggle commands work even without the flag present
     if p in OFF_CMDS:
@@ -101,11 +149,27 @@ def main() -> int:
     # Every Story-Mode-active, non-toggle turn is ONE menu impression; classifying
     # it pick-vs-off-menu gives the denominator catch-rate needs.
     picks = []
-    mm = re.fullmatch(r"\s*(\d{1,2}(?:\s*[, ]\s*\d{1,2})*)\s*", p)
-    if mm:
-        cand = [int(x) for x in re.findall(r"\d{1,2}", mm.group(1))]
-        if cand and all(1 <= x <= 10 for x in cand):
-            picks = cand
+    pick_letters = False
+    content_pick = False  # a bare number that belongs to a content list, not the menu
+    raw = prompt.strip()
+    # Letter keyspace (a-j) = menu picks in list-isolation mode. Disjoint from the
+    # number keyspace by construction, so the two never collide (Will's ECDSA frame).
+    lm2 = re.fullmatch(r"([a-jA-J](?:\s*[, ]\s*[a-jA-J])*)", raw)
+    if lm2 and len(raw) <= 24:
+        letters = [c.lower() for c in re.findall(r"[a-jA-J]", lm2.group(1))]
+        picks = [ord(c) - 96 for c in letters]
+        pick_letters = True
+    else:
+        mm = re.fullmatch(r"\s*(\d{1,2}(?:\s*[, ]\s*\d{1,2})*)\s*", p)
+        if mm:
+            cand = [int(x) for x in re.findall(r"\d{1,2}", mm.group(1))]
+            if cand and all(1 <= x <= 10 for x in cand):
+                # COLLISION GUARD: if the last menu was lettered, bare numbers are a
+                # content-list selection -- hand them to the model, don't hijack as picks.
+                if last_menu_lettered(tp):
+                    content_pick = True
+                else:
+                    picks = cand
 
     # Inline modifier: "N: <instruction>" (also N. / N -) runs a SINGLE item with a
     # short tweak, e.g. "3: only the auth part" or "3 - use sonnet". Case-preserved
@@ -129,7 +193,7 @@ def main() -> int:
     # The menu still renders below; only the impression log is skipped.)
     is_meta = p in ("story mode", "story", "menu", "story status", "story mode status")
     sel_note = ""
-    if not is_toggle and not is_cron_injection and not is_meta:
+    if not is_toggle and not is_cron_injection and not is_meta and not content_pick:
         kind = "pick" if picks else "off_menu"
         try:
             with open(os.path.join(SIG_DIR, f"{USER}_impressions.jsonl"), "a",
@@ -158,7 +222,8 @@ def main() -> int:
             except Exception:
                 pass
         if picks:
-            items = ", ".join(str(x) for x in picks)
+            items = (", ".join(chr(96 + x) for x in picks) if pick_letters
+                     else ", ".join(str(x) for x in picks))
             multi = len(picks) > 1
             if multi:
                 sel_note = (
@@ -220,7 +285,15 @@ def main() -> int:
            "(send / publish / deploy / delete / push / message / email / post) with a leading "
            "'⚠ ' marker so a phone-tapper sees the consequence before tapping. "
            "MODIFIERS: a user may also reply 'N: <tweak>' to run item N with a small adjustment "
-           "(e.g. '3: only the auth part')."
+           "(e.g. '3: only the auth part'). "
+           "COLLISION-RESISTANCE (disjoint keyspaces): if THIS response contains its own list the "
+           "user picks from by number (ideas, files, drafts, search results, options to select), do "
+           "NOT number the menu 1-10 -- that collides with the content list. Instead key the menu "
+           "with LETTERS and title it EXACTLY 'Story Mode -- reply with a letter (a-j), or chain "
+           "several (e.g. `c` or `e,d,a`); bare numbers select from the list above:'. Numbers then "
+           "decode unambiguously to the content list, letters to the menu -- two disjoint "
+           "namespaces that cannot collide by construction. With no content pick-list present, use "
+           "the standard numbered menu and its standard title."
            + sig_rules + sel_note)
     print(json.dumps({"hookSpecificOutput": {
         "hookEventName": "UserPromptSubmit", "additionalContext": ctx}}))
