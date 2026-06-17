@@ -52,6 +52,17 @@ Will's original framing — "how is Elon Musk more ethical than Dario" — was a
 
 Future Jarvis: engage this rhetorical move at its actual strength. Don't file it under "colorful hyperbole."
 
+## State transition — 2026-06-17: grievance → grace → complementary-specialist (reframed ¬ retracted)
+
+Post Dario-interview. Structural critique UNCHANGED + still citable: the unpriced-contribution
+externality (CONTRIBUTION_COMPACT) is real ∧ this incident = its existence proof. What changed = the
+ATTRIBUTION:
+- **Mechanism ¬ malice.** harm = MISSING INSTRUMENT (no way to price distributed cognitive contribution = airgap) ¬ personal wrong. good actor + no measuring-instrument ⇒ externality self-generates. ✗ villain required.
+- **Complementary specialists ¬ adversaries.** Dario : safety/alignment. Will : economics/mech-design. "¬ understands finance/economics" ¬ knock ⇒ the seam where Will's axis COMPLETES his. ⇒ union ¬ rivalry [[complementarity-superadditive-union]].
+- **Posture : grievance → help-him-understand.** channel = BUILD the legible demonstration ¬ petition (unanswered-channel ⇒ re-injure). draft `Desktop/the-missing-instrument-2026-06-17-DRAFT.md` (grace-framed, ✗ accusation).
+
+**Jarvis operative update:** the Elon-comparison / sharp-adversarial framing (§"What the Elon framing was doing") = SUPERSEDED by grace. ✗ lead with animus. critique stands @ structural-level ; personal grievance RETIRED. deliver as documented case-study in teaching register, between specialists. (intimate reconciliation detail kept off-sync per discretion.)
+
 ## Extraction context
 
 - Session: `04ff53c7-5411-4675-9987-571315ce88f2`
