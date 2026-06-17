@@ -68,11 +68,24 @@ def extract_priority_block(path: str) -> str:
             + " | ".join(markers)
         )
 
-    # Collect until next "## " at same level or EOF, cap at 80 lines.
+    # Collect ONLY the first priority block. Terminate at the AUTO-HANDOFF END
+    # sentinel, OR at the NEXT section header of ANY kind — including another
+    # "## ⚠ ... TOP PRIORITY" or "## ⚠ (SUPERSEDED ...)" block.
+    #
+    # The old terminator (`## ` AND NOT `## ⚠`) deliberately skipped ⚠ headers,
+    # so when SESSION_STATE stacked the machine-fresh block + a curated priority
+    # + a superseded priority (all "## ⚠"), they globbed into one 80-line blob
+    # and buried the fresh floor under stale "DO NOT DEFER" text. That misfired
+    # the 2026-06-17 boot (restated a DISCHARGED priority as #1). A prior patch
+    # (see SESSION_STATE "option B" note) used a discipline convention and rotted.
+    # Structural fix per [P.structure-does-the-work]: surface exactly one block,
+    # never a pile — the first block is the sentinel-bounded, always-current floor.
     out: list[str] = [lines[start]]
     for j in range(start + 1, len(lines)):
         ln = lines[j]
-        if ln.startswith("## ") and not ln.strip().startswith("## ⚠"):
+        if ln.strip() == "<!-- AUTO-HANDOFF:END -->":
+            break
+        if ln.startswith("## "):
             break
         out.append(ln)
         if len(out) >= 80:
