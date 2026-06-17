@@ -17,7 +17,7 @@ metadata:
 
 **Why:** real-partner deliverable ⇒ ship the long-deferred backend.
 
-**How to apply:** "continue Soham/Lithos/IDE-backend" ⇒ read `Lithos/HANDOFF.md` → `docs/DEVELOPMENT.md`.
+**How to apply:** "continue Soham/Lithos/IDE-backend" ⇒ read `Lithos/HANDOFF.md` → `docs/DEVELOPMENT.md`. NEXT-SESSION TOP (Will 2026-06-17): continue Lithos + **open the PR** (`feat/python-backend-scaffold` → `S0hamJosh1/Lithos`, 8 commits pushed, RED→40✓).
 - next ⇒ needs real-HW (XIAO nRF52840 Sense): validate BLE + `west` build/flash
 - still-stub: STM32/ESP32/RP2040 adapters ∧ ROS-receiver ; ✗ repair-loop-v2 ; ✗ PR-opened ; ✗ Soham-messaged (held ∀ Will)
 - discipline ✓: moat-first ∧ HW-independent+tested-here ∧ honest-stubs(¬fake-PASS) ∧ scoped-commits ∧ verify-before-commit
