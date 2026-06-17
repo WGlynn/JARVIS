@@ -1,0 +1,8 @@
+{
+  "name": "agent-patterns",
+  "version": "0.1.0",
+  "description": "Substrate patterns for long-running agents: self-adversarial QA before declaring done, cheapest-viable model-tier routing, pre-ship web verification, claim verification, and operator-notation memory compaction.",
+  "author": { "name": "WGlynn" },
+  "license": "Apache-2.0",
+  "keywords": ["agents", "quality", "cost", "memory", "verification"]
+}

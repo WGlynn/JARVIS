@@ -1,0 +1,15 @@
+{
+  "name": "agent-patterns",
+  "owner": "WGlynn",
+  "metadata": {
+    "description": "Reusable substrate patterns for long-running agents.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "agent-patterns",
+      "source": "./",
+      "description": "critical-qa, classify (tier routing), ship-web, anti-hallucinate, and compact-memory — five self-contained skills for agent quality, cost, and memory."
+    }
+  ]
+}
