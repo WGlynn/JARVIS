@@ -55,6 +55,9 @@ def main() -> int:
     regular = [p.get("picked") for p in picks
                if isinstance(p.get("picked"), int) and p.get("meta") != "loop"]
     n = len(regular)
+    # the loop-approval signal excluded from `regular` above (inert until the gate tags meta=="loop").
+    loop_approvals = sum(1 for p in picks
+                         if isinstance(p.get("picked"), int) and p.get("meta") == "loop")
     top3 = sum(1 for x in regular if x <= 3)
     health = top3 / n if n else 0.0  # precision@3 over REGULAR picks only -- SECONDARY
 
