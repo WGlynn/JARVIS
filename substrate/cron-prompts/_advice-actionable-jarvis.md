@@ -165,3 +165,18 @@ Format same as `_advice-actionable-vibeswap.md`.
 - Our substrate state: this is already the cron architecture -- cron entry = thin pointer (marker + path), canonical .md = logic; CLAUDE.md/core memory stays small, behavior lives in hooks/cron-prompt "plugins." Validates the design. The refinement we lack: new cron behaviors are sometimes authored as fat monolithic prompts instead of pointer+canonical from inception.
 - Suggested action: enforce the pointer+canonical contract for ALL new crons from inception (marker + path in scheduled_tasks; logic in a versioned .md), and land new substrate features as the minimal contract first (IPM/ponytail at the substrate layer) rather than a monolithic prompt. Same shape as "land the contract as one small PR."
 - Will-triage: pending
+
+
+## [2026-06-18 17:17 ET] — plugin/extension contract so large features don't all land in core
+- Source: #4439 comment by @vdmkenny (https://github.com/pewdiepie-archdaemon/odysseus/discussions/4439)
+- Their advice (paraphrase): define a stable extension/plugin contract so multi-thousand-line features migrate OUT of core; core stays lean.
+- Our substrate state (shape-match): JARVIS-OS has hook/primitive sprawl (329 primitives, 361 orphan files at boot) — the "everything lands in core" shape.
+- Suggested action: a plugin/skill contract boundary for JARVIS primitives/hooks so new capability is additive-modular, not core-bloat.
+- Will-triage: pending
+
+## [2026-06-18 17:17 ET] — release tags + branch discipline for a single-main repo
+- Source: #2431 comment by @Faultline47 (https://github.com/pewdiepie-archdaemon/odysseus/discussions/2431)
+- Their advice (paraphrase): single active main + no release tags + large open-PR backlog = stability risk for self-hosted prod; add release tags / branch discipline.
+- Our substrate state (shape-match): JARVIS substrate + vibeswap push-to-main, no tagged releases.
+- Suggested action: lightweight release tagging on the public substrate so inspectors can pin a known-good state.
+- Will-triage: pending
