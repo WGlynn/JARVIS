@@ -35,6 +35,40 @@ ON_CMDS = ("story on", "story mode on", "activate story mode",
            "afk on", "afk mode on", "activate afk mode")
 OFF_CMDS = ("story off", "story mode off", "afk off", "afk mode off")
 
+# Wind-down signals: when the user is CLEARLY done for the session (or done with
+# Story Mode), appending another menu is redundant and tone-deaf at a sign-off.
+# Per Will 2026-06-17: exit Story Mode on these; the post-wind-down menu is OPT-IN
+# (resume requires an explicit "story on"). Substring match on the lowercased prompt,
+# biased toward suppression -- a missed menu costs nothing; a sign-off menu annoys.
+WIND_DOWN = (
+    "wind down", "winding down", "wind it down", "wind things down",
+    "stop here", "stop for now", "stop for the", "lets stop", "let's stop",
+    "ok stop", "okay stop", "stop story", "exit story", "end story", "kill story",
+    "handoff", "hand off", "hand it off", "hand things off",
+    "going to bed", "go to bed", "off to bed", "going to sleep", "im going to sleep",
+    "head to bed", "heading to bed", "gonna sleep", "gonna crash", "im crashing",
+    "goodnight", "good night", "gnight", "g'night", "night night",
+    "call it a night", "call it here", "call it for", "calling it", "call it a day",
+    "wrap up", "wrap it up", "wrapping up", "lets wrap", "let's wrap",
+    "done for the", "im done for", "thats it for", "that's it for",
+    "thats all for", "that's all for", "im done here", "we're done", "were done",
+    "signing off", "sign off", "log off", "logging off",
+    "im out", "i'm out", "heading out", "im heading out",
+    "see you tomorrow", "see you in the morning", "talk tomorrow", "ttyl",
+    "no menu", "no more menu", "skip the menu", "drop the menu", "stop the menu",
+)
+
+
+def is_wind_down(p: str) -> bool:
+    """True if the prompt clearly signals the user is done (session or Story Mode).
+    Phrase match for multi-word signals + whole-message match for bare 'stop'/'done'
+    (which are too common to substring-match safely)."""
+    if any(s in p for s in WIND_DOWN):
+        return True
+    bare = p.strip().strip(".!").strip()
+    return bare in ("stop", "done", "im done", "i'm done", "that's all", "thats all",
+                    "wind down", "thats it", "that's it", "enough", "k done")
+
 
 def last_menu_lettered(tp: str) -> bool:
     """True if the previous assistant turn rendered the Story Mode menu with
@@ -142,6 +176,26 @@ def main() -> int:
 
     if not os.path.exists(FLAG):
         print(json.dumps({}))
+        return 0
+
+    # ---- wind-down exit (Will 2026-06-17) ----
+    # The user is CLEARLY done for the session / done with Story Mode. Appending
+    # another menu here is redundant and tone-deaf at a sign-off. Deactivate Story
+    # Mode and tell the model NOT to render a menu this turn. Resume is OPT-IN: the
+    # menu only comes back when the user explicitly re-enables ("story on"). Guard:
+    # never fire on a bare menu pick (a numeric/letter selection is engagement, not
+    # a wind-down), so the model still cleanly handles a picked terminal item.
+    is_pick_token = bool(re.fullmatch(r"\s*([a-jA-J]|\d{1,2})(\s*[, ]\s*([a-jA-J]|\d{1,2}))*\s*", raw_lower := prompt.strip())) and len(prompt.strip()) <= 24
+    if is_wind_down(p) and not is_pick_token:
+        try:
+            os.remove(FLAG)
+        except OSError:
+            pass
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit",
+            "additionalContext": (
+                "[STORY MODE] The user is winding down -- do NOT append a menu this turn. "
+                "Respond naturally and close out. Story Mode is now OFF; it resumes only when "
+                "the user opts back in (\"story on\"). Do not mention this gate unless asked.")}}))
         return 0
 
     # ---- selection + impression logging (catch-rate / recall@10) ----

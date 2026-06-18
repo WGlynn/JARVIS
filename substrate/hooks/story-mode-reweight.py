@@ -74,7 +74,11 @@ def main() -> int:
                 continue
             r = json.loads(line)
             impressions += 1
-            if r.get("kind") == "pick":
+            # "paraphrase_pick" = the gate's TELEMETRY-ONLY fuzzy match of a free-text turn
+            # against the last menu (detection decoupled from routing — the prompt still goes to
+            # the model verbatim, only the impression is reclassified, so there is no wrong-action
+            # risk). Counts as a catch in recall@10. Inert until the gate emits this kind.
+            if r.get("kind") in ("pick", "paraphrase_pick"):
                 on_menu += 1
     except FileNotFoundError:
         pass
