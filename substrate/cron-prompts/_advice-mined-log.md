@@ -55,3 +55,5 @@ Format per row:
 | 2026-06-11 | Discussion #3932 | various | Odysseus feature-appeal feedback thread (deep-research praised, mobile UX weak, per-message cost N/A on OpenRouter) -- product-specific | d-skip |
 
 - [2026-06-12 11:49 ET] #4089 + #4084 (@SynapticSmith): comprehensive PR-taxonomy + issue-taxonomy/triage-strategy docs (667 PRs / 576 issues). Shape overlaps JARVIS contribution-graph + DRI + taxonomize-everything. Deep-mine DEFERRED (rest posture, Will-active in-session); flagged for next-fire C2.5 deep pass.
+
+[2026-06-19 06:40 ET] #4439 (plugin/extension contract). Mined 2 (b)-jarvis entries: holden093 "resistance-defines-the-seam-boundary" + RaresKeY "don't-canonize-contract-before-core-stable". Generic-good-design also noted: vdmkenny "lean on existing seams (MCP/skills/provider registries) before building a new runtime" = real-modularity-vs-fake-modularity ([P·omni-software-convergence-hypothesis]), no new action (already a held principle). CoolJohn-lab "just say no" = (d) odysseus-specific, skip.
