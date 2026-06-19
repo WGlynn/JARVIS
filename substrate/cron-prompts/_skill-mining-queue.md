@@ -181,3 +181,19 @@ Entries appended by skill-mining sweeps (`skill-mining.md`). Promote → work on
 - Suggested action: zero-risk audit — check whether THIS harness build writes oversized tool outputs to on-disk full-result files (look for them), and confirm the ~50K threshold empirically. That audit GATES the headroom prototype above. Will-triage on anything live.
 - Verifier (sonnet subagent): REVISE → applied (harness-mechanism params demoted to SEARCH-CLAIMED/UNVERIFIED with correct provenance; trio kept at search-level; gate logic kept).
 - Will-triage: pending
+
+## [2026-06-19 06:43 ET] — block-level CRDT merge for concurrent agent markdown edits
+- Source: github.com/sqliteai/sqlite-memory (MIT) [FETCH-VERIFIED]
+- Technique (paraphrase): block-level last-writer-wins CRDT merge so concurrent agents editing the same markdown don't clobber each other; content-hash cleanup-then-scan loop for dedup.
+- Port class: 3-way — REINTERPRET the CRDT block-merge concept (directly addresses our ~12× logged two-clone push-race papercut on memory dir); DIRECT-PORT (concept) the content-hash cleanup-then-scan; DROP the SQLite/embeddings/vector retrieval stack (substrate-mismatch, we're file+BPE).
+- Our substrate state: memory-sync-pull skips on dirty dir (saw it this boot: "behind=0 ahead=1"); two-clone push races logged repeatedly.
+- Suggested action: prototype a block-LWW merge on a SCRATCH copy of the memory dir; if it cleanly resolves the ahead/behind race, propose for the sync hook. Zero-risk experiment only; live-hook change = Will-triage.
+- Will-triage: pending
+
+## [2026-06-19 06:43 ET] — Tailwind v4 automated upgrade codemod
+- Source: `npx @tailwindcss/upgrade` (official) [SEARCH-VERIFIED — not fetch-run]
+- Technique (paraphrase): official codemod that auto-migrates a Tailwind v3 config+classes to v4. Supersedes the vague 2026-06-10 "Tailwind v4 horizon" note with the concrete path.
+- Port class: DIRECT-PORT — a command to run on a throwaway upgrade-spike branch of vibeswap/frontend.
+- Our substrate state: vibeswap/frontend on React 18 + Vite 5 + Tailwind (v3) + framer-motion + ethers v6. LOCKED terminal-console aesthetic — verify codemod output doesn't fight it.
+- Suggested action: cut a spike branch, run the codemod, eyeball diff vs the locked aesthetic. Will-triage before any merge.
+- Will-triage: pending

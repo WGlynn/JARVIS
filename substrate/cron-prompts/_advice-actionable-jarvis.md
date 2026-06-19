@@ -180,3 +180,17 @@ Format same as `_advice-actionable-vibeswap.md`.
 - Our substrate state (shape-match): JARVIS substrate + vibeswap push-to-main, no tagged releases.
 - Suggested action: lightweight release tagging on the public substrate so inspectors can pin a known-good state.
 - Will-triage: pending
+
+## [2026-06-19 06:40 ET] — seam boundary is defined by what RESISTS the clean interface
+- Source: #4439 comment by @holden093 (https://github.com/pewdiepie-archdaemon/odysseus/discussions/4439)
+- Their advice (paraphrase): tried porting OIDC to the proposed plugin contract; 5/11 integration points mapped cleanly, the 6 that didn't were all auth-middleware/AuthManager internals. Conclusion: partial-mapping is NOT a contract flaw, it is evidence of correct scope. Auth = the one subsystem where a bug breaks the whole trust boundary, so it SHOULD resist the seam and stay in-tree with mandatory multi-reviewer scrutiny.
+- Our substrate state: deciding what earns a hook (clean seam) vs stays in core logic. [F·primitives-are-bottleneck-dissolutions] already exempts identity/value/mission/philosophy from primitive-extraction. holden093's framing gives the POSITIVE test: the things that resist clean externalization are the ones that touch a core invariant and must stay reviewed, not patched into a seam.
+- Suggested action: when auditing which JARVIS logic to promote to a hook/gate vs keep in core, use "does it map cleanly to the seam's declared surface?" as the predicate. Resistance = signal to keep in core, not a reason to build a bigger SPI. Composes with [P·universal-coverage-hook] (when DOES a rule earn a hook) and the WAL "promote implicit signal to explicit predicate" pattern.
+- Will-triage: pending
+
+## [2026-06-19 06:40 ET] — don't canonize an external contract before the core shape stabilizes
+- Source: #4439 comment by @RaresKeY (same URL)
+- Their advice (paraphrase): exposing a plugin platform before core is ready means today's internal structure becomes tomorrow's compatibility contract; plugins built on unsettled internals become fragile wrappers or freeze accidental contracts. Canonize the most important service boundary (the inference path) FIRST, then build the seam around stable internals.
+- Our substrate state: memory format (HIERO), hook API, cron-prompt pointer/logic split. We are single-user pre-decentralization.
+- Suggested action: composes directly with [P·pre-decentralization-optimization-sequencing] (single-user phase = optimize-local first, decentralize at traction) and [P·jarvis-substrate-decentralization-roadmap]. The Odysseus thread is independent confirmation of the same sequencing: do NOT freeze the memory/hook/cron public API for external consumers until the substrate shape is settled. Canonize the highest-traffic boundary first (memory recall path is our "inference path").
+- Will-triage: pending
