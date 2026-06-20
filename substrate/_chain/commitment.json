@@ -1,7 +1,7 @@
 {
-  "head_hash": "b8f497383f6210ee",
-  "height": 28349,
-  "committed_at": 1781906022,
+  "head_hash": "ed641ae3102625bf",
+  "height": 28598,
+  "committed_at": 1781964501,
   "framework": "local-authority -> public-commitment -> shard-replication",
   "note": "blocks stay local (raw prompt/response); this head hash commits the full chain."
 }

@@ -286,6 +286,27 @@ def sync_hooks(apply: bool) -> dict:
                 else:
                     stats["skipped"] += 1
                 continue
+            # Content-scrub for hooks: a hook NAMING any private stealth marker must never reach the
+            # public substrate. This applies the SAME predicate the leak-gate enforces
+            # (PRIVATE_LEAK_MARKERS, sourced from the local-only patterns file), PRE-mirror, so the
+            # gate can never trip on a hook — and it dissolves the class instead of hand-maintaining
+            # HOOK_SKIP_LIST per private-referencing hook (a private whitepaper-build reminder hook
+            # was the 2026-06-20 abort cause). Stale public copies are deleted, like the skip-list
+            # path above. (This comment carries NO codenames — those live only in the patterns file.)
+            try:
+                marker_text = src.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                marker_text = ""
+            if any(pat.search(marker_text) or pat.search(name) for pat in PRIVATE_LEAK_MARKERS):
+                rel = src.relative_to(hook_dir)
+                dest = SUB_HOOKS / rel
+                if apply and dest.exists():
+                    dest.unlink()
+                    stats["deleted"] += 1
+                    print(f"    delete-stale (private-marker): {rel}")
+                else:
+                    stats["skipped"] += 1
+                continue
             rel = src.relative_to(hook_dir)
             dest = SUB_HOOKS / rel
             dest.parent.mkdir(parents=True, exist_ok=True)
