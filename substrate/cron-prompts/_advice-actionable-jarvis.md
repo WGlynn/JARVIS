@@ -194,3 +194,10 @@ Format same as `_advice-actionable-vibeswap.md`.
 - Our substrate state: memory format (HIERO), hook API, cron-prompt pointer/logic split. We are single-user pre-decentralization.
 - Suggested action: composes directly with [P·pre-decentralization-optimization-sequencing] (single-user phase = optimize-local first, decentralize at traction) and [P·jarvis-substrate-decentralization-roadmap]. The Odysseus thread is independent confirmation of the same sequencing: do NOT freeze the memory/hook/cron public API for external consumers until the substrate shape is settled. Canonize the highest-traffic boundary first (memory recall path is our "inference path").
 - Will-triage: pending
+
+## [2026-06-19 17:20 ET] — stage/test substrate hook+cron changes before they go live (deployment-stability shape)
+- Source: odysseus discussion #2431 "Semantic Versioning, Staging Branches, Automated CI/CD to Stabilize Self-Hosted Deployments" (https://github.com/pewdiepie-archdaemon/odysseus/discussions/2431)
+- Their advice (shape, not stack): self-hosted deployments break silently when changes ship straight to prod with no staging/CI gate; add a staging branch + automated checks before live.
+- Our substrate state: JARVIS hooks/crons/scripts deploy LIVE to ~/.claude with no test gate. TODAY this bit us — the doc-coherence pre-commit regex false-positive (matched prose "19 test literals") silently BLOCKED every commit for ~2h. A pre-deploy smoke-test of each hook against a fixture corpus would have caught it.
+- Suggested action: a `hooks/_smoke/` fixture set + a one-shot `verify-hooks.py` that pipes known-good/known-bad payloads through each PreToolUse/PostToolUse hook and asserts the expected emit, run before a hook edit goes live (or as its own PreToolUse gate on edits to hooks/*.py). Sibling of the git-commit-landed-gate shipped today.
+- Will-triage: pending
