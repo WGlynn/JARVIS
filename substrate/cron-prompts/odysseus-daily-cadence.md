@@ -42,7 +42,7 @@ Self-perpetuation before any other work. The loop NEVER dies.
 ### Steps
 1. **Engagement-aware SKIP (UTXO-scoped — NOT a global pause; per [F·pivot-until-read-not-global-pause])**: for each shipped post (last 14d), query non-WGlynn replies. A post with unread non-WGlynn replies is a BLOCKED INPUT — exclude ONLY that thread (and #-adjacent dispatch) from this fire. Do NOT halt: pivot to independent candidates and dispatch normally (the 1-dispatch/24h cap + reputational quota-floor below remain global — shared budgets, not per-thread deps). Surface blocked thread(s) ONCE via a single consolidated Tomato ping; no duplicate within 6h. A Will-read dependency freezes only the transaction that spends it, like a UTXO — never the whole mempool.
 2. **Selection (active > new per "almost always tbh")**: pull top-10 most-recently-active discussions. Pull next queued topic. Active-thread overlap → reply. Else cold-start in Ideas category.
-3. **Convergence-proof gate**: VibeSwap artifact + Odysseus-side anchor (live) + structural overlap defensible + substance ADDS to thread. Fails → mark [✗] in queue, advance, retry. 3 fails → halt + ping Will.
+3. **Pure-technical gate (PIVOTED 2026-06-28, Will decision)**: the VibeSwap-convergence framing is RETIRED — it drew a public fit-rejection (@CoolJohn-lab #4166 "what does this have to do with the project?") and held the campaign 6+ times. The only dispatch that landed (#4439) was pure-technical with a real anchor. New gate: reply ONLY where there is (a) a genuine Odysseus-side technical anchor (live thread, real problem) AND (b) substance that ADDS to the thread on its own merits. Do NOT force a VibeSwap/JARVIS tie-in; if the contribution can't stand as plain technical help, skip it. A VibeSwap reference is permitted ONLY when it is the most natural way to make the technical point, never as the reason to post. Fails → mark [✗] in queue, advance, retry. 3 fails → exit silent (quota≠obligation; do not halt the loop). Quality-before-volume per the 2026-06-28 AI-stigma directive: a skipped day beats a forced post.
 4. **Compute IPT budget**: for REPLY: `python C:/Users/Will/.claude/scripts/odysseus_discovery.py --budget-for <N>`. For NEW: budget=200. Read thread's last 10 comments + OP body.
 5. **Draft to disk**: `Desktop/odysseus-day-N-YYYY-MM-DD.md` with metadata.
 6. **AI-tell scrub**: U+2014, U+2013, listicle labels, parallel headers, meta-narration, AI-cadence closers, "worth flagging"/"worth noting", listicle stacks, "this composes with..." bullets, > 1 @-citation.
@@ -62,7 +62,8 @@ After COMMANDMENT 2 (whether dispatch happened or not):
 1. **Read scope**: today's engagement-state threads (whatever surfaced in C2's pause-audit) + top-5 most-recently-active discussions. Scan top-3 highest-signal comments each.
 2. **Two-axis classify** substantive advice into `_advice-actionable-vibeswap.md` / `_advice-actionable-jarvis.md` / `_advice-mined-log.md` / skip. See discovery canonical for full classifier.
 3. **Substrate-divergence check**: classify by SHAPE not stack (Vue/Nuxt → React/Vite = same shape if it's "framework migration", different shape if it's "Vue-specific composables").
-4. **Will-triage required**: do not auto-act on queued advice.
+4. **Adoption-ledger feeder** (per discovery C2.5 step 5, [[anti-ghost-building]]): any external technique we'd ADOPT ⇒ append a PROPOSED row to `_adoption-ledger.md`. Claiming useful-to-us = owing the adoption.
+5. **Will-triage required**: do not auto-act on queued advice.
 
 Runs every cron fire regardless of dispatch state. Burn-compute compounds into substrate quality per [J·subscription-cancelled-dont-stop].
 
