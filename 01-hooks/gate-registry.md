@@ -10,7 +10,7 @@ Read the three roles before the tables:
 - **Loader** injects state or context at a lifecycle moment. It does not block; it makes the model see something it would otherwise miss.
 - **Closer** fires when a turn or session ends, to persist state, capture drift, or continue a loop.
 
-Count as of this enumeration: roughly 50 registered invocations across eight lifecycle events. Some scripts appear on more than one event (`api-death-shield`, `atomic-reflection-gate`, `runtime-heartbeat`), so the invocation count exceeds the distinct-script count.
+Count as of this enumeration: **71 distinct hook scripts** are registered across eight lifecycle events, verified by [`registry-drift-check.py`](registry-drift-check.py). Several fire on more than one event (`api-death-shield`, `atomic-reflection-gate`, `runtime-heartbeat`), so the total invocation count is higher still. Run the drift check to re-verify this against `settings.json` at any time: a registry that silently drifts from the live config fakes the confidence every layer above assumes, so the registry is now self-checking rather than a one-time human enumeration.
 
 ---
 
