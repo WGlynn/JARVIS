@@ -23,9 +23,11 @@ Each hook is **deterministic** — no LLM call, no probabilistic judgment. Regex
 | SessionStart hooks | Boot | Surfaces SESSION_STATE, WAL, RSI-pending, link-rot |
 | Stop hook | Session end | Validates persistence chain, blocks if WAL/state un-updated |
 
+> This table is a sample. The complete gate surface, every registered hook by role and lifecycle event, is enumerated in [gate-registry.md](gate-registry.md).
+
 ## Source of truth
 
-Hooks live in `~/.claude/session-chain/` (private, machine-local) and are configured via `~/.claude/settings.json`. Public-safe hook patterns are documented in [vibeswap/.claude/](https://github.com/wglynn/vibeswap/tree/master/.claude).
+Hooks live in `~/.claude/session-chain/` and `~/.claude/hooks/` (machine-local) and are configured via `~/.claude/settings.json`. The full set is enumerated at mechanism level in [gate-registry.md](gate-registry.md); public-safe hook patterns are also mirrored in [vibeswap/.claude/](https://github.com/wglynn/vibeswap/tree/master/.claude).
 
 ## How the substance gate works
 
