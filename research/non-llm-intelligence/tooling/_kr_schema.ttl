@@ -1,0 +1,130 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# ── Ontology declaration ─────────────────────────────────────────────────────
+<urn:jarvis:kr>
+    a owl:Ontology ;
+    rdfs:label "JARVIS Memory Primitive Ontology" ;
+    rdfs:comment "LOOP 6 (Typed Knowledge + Sound Inference). OWL-EL subset compatible. Zero LLM calls." .
+
+# ── Base class ───────────────────────────────────────────────────────────────
+<urn:jarvis:MemoryNode>
+    a owl:Class ;
+    rdfs:label "MemoryNode" ;
+    rdfs:comment "Any top-level node in the JARVIS memory graph (derived from a *.md file)." .
+
+# ── Leaf classes (disjoint intent, not enforced as OWL disjoint for EL compat) ─
+<urn:jarvis:Primitive>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:MemoryNode> ;
+    rdfs:label "Primitive" ;
+    rdfs:comment "Reusable first-principle behaviour rule. File prefix: primitive_" .
+
+<urn:jarvis:Gate>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:Primitive> ;
+    rdfs:label "Gate" ;
+    rdfs:comment "A Primitive that enforces a rule structurally via a registered ~/.claude/hooks/*.py hook." .
+
+<urn:jarvis:Pattern>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:Primitive> ;
+    rdfs:label "Pattern" ;
+    rdfs:comment "A recurring design shape (not yet hook-enforced). May graduate to Gate." .
+
+<urn:jarvis:Feedback>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:MemoryNode> ;
+    rdfs:label "Feedback" ;
+    rdfs:comment "Behavioural correction or observation from a session. File prefix: feedback_" .
+
+<urn:jarvis:Project>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:MemoryNode> ;
+    rdfs:label "Project" ;
+    rdfs:comment "Active or completed initiative with state. File prefix: project_" .
+
+<urn:jarvis:Reference>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:MemoryNode> ;
+    rdfs:label "Reference" ;
+    rdfs:comment "External resource pointer (research / tool / library). File prefix: reference_" .
+
+<urn:jarvis:Protocol>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:MemoryNode> ;
+    rdfs:label "Protocol" ;
+    rdfs:comment "Multi-step repeatable workflow or session procedure." .
+
+<urn:jarvis:Canon>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:Primitive> ;
+    rdfs:label "Canon" ;
+    rdfs:comment "EXALTED strategic capstone. File prefix: _CANON_. Status: CANON in frontmatter." .
+
+<urn:jarvis:UserContext>
+    a owl:Class ;
+    rdfs:subClassOf <urn:jarvis:MemoryNode> ;
+    rdfs:label "UserContext" ;
+    rdfs:comment "Will-specific personal context / preferences. File prefix: user_" .
+
+# ── Properties ───────────────────────────────────────────────────────────────
+
+# links_to: generic directed edge (wikilink or bracket-tag)
+<urn:jarvis:links_to>
+    a owl:ObjectProperty ;
+    rdfs:domain <urn:jarvis:MemoryNode> ;
+    rdfs:range  <urn:jarvis:MemoryNode> ;
+    rdfs:label "links_to" ;
+    rdfs:comment "Source node references target node (wikilink [[...]] or bracket-tag [X·slug])." .
+
+# gate_hasHook: a Gate is backed by a physical hook file on disk
+<urn:jarvis:gate_hasHook>
+    a owl:DatatypeProperty ;
+    rdfs:domain <urn:jarvis:Gate> ;
+    rdfs:range  xsd:string ;
+    rdfs:label "gate_hasHook" ;
+    rdfs:comment "Filename of the ~/.claude/hooks/*.py script that enforces this Gate (basename only)." .
+
+# primitive_hasType: raw string type tag from frontmatter
+<urn:jarvis:primitive_hasType>
+    a owl:DatatypeProperty ;
+    rdfs:domain <urn:jarvis:MemoryNode> ;
+    rdfs:range  xsd:string ;
+    rdfs:label "primitive_hasType" ;
+    rdfs:comment "Verbatim 'type:' frontmatter value, used to cross-check class assignment." .
+
+# feedback_refinesPrimitive: Feedback improves a specific Primitive/Gate
+<urn:jarvis:feedback_refinesPrimitive>
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf <urn:jarvis:links_to> ;
+    rdfs:domain <urn:jarvis:Feedback> ;
+    rdfs:range  <urn:jarvis:Primitive> ;
+    rdfs:label "feedback_refinesPrimitive" ;
+    rdfs:comment "A Feedback's structural link to the Primitive it refines or instantiates." .
+
+# canon_isCapstoneOf: Canon is capstone of a strategic theme
+<urn:jarvis:canon_isCapstoneOf>
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf <urn:jarvis:links_to> ;
+    rdfs:domain <urn:jarvis:Canon> ;
+    rdfs:range  <urn:jarvis:Primitive> ;
+    rdfs:label "canon_isCapstoneOf" ;
+    rdfs:comment "Canon node is the strategic capstone of a cluster of Primitives." .
+
+# isCorpusNode: asserted only during file-walk Pass 1; NEVER has domain/range so
+# closure cannot propagate it to ghost nodes. Used by dead-link check to
+# distinguish real corpus nodes from range-inferred ghosts.
+<urn:jarvis:isCorpusNode>
+    a owl:DatatypeProperty ;
+    rdfs:label "isCorpusNode" ;
+    rdfs:comment "True iff this node was extracted from a real *.md file. Never inferred by closure." .
+
+# ── RDFS closure aids ────────────────────────────────────────────────────────
+# Gate subClassOf Primitive subClassOf MemoryNode  → closure infers:
+#   ?x a Gate  ⇒  ?x a Primitive  ⇒  ?x a MemoryNode
+# Canon subClassOf Primitive → same chain
+# feedback_refinesPrimitive subPropertyOf links_to → closure infers:
+#   feedback_refinesPrimitive triples also satisfy links_to domain/range
