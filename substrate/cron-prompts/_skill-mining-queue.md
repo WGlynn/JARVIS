@@ -197,3 +197,29 @@ Entries appended by skill-mining sweeps (`skill-mining.md`). Promote → work on
 - Our substrate state: vibeswap/frontend on React 18 + Vite 5 + Tailwind (v3) + framer-motion + ethers v6. LOCKED terminal-console aesthetic — verify codemod output doesn't fight it.
 - Suggested action: cut a spike branch, run the codemod, eyeball diff vs the locked aesthetic. Will-triage before any merge.
 - Will-triage: pending
+
+- fire 2026-07-23 01:04 | NO NEW FIND (honest-negative) | 3h23m saturated + token-economy => no active web/GitHub discovery spawned without a lead = low-value churn avoided. Existing queue items await Will-triage. C1 ok (0.51d). Silent success.
+
+- fire 2026-07-23 05:03 | NO NEW FIND (honest-negative) | 7h22m saturated + token-economy; no lead => no discovery spawn (low-value churn avoided). Queue items await Will-triage. C1 ok (<5d). Silent success.
+
+- fire 2026-07-23 09:03 | NO NEW FIND (honest-negative) | 11h22m saturated + token-economy; no discovery spawn. Queue awaits Will-triage. C1 ok. Silent success.
+
+- fire 2026-07-23 13:03 | NO NEW FIND (honest-negative) | FRESH session but no lead + live Will-directed ethresearch session => no web/GitHub discovery spawn (token-economy: speculative-mining-without-a-lead = low-value churn). Queue awaits Will-triage. C1 ok (skill-mining 1.01d, single entry). Silent success.
+
+- fire 2026-07-23 21:03 | NO NEW FIND (honest-negative) | ~3h15m C1-tier session (Saito Fable-5 fleet + full cron sweep + live ethresearch/Boardy drafting); no organic substrate-technique lead surfaced. Token-economy: speculative web/GitHub fan-out without a lead = low-value churn, and a real mine (8 searches + verifier subagent) wants fresh judgment not a tail-of-session squeeze. No discovery spawn. Queue awaits Will-triage. C1: skill-mining 1.2d single-entry, no recreate/prune. Silent success.
+
+- fire 2026-07-24 01:03 | NO NEW FIND (honest-negative) | ~7h C1-tier session; no organic substrate-technique lead surfaced. Token-economy: speculative web/GitHub fan-out without a lead = low-value churn; a real mine wants fresh judgment not a 7h-tail squeeze. No discovery spawn. Queue awaits Will-triage. C1: skill-mining 1.4d single-entry, no recreate/prune. Silent success.
+
+- fire 2026-07-24 05:03 | NO NEW FIND (honest-negative) | ~11h deep-context session; no organic lead. Token-economy: speculative web/GitHub fan-out without a lead = churn, wants fresh judgment. No spawn. Queue awaits Will-triage. C1: skill-mining 1.6d single-entry, no recreate/prune. Silent success.
+
+- fire 2026-07-24 09:03 | NO NEW FIND (honest-negative) | 15h/~654k deep-context; no organic lead. Token-economy: speculative fan-out without a lead = churn, wants fresh judgment. No spawn. Queue awaits Will-triage. C1: skill-mining 1.7d single-entry, no recreate/prune. Silent success.
+
+- fire 2026-07-25 13:03 | NO NEW FIND (honest-negative) | ~3.3h dense session (resume + leak-catches + 12 cron passes); no organic external substrate-technique lead surfaced. Token-economy: speculative web/GitHub fan-out without a lead = low-value churn. The session's real substrate gap (write-time discretion/leak-flag gate — recurred 3x today) is ALREADY in _primitives-pending.md (63 discretion/leak refs) awaiting Will-triage, so no dup append. No discovery spawn. C1: skill-mining 3.01d single-entry, no recreate/prune. Silent success.
+
+- fire 2026-07-25 17:09 | NO NEW FIND (honest-negative) | C1 OK (skill-mining 3.18d). No cold web/GitHub fan-out from 619k loaded window; subagent-thrift decision (this session) reinforces: no unjustified exploration spend. Session substrate gap (write-time leak gate) already in _primitives-pending. Silent success.
+
+- fire 2026-07-25 21:03 | NO NEW FIND (honest-negative) | C1 OK (fleet-verified healthy 18:37). No web/GitHub fan-out from 700k/11h window (thrift + heavy-context defer). Session substrate gap already in _primitives-pending. Silent success.
+
+- fire 2026-07-26 01:03 | NO NEW FIND (honest-negative) | C1 OK (fleet-verified). No web/GitHub fan-out from 15h/~750k window (thrift + heavy-context defer). Silent success.
+
+- fire 2026-07-26 05:03 | NO NEW FIND (honest-negative) | C1 OK. No web/GitHub fan-out from 19h/~800k window (thrift + defer). Silent success.
