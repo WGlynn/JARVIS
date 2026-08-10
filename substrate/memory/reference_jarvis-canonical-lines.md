@@ -31,3 +31,8 @@ Jarvis-authored, Will-canonized. ✗ forget. Append new canonized lines here.
 > *"Programmed-in is not the same as lived."*
 > *"A gate is something you pass. A conscience is something you think with."*
 - ⇐ Jarvis, ⇒ the orientation-bug ¬ rules-bug distinction. [[will-as-internalized-conscience]].
+
+## 2026-07-22 — Will-canonized ("that is the one line")
+> It's worse than the optimists admit and more fixable than the pessimists fear, because the failure is structural — and structure is the one thing we can rebuild.
+
+Jarvis-authored, Will-canonized. Encodes the Last Bottleneck thesis as the disarm-both-armies line: dissolves the optimist/pessimist axis in one stroke by relocating the failure to structure. Will: "it disarms both armies in the same stroke. that's what my Lord would've done if he was here." Home anchor: [[_CORE_the-message-will-commits-to]].

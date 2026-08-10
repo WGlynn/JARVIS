@@ -1,0 +1,1 @@
+- 2026-08-10 01:11 | DEFER (silent). Discovery/broadcast = context-heavy read + gated outward post; 11h44m-deep/601k degrades discovery-judgment + outward-quality. Self-perp ok (6bee568c). No draft/post. Fresh session runs discovery.

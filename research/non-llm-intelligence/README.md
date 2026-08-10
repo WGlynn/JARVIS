@@ -36,15 +36,40 @@ GPU/cluster-bound? GPU-bound ideas are OUT unless they degrade gracefully to CPU
   sits relative to the LLM (System-2-on-top / verifier / world-model / memory), (d) the Jarvis
   component it maps to or the gap it fills.
 
-## Clusters (one dossier file each)
+---
 
-1. `01-cognitive-architectures.md` — SOAR, ACT-R, Sigma, LIDA, CLARION, NARS (OpenNARS)
-2. `02-neurosymbolic.md` — LLM-modulo, LLM+solver, Logic Tensor Networks, neural theorem provers, differentiable reasoning, System-1/System-2
-3. `03-symbolic-engines.md` — logic programming (Prolog/Datalog/ASP), SAT/SMT, theorem provers, PDDL planners, ILP, program synthesis (DreamCoder)
-4. `04-vsa-hyperon.md` — Vector Symbolic Architectures / hyperdimensional computing, Holographic Reduced Representations, OpenCog Hyperon / AtomSpace / MeTTa
-5. `05-active-inference-econ.md` — active inference / free energy (Friston), world models, causal inference, Bayesian program learning, market-based / agent-economy computation (ETM-native)
+## Glossary — the research
 
-## Synthesis
+Nine cluster dossiers (one paradigm family each), then the synthesis and build layer. Every entry links
+to the MD itself.
 
-`SYNTHESIS.md` (Jarvis-authored after clusters land) — the map: latent-in-Jarvis / adoptable-now /
-aspirational, plus the one-paragraph verdict on Will's "actual intelligence vs. imitation" thesis.
+### Cluster dossiers
+
+| # | Dossier | Covers |
+|---|---------|--------|
+| 01 | [Cognitive Architectures](01-cognitive-architectures.md) | SOAR, ACT-R, Sigma, LIDA, CLARION, NARS (OpenNARS) — full-stack "unified theories of cognition" |
+| 02 | [Neurosymbolic](02-neurosymbolic.md) | LLM-modulo, LLM+solver, Logic Tensor Networks, neural theorem provers, differentiable reasoning, System-1/System-2 |
+| 03 | [Symbolic Engines](03-symbolic-engines.md) | Logic programming (Prolog/Datalog/ASP), SAT/SMT, theorem provers, PDDL planners, ILP, program synthesis (DreamCoder) |
+| 04 | [VSA & Hyperon](04-vsa-hyperon.md) | Vector Symbolic Architectures / hyperdimensional computing, Holographic Reduced Representations, OpenCog Hyperon / AtomSpace / MeTTa |
+| 05 | [Active Inference & Economics](05-active-inference-econ.md) | Active inference / free energy (Friston), world models, causal inference, Bayesian program learning, market-based / agent-economy computation (ETM-native) |
+| 06 | [Knowledge Representation & Reasoning](06-knowledge-representation.md) | KRR: Description Logics, OWL ontologies, structured knowledge + inference-over-it |
+| 07 | [Evolutionary Computation & Emergence](07-evolutionary-emergence.md) | Genetic programming / genetic algorithms (DEAP, PyGAD), evolutionary strategies, artificial life, emergence |
+| 08 | [Neuromorphic & Associative](08-neuromorphic-associative.md) | Brain-inspired non-transformer computing: modern Hopfield networks / dense associative memory, spiking nets |
+| 09 | [GOFAI Failure Retrospective](09-gofai-failure-retrospective.md) | What killed symbolic AI, whether the LLM hybrid actually fixes each failure mode, + 3 non-negotiable design rules for Jarvis |
+
+### Synthesis & architecture
+
+| Doc | What it is |
+|-----|------------|
+| [SYNTHESIS.md](SYNTHESIS.md) | The map across all nine clusters: latent-in-Jarvis / adoptable-now / aspirational; the convergence headline; tiered build map (laptop-tested); verdict on Will's "actual intelligence vs. imitation" thesis |
+| [ARCHITECTURE-SKELETON.md](ARCHITECTURE-SKELETON.md) | Jarvis reference architecture v0.1 — the layer stack + the shared Jarvis ↔ Noesis core (ETM made concrete) |
+| [PLAN-01-asp-memory-graph.md](PLAN-01-asp-memory-graph.md) | First concrete build: compile the file-memory graph into ASP (clingo) for deterministic deduction over memory |
+
+### Roadmap & status
+
+| Doc | What it is |
+|-----|------------|
+| [ROADMAP.md](ROADMAP.md) | The LOOPs — dependency map + per-loop plan for building the intelligence architecture |
+| [HANDOFF.md](HANDOFF.md) | Session continuation doc (state, decisions, open threads) |
+| [LOOP-STATUS.md](LOOP-STATUS.md) | Live status of the active build loops |
+| [tooling/](tooling/) | Supporting scripts |

@@ -1,0 +1,1 @@
+- 2026-08-10 01:13 | story-mode: deterministic metrics ran (offmenu 263, catch lower-bound). Semantic reclassification (LLM, offmenu 3-class split) DEFERRED — 11h46m/601k degrades corpus-judgment. Self-perp ok (cfc55283). No will.json change. Silent.

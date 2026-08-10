@@ -40,7 +40,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `partner-facing-additive-gate.py` | Bash (push, PR) | Scans push and PR text for retrospective keywords that leak internal error narrative. |
 | `foundry-test-gate.py` | Bash | Blocks an unscoped `forge test` (OOM guard on constrained hardware). |
 | `resource-cgroup-gate.py` | Bash | Enforces the concurrent-build cap. |
-| `coordination-mechanism-gate.py` | Agent | Classifies an agent spawn for a cost-tier recommendation before it runs. |
+| `coordination-mechanism-gate.py` | Agent, Workflow | On an Agent spawn, classifies it for a cost-tier recommendation. On a Workflow spawn, emits the execute-to-verify / size-to-artifact / ultracode-floor pre-check, so the deterministic cheap check is considered before an N-agent swarm. |
 | `atomic-reflection-gate.py` | Agent, and all PostToolUse | Forces a reflection at a delegation or after an error/timeout, so the lesson is captured before routing around it. |
 | `autopilot-allow.py` | all | Autopilot permission handling. |
 
@@ -48,7 +48,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 
 | Gate | Matcher | What it does |
 |---|---|---|
-| `em-dash-augmentation-gate.py` | Write, Edit, NotebookEdit | Scans partner-facing drafts for em and en dashes and surfaces a scrub warning. Augmentation, not block. |
+| `em-dash-augmentation-gate.py` | Write, Edit, NotebookEdit | Partner-draft gate, 3 axes (2026-07-29): (1) em/en-dash scrub; (2) de-model tells from `model-tells.json` (growing corpus, appendable without code change) + an always-injected de-model checklist; (3) source-grounding, flags partner-facing technical drafts that assert protocol/mechanism behavior but cite no source (EIP/spec/URL/file:line). Augmentation, not block. |
 | `code-mode-nudge.py` | Bash, Read, Grep, Glob | Detects repeated tool round-trips and nudges toward a single script. |
 | `git-commit-landed-gate.py` | Bash, Read, Grep, Glob | Confirms a claimed commit actually landed. |
 | `wp-dated-doc-reminder.py` | Write, Edit, NotebookEdit | Reminds to date partner-facing docs. |
