@@ -41,7 +41,7 @@ originSessionId: fa79e2f6-c3ad-4437-b4a7-ff92f216988e
 | jarvis-x-fetcher inbox `*.json` | JSON ✓ | already correct |
 | `_system/decisions_log.md` | markdown | ⚠ candidate (append-only ⇒ probably OK) |
 | `~/jarvis-x-inbox/<id>.json` | JSON ✓ | already correct |
-| `Desktop/odysseus-discussion-campaign-log.md` | markdown | ✗ keep (human-readable table) |
+| `Desktop/Odysseus/odysseus-discussion-campaign-log.md` | markdown | ✗ keep (human-readable table) |
 
 ## 🪝 Triggers
 

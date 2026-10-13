@@ -20,7 +20,7 @@ Memory origin pushed: `04d4fb1` ∧ `26dd52d` ∧ `0686d04`. ~/.claude artifacts
    - reweight=NONE (n<10 actionable ⇒ ✗ overfit-noise)
 2. **open-threads class-fix** `_open_threads.py`: HIGH 210→15 · total 537→188
    - 3 over-counts killed: `_obsidian-view/`→EXCLUDED_PREFIXES · `scan_external`→`live_top_block()` only ¬ 2482-line archive · bare-"Open" dropped from section-header regex
-3. **Odysseus issue-help** loop built `~/.claude/cron-prompts/odysseus-issue-help.md` + ALL 626 triaged via `~/.claude/scripts/odysseus_issue_triage.py` → `Desktop/odysseus-issue-triage.md`
+3. **Odysseus issue-help** loop built `~/.claude/cron-prompts/odysseus-issue-help.md` + ALL 626 triaged via `~/.claude/scripts/odysseus_issue_triage.py` → `Desktop/Odysseus/odysseus-issue-triage.md`
    - buckets: 475 has-pr-inflight · 28 candidate · 89 active · 34 needs-info · 0 stale
 
 ## ‼ Key decision — Odysseus posting HELD
@@ -31,7 +31,7 @@ Memory origin pushed: `04d4fb1` ∧ `26dd52d` ∧ `0686d04`. ~/.claude artifacts
 - composes [[feedback_jarvis-prep-not-delivery-for-partner-chat]] ∧ [[feedback_odysseus-issue-help-as-commons-contribution]] ∧ [[primitive_full-leverage-only-moves]]
 
 ## ◐ Next steps
-- Will reads `Desktop/odysseus-issue-triage.md` → calibrate voice on 1 draft-batch → re-greenlight posting
+- Will reads `Desktop/Odysseus/odysseus-issue-triage.md` → calibrate voice on 1 draft-batch → re-greenlight posting
 - settlement-verify #4121 → checkout PR #4122 → run tests red/green → confirm-comment
 - story-mode cycle-2: recompute true-rate post-gate-fix; design `_lastmenu.json` in-gate paraphrase-detection (⚠ fuzzy-FP = wrong-action)
 - triage now-clean 15 HIGH open-threads
