@@ -75,6 +75,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `jarvis-os-boot-screen.py` | Loader | Renders the boot screen. |
 | `integrity-attest.py boot` | Gate | Verifies the governed-substrate merkle root; flags tamper vs sanctioned drift. |
 | `ctx-handoff-loader.py` | Loader | Loads the deterministic context handoff. |
+| `data-recorder-witness.py` | Gate | Liveness witness for a private project's scheduled market-data recorder (absence is loud): alarms when the OS task is missing, the run log is stale, collectors errored in the last 24h, or daily sealing lags. Silent when healthy or when the project is not on the machine. |
 
 ### UserPromptSubmit (per-prompt injectors and gates)
 
