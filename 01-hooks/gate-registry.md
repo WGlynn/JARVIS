@@ -140,6 +140,19 @@ These are the ones that actually stop or flag an action. If you only read one ta
 
 ---
 
+## Hard triggers (the law layer, 2026-10-19)
+
+Measured on 2026-10-19: of 97 registered hooks, 88 only inject text and 9 can block. Text decays, because it competes for attention in a large context and the weights never change. A hard trigger either performs the action itself or blocks until a mechanical condition holds, has a canary that proves it still works at every boot, and is locked so the model cannot edit it without a human unlock.
+
+| Gate | Event / matcher | What it does |
+|---|---|---|
+| `inner-dialogue.py` | PostToolUse Write, Edit (drafts, write-ups, docs, session notes) | Quotes the weakest sentences of the text just written back as generative pushback questions from a growing bank (concede: "why accept this instead of closing it?", unclear, absolute, attack, hedge) and records them as open. |
+| `inner-dialogue-stop.py` | Stop | Refuses to end the turn while pushback questions are open; they close only when the file is revised or a reason is logged. Capped so a broken loop cannot wedge a session. |
+| `hard-lock.py` | PreToolUse Write, Edit, Bash | Denies model edits to the hard-trigger files and settings edits that would drop their registration; the files are also OS read-only. Only a human opens a 30-minute unlock window, from their own terminal. |
+| `canary.py` | SessionStart | Runs every hard trigger on canned inputs (the inner-dialogue check replays the real pushback that motivated it), checks registration, re-locks an expired unlock window, and prints one alive-or-DEAD line at boot. |
+
+---
+
 ## Why this file exists
 
 The README makes the case for gates and shows a few. `ARCHITECTURE.md` counts them. Neither lists them, and an un-listed gate is one nobody can verify still fires, still matches the right tool, or still means what its name claims. This registry closes that gap: it is the layer's self-audit surface, the thing you diff against `settings.json` to catch a gate that silently fell out of the config or a script that lingers on disk with no registration.
