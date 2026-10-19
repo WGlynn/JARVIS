@@ -92,6 +92,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `triad-check-injector.py` | Gate | Injects the Correspondence Triad on design-level questions. |
 | `save-session-state-trigger.py` | Closer | Save-state trigger check. |
 | `partner-draft-formalize-gate.py` | Gate | Detects partner-draft intent and forces the draft to disk first. |
+| `partner-thread-loader.py` | Loader | When a prompt names someone with a conversation record (People/<Name>/THREAD.md + STATE.md), injects their state and recent thread, once per session, so replies after a /clear keep full context (2026-10-19). |
 | `anticipation-hook.py` | Loader | Date-anchored, stale-PENDING, and unactioned-recall scan. |
 | `story-mode-gate.py` | Gate | Story Mode menu enforcement and number-reply interpretation. |
 | `runtime-heartbeat.py user-prompt` | Closer | Runtime liveness heartbeat. |
