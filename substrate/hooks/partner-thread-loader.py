@@ -46,6 +46,44 @@ def records():
     return out
 
 
+PATH_RE = re.compile(r"(?:/c/|[A-Za-z]:[\\/]|~/)[^\n'\"]*?\.(?:md|txt)", re.I)
+
+
+def pasted_files(prompt):
+    """Files the prompt points at (Git Bash /c/..., C:\\..., ~/...), with their lowercased text."""
+    out = []
+    for m in PATH_RE.findall(prompt):
+        p = m.strip()
+        if p.startswith("/c/"):
+            p = "C:/" + p[3:]
+        elif p.startswith("~/"):
+            p = os.path.join(os.path.expanduser("~"), p[2:])
+        p = os.path.normpath(p)
+        if os.path.isfile(p) and os.path.getsize(p) < 1_000_000:
+            out.append((p, open(p, encoding="utf-8", errors="replace").read().lower()))
+    return out
+
+
+def copy_in(src, person_dir):
+    """Copy a pasted file into <person>/inbox/ (no overwrite; skip if it already lives in the record)."""
+    if os.path.normcase(os.path.abspath(src)).startswith(os.path.normcase(os.path.abspath(person_dir))):
+        return None
+    inbox = os.path.join(person_dir, "inbox")
+    os.makedirs(inbox, exist_ok=True)
+    base = os.path.basename(src)
+    dst = os.path.join(inbox, base)
+    data = open(src, "rb").read()
+    n = 2
+    while os.path.exists(dst):
+        if open(dst, "rb").read() == data:
+            return None
+        stem, ext = os.path.splitext(base)
+        dst = os.path.join(inbox, f"{stem}-{n}{ext}")
+        n += 1
+    open(dst, "wb").write(data)
+    return f"{src} -> {dst}"
+
+
 def main():
     try:
         payload = json.load(sys.stdin)
@@ -61,10 +99,17 @@ def main():
     seen_path = os.path.join(SEEN_DIR, f"{session}.json")
     seen = set(json.load(open(seen_path))) if os.path.isfile(seen_path) else set()
 
+    pasted = pasted_files(payload.get("prompt", "") or "")
     parts = []
     for name, d, thread, state, aliases in records():
-        if not any(re.search(r"(?<![a-z0-9])" + re.escape(a) + r"(?![a-z0-9])", low) for a in aliases):
+        hit = lambda text: any(re.search(r"(?<![a-z0-9])" + re.escape(a) + r"(?![a-z0-9])", text) for a in aliases)
+        mine = [(p, txt) for p, txt in pasted if hit(txt) or hit(os.path.basename(p).lower())]
+        if not (hit(low) or mine):
             continue
+        copied = [c for c in (copy_in(p, d) for p, _ in (mine or pasted)) if c]
+        if copied:
+            parts.append(f"[PARTNER RECORD: {name}] copied into the record so it survives context windows: "
+                         + "; ".join(copied))
         if name in seen:
             parts.append(f"[PARTNER RECORD: {name}] already loaded this session ({d}). {RULES}")
             continue
