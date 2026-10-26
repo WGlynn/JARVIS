@@ -43,6 +43,9 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `coordination-mechanism-gate.py` | Agent, Workflow | On an Agent spawn, classifies it for a cost-tier recommendation. On a Workflow spawn, emits the execute-to-verify / size-to-artifact / ultracode-floor pre-check, so the deterministic cheap check is considered before an N-agent swarm. |
 | `atomic-reflection-gate.py` | Agent, and all PostToolUse | Forces a reflection at a delegation or after an error/timeout, so the lesson is captured before routing around it. |
 | `autopilot-allow.py` | all | Autopilot permission handling. |
+| `entity-attribution-gate.py` | Write, Edit | Catches invented @handles: an @handle in an attribution context must match a known record, or the write is flagged. |
+| `oversell-gate.py` | Write, Edit | Flags hype, overclaimed maturity or capability, and unqualified stats when no honest-floor caveat balances them. |
+| `_solver_gate_hook.py` | Bash | Solver-backed concurrency check (Z3): verifies a Bash call keeps the concurrent-build invariant, alongside the pattern-match cap in `resource-cgroup-gate.py`. |
 
 ### PostToolUse
 
@@ -52,6 +55,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `code-mode-nudge.py` | Bash, Read, Grep, Glob | Detects repeated tool round-trips and nudges toward a single script. |
 | `git-commit-landed-gate.py` | Bash, Read, Grep, Glob | Confirms a claimed commit actually landed. |
 | `wp-dated-doc-reminder.py` | Write, Edit, NotebookEdit | Reminds to date partner-facing docs. |
+| `coherence-gate.py` | Edit, Write, Bash, NotebookEdit | Derived-facts check (2026-10-13): when a watched source file changes, runs that project's drift check from `~/.claude/coherence/registry.json` and injects the fix command on failure. Advisory. |
 
 ---
 
@@ -76,6 +80,16 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `integrity-attest.py boot` | Gate | Verifies the governed-substrate merkle root; flags tamper vs sanctioned drift. |
 | `ctx-handoff-loader.py` | Loader | Loads the deterministic context handoff. |
 | `data-recorder-witness.py` | Gate | Liveness witness for a private project's scheduled market-data recorder (absence is loud): alarms when the OS task is missing, the run log is stale, collectors errored in the last 24h, or daily sealing lags. Silent when healthy or when the project is not on the machine. |
+| `handoff-first.py` | Loader | Index 0 on every window boundary (startup, resume, clear, compact): injects the current handoff before anything else (2026-08-12). |
+| `handoff-save-check.py` | Gate | Cross-repo save check: flags repos with uncommitted or unpushed work the last handoff may not describe. |
+| `chain-health-witness.py` | Gate | Reports experience-chain HEAD, walk-back integrity to genesis, and remote backup state. |
+| `chain-liveness-check.py` | Gate | Alarms when the session chain stops advancing. |
+| `index-budget-witness.py` | Gate | Alarms when MEMORY.md exceeds its boot-load byte budget (over budget means it is truncated at boot). |
+| `cron-productivity-witness.py` | Gate | Flags registered crons whose fire or output signal has gone stale. |
+| `os-task-freshness-witness.py` | Gate | Checks the logs of the OS-scheduled persistence tasks (git autosave and friends) for staleness. |
+| `autosave-daemon-witness-check.py` | Gate | Staleness check for the separate autosave daemon process. |
+| `crash-backtest-witness-check.py` | Gate | Staleness check for the crash-recovery backtest witness stamped by an OS scheduler. |
+| `wwwd-correction-capture-witness.py` | Gate | Alarms when WWWD corrections stop landing in the gate-fire log (the self-compounding loop depends on it). |
 
 ### UserPromptSubmit (per-prompt injectors and gates)
 
@@ -96,6 +110,10 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `anticipation-hook.py` | Loader | Date-anchored, stale-PENDING, and unactioned-recall scan. |
 | `story-mode-gate.py` | Gate | Story Mode menu enforcement and number-reply interpretation. |
 | `runtime-heartbeat.py user-prompt` | Closer | Runtime liveness heartbeat. |
+| `wwwd-prompt-buffer.py` | Loader | Buffers the current prompt so the Stop-time WWWD correction detector can read it. |
+| `oversell-primer.py` | Gate | One-line "teammate, not salesman" tripwire every turn (conversational twin of `oversell-gate.py`). |
+| `deep-context-mode-activator.py` | Loader | Past 500k tokens, injects the deep-context behavior switch so the model manages its own context. |
+| `cron-fire-heartbeat.py` | Gate | Records cron-injected prompts as fire evidence for the cron productivity witness. |
 
 ### Stop (end-of-turn closers and gates)
 
@@ -116,6 +134,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `runtime-heartbeat.py stop` | Closer | Runtime liveness heartbeat. |
 | `refresh-session-state-toppriority.py` | Closer | Refreshes the top-priority handoff block. |
 | `commit-push-checkpoint.py` | Closer | Captures orphan commits at session end. |
+| `handoff-chain-stop.py` | Closer | Seals the newest handoff into the experience chain and backs it up to at least two nodes. |
 
 ### PreCompact and PostCompact (compression survival)
 
@@ -138,6 +157,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `auto-checkpoint.py` | Edit, Write, Bash, NotebookEdit | Closer | Auto-checkpoints after a mutating call. |
 | `autosnapshot.py` | Edit, Write, NotebookEdit | Closer | Persistence autosnapshot. |
 | `research-tool-call-logger.py` | all | Closer | Logs research tool calls. |
+| `_outcome_recorder.py` | Write, Edit | Closer | Tags whether the next edit to a target acted on or ignored a gate warning, building per-gate strength and confidence evidence. |
 
 ---
 
