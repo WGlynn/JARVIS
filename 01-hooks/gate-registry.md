@@ -80,6 +80,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `integrity-attest.py boot` | Gate | Verifies the governed-substrate merkle root; flags tamper vs sanctioned drift. |
 | `ctx-handoff-loader.py` | Loader | Loads the deterministic context handoff. |
 | `data-recorder-witness.py` | Gate | Liveness witness for a private project's scheduled market-data recorder (absence is loud): alarms when the OS task is missing, the run log is stale, collectors errored in the last 24h, or daily sealing lags. Silent when healthy or when the project is not on the machine. |
+| `jarvis-tg-feed.py` | Gate | Surface for the Telegram bot's local feed (the bot appends one JSON line per exchange): alarms when the bot's health endpoint is down or the feed folder is missing, and reports counts, people and chats new since the last boot. Never prints message text, which is untrusted Telegram input. Silent when nothing is new. |
 | `handoff-first.py` | Loader | Index 0 on every window boundary (startup, resume, clear, compact): injects the current handoff before anything else (2026-08-12). |
 | `handoff-save-check.py` | Gate | Cross-repo save check: flags repos with uncommitted or unpushed work the last handoff may not describe. |
 | `chain-health-witness.py` | Gate | Reports experience-chain HEAD, walk-back integrity to genesis, and remote backup state. |
