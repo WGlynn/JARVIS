@@ -51,6 +51,14 @@ try:
 except Exception:
     def log_event(*a, **kw): pass
 
+# LOOP 2 structured-critic (graceful fallback if _critic is unavailable)
+try:
+    from _critic import emit_critic as _ecxr_emit_critic
+except Exception:
+    def _ecxr_emit_critic(violated_constraint, suggested_reformulation,
+                          severity="medium", evidence=None, gate_name=""):
+        return f"[ENTITY-CONTEXT] {violated_constraint}\nSuggestion: {suggested_reformulation}"
+
 # Cache the loaded index across a single invocation. Stale-check via mtime
 # comparison against the memory dir's most recent .md mtime.
 _index_cache: dict | None = None
@@ -265,36 +273,30 @@ def main() -> int:
               meta={"entity_count": len(matched),
                     "total_file_matches": sum(len(v) for v in matched.values())})
 
-    # Build the system-reminder
-    lines = [
-        "[ENTITY-CONTEXT CROSS-REFERENCE — AA#3 / CCP enforcer]",
-        "",
-        "The content being written contains named entities that have memory references. "
-        "Per [F·entity-context-cross-reference] (AA#3) and [P·cross-context-protocol] (CCP), "
-        "cross-reference each before delivery. Stated entities ≠ valid entities until reconciled.",
-        "",
-        "Matches found:",
-        "",
-    ]
-
+    # Build the structured critic feedback (AA#3 / CCP enforcer)
+    evidence_items: list[str] = []
     for entity, results in matched.items():
-        lines.append(f"**{entity}**:")
-        for filepath, snippet in results[:3]:  # cap to top 3 per entity to avoid noise
-            rel_path = filepath.name
-            lines.append(f"  - `{rel_path}` — {snippet}")
-        lines.append("")
+        for filepath, snippet in results[:2]:
+            evidence_items.append(f"{entity}: `{filepath.name}` -- {snippet[:80]}")
 
-    lines.extend([
-        "Reconciliation checklist:",
-        "- Relationship: is this entity an employer / co-founder / collaborator of someone on our team?",
-        "- Abandoned: did we recently move off this entity (e.g., post-incident)?",
-        "- In-flight: is another team member already in conversation with this entity?",
-        "- NDA-locked: is this entity tied to a discretion-flagged engagement?",
-        "",
-        "If any reconciliation applies, revise the output before completing the Write/Edit.",
-    ])
-
-    additional_context = "\n".join(lines)
+    entity_list = ", ".join(list(matched.keys())[:8])
+    additional_context = _ecxr_emit_critic(
+        violated_constraint=(
+            f"Draft references {len(matched)} named entity/entities ({entity_list}) that have "
+            f"memory entries. Per [F·entity-context-cross-reference] (AA#3) and "
+            f"[P·cross-context-protocol] (CCP), stated entities are not valid until cross-referenced: "
+            f"relationship / abandonment / in-flight / NDA status have not been confirmed."
+        ),
+        suggested_reformulation=(
+            "For each flagged entity, answer: (a) Relationship -- employer/co-founder/collaborator of "
+            "a team member? (b) Abandoned -- recently moved off this entity (e.g. post-incident)? "
+            "(c) In-flight -- another team member already in conversation? (d) NDA-locked -- tied to a "
+            "discretion-flagged engagement? If any apply, revise before completing the Write/Edit."
+        ),
+        severity="medium",
+        evidence=evidence_items[:5],
+        gate_name="entity-context-cross-reference",
+    )
 
     out = {
         "hookSpecificOutput": {

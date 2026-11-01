@@ -29,14 +29,30 @@ try:
     from _telemetry import log_event
 except Exception:
     def log_event(*a, **kw): pass
+try:
+    import _seen_set as _ss
+except Exception:
+    _ss = None
 
 
 def main() -> int:
+    data = {}
     try:
         payload = sys.stdin.read()
-        _ = json.loads(payload) if payload.strip() else {}
+        data = json.loads(payload) if payload.strip() else {}
     except Exception:
-        pass
+        data = {}
+
+    # Deep Context Mode: compaction summarized away context detail, so a warm shard
+    # marked "already injected this session" may no longer be present. Clear the
+    # session seen-set so loaders may re-inject as needed post-compaction.
+    if _ss:
+        sid = data.get("session_id") or data.get("sessionId") or ""
+        if sid:
+            try:
+                _ss.clear(sid)
+            except Exception:
+                pass
 
     ctx = None
     try:

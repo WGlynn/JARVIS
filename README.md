@@ -46,7 +46,7 @@ If `verify` prints `0 errors` you're set. The CLI reads the markdown corpus at `
 
 | Artifact | Where | What it does |
 |---|---|---|
-| **62 hook + session-chain scripts** | `substrate/hooks/` | Drop-in `PreToolUse` / `SessionStart` / `Stop` gates (42 hooks) plus the session-chain persistence scripts. Each is a self-contained Python script that reads a JSON payload from stdin and emits an `additionalContext` block. Wire into `~/.claude/settings.json`. |
+| **101 hook + session-chain scripts** | `substrate/hooks/` | Drop-in `PreToolUse` / `SessionStart` / `Stop` gates plus the session-chain persistence scripts and shared helpers (synced 2026-11-01). The live setup registers 99 hooks, each listed in [`01-hooks/gate-registry.md`](./01-hooks/gate-registry.md); a few live gates stay out of this folder because they name private parties. Each is a self-contained Python script that reads a JSON payload from stdin and emits an `additionalContext` block. Wire into `~/.claude/settings.json`. |
 | **500 markdown files** | `substrate/memory/` | The discipline corpus: 213 primitives + 185 feedback rules + 57 projects + 17 references (+ indexes). Each file is one pattern. Importable as Python objects; greppable as files. |
 | **12 cron canonicals** | `substrate/cron-prompts/` | Slash-command prompts scheduled via Claude Code's scheduling layer. Examples: substrate sync (+ chain commitment), advice mining, skill mining, link-rot detection. |
 | **`jarvis` Python package** | `substrate/jarvis/` | CLI + library for `show / list / graph / verify / search / count / hindsight` over the corpus. |

@@ -180,8 +180,16 @@ def main() -> int:
         all_md.add(f)
     orphan_files = sorted(all_md - all_refs)
 
+    # Actionable-rot headline: orphan_refs + hook-rot + protocol-rot are the
+    # breaking classes (a dangling ref, not benign memory-garbage). A single
+    # dangling ref can otherwise be lost among hundreds of [ORPH] lines, so we
+    # always emit an explicit count of actionable items — even zero — so the one
+    # session it appears is the session it gets fixed (task corpus-health-3).
+    actionable_count = len(orphan_refs) + len(hook_path_rot) + len(protocol_chain_rot)
+
     # Build report
     lines = []
+    lines.append(f"[ACTIONABLE] {actionable_count} actionable rot refs (orphan-refs + hook-rot + protocol-rot; fix these; orphan-files below are benign)")
     if orphan_refs:
         lines.append(f"[MISS] {len(orphan_refs)} orphan refs (index points to missing files):")
         for ref, where in sorted(orphan_refs.items()):

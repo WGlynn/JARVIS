@@ -104,9 +104,32 @@ def main() -> int:
     except Exception:
         print('{}')
         return 0
+    tool_name = payload.get('tool_name') or payload.get('toolName') or ''
     ti = payload.get('tool_input') or payload.get('toolInput') or {}
     if not isinstance(ti, dict):  # malformed payload (e.g. tool_input as string) must fail-quiet
         ti = {}
+
+    # Workflow spawn: emit the execute-to-verify / right-size pre-check.
+    # Will 2026-07-10 "make it so"; see feedback_execute-to-verify-over-delegate.
+    if tool_name == 'Workflow':
+        msg = (
+            '[ORCHESTRATION PRE-CHECK — execute-to-verify-over-delegate]\n'
+            '1. EXECUTE-TO-VERIFY: can a deterministic check (test / bench / grep / build) answer the '
+            'load-bearing question? Run it FIRST — one command can beat an N-agent swarm.\n'
+            '2. SIZE-TO-ARTIFACT: does artifact size x uncertainty justify a multi-agent fleet? '
+            'Small (e.g. a 40-line diff) => inline pass or /critical-qa, not a workflow.\n'
+            '3. ULTRACODE FLOOR: default-to-workflow is a CEILING for research/audit/broad-sweep, not a '
+            'floor — small / executable-checkable / trivial => solo or single-agent even in ultracode.\n'
+            'Augmentation only; proceed if the swarm is genuinely right-sized.'
+        )
+        print(json.dumps({
+            'hookSpecificOutput': {
+                'hookEventName': 'PreToolUse',
+                'additionalContext': msg,
+            }
+        }))
+        return 0
+
     desc = ti.get('description', '')
     prompt = ti.get('prompt', '')
     subagent_type = ti.get('subagent_type', 'general-purpose')

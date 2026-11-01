@@ -63,9 +63,13 @@ def read_cursor() -> int:
 
 
 def write_cursor(offset: int):
+    """Atomic cursor write (F9): tmp + os.replace so a crash mid-write can't leave a
+    torn/half-written offset that seeks into the middle of a JSON line."""
     try:
         CURSOR_PATH.parent.mkdir(parents=True, exist_ok=True)
-        CURSOR_PATH.write_text(str(offset), encoding="utf-8")
+        tmp = CURSOR_PATH.with_suffix(".cursor.tmp")
+        tmp.write_text(str(offset), encoding="utf-8")
+        os.replace(tmp, CURSOR_PATH)
     except Exception:
         pass
 
@@ -75,6 +79,15 @@ def fetch_undelivered_reflections() -> tuple[list[dict], int]:
     if not REFLECTION_LOG.exists():
         return [], 0
     cursor = read_cursor()
+    # Rotation/truncation guard: if the cursor is past the current file size, the
+    # log was rotated (telemetry-rotate moves post_gen_reflections.jsonl) or
+    # truncated, and the stale byte offset would seek past EOF and silently
+    # deliver nothing forever. Reset to 0 so delivery resumes from the new file.
+    try:
+        if cursor > REFLECTION_LOG.stat().st_size:
+            cursor = 0
+    except Exception:
+        pass
     try:
         with REFLECTION_LOG.open("rb") as f:
             f.seek(cursor)
@@ -115,12 +128,14 @@ def main() -> int:
         return 0
 
     # Take only the most recent fresh entry; older reflections are stale
-    # relative to the current turn. Advance the cursor past everything we
-    # saw so we don't re-deliver later.
+    # relative to the current turn. The cursor is advanced AFTER a successful
+    # deliver (F9: advance-after-print => at-least-once, so a crash between the
+    # advance and the print can no longer silently drop a reflection). Stale /
+    # empty terminal branches still consume the offset so we don't re-scan.
     fresh = [e for e in entries if is_fresh(e)]
-    write_cursor(new_offset)
 
     if not fresh:
+        write_cursor(new_offset)
         log_event("post-generation-recall", "noop",
                   meta={"reason": "no_fresh_entries", "total_undelivered": len(entries)})
         return 0
@@ -128,6 +143,7 @@ def main() -> int:
     latest = fresh[-1]
     rendered = latest.get("rendered", "")
     if not rendered.strip():
+        write_cursor(new_offset)
         return 0
 
     log_event("post-generation-recall", "fire",
@@ -141,6 +157,7 @@ def main() -> int:
         }
     }
     print(json.dumps(out))
+    write_cursor(new_offset)
     return 0
 
 

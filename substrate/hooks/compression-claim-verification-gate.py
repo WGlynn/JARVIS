@@ -35,6 +35,20 @@ import json
 import re
 from pathlib import Path
 
+# LOOP 2 structured-critic (graceful fallback if _critic is unavailable) --------
+_HOOKS_DIR = Path(__file__).parent
+sys.path.insert(0, str(_HOOKS_DIR))
+try:
+    from _critic import emit_critic
+except Exception:
+    def emit_critic(violated_constraint, suggested_reformulation,
+                    severity="medium", evidence=None, gate_name=""):
+        parts = [f"[{gate_name.upper() or 'CRITIC'}] {violated_constraint}",
+                 f"Suggestion: {suggested_reformulation}"]
+        if evidence:
+            parts += [f"  - {e}" for e in evidence[:5]]
+        return "\n".join(parts)
+
 TELEMETRY = Path.home() / '.claude' / 'projects' / 'C--Users-Will' / 'memory' / '_system' / 'compression_claim_gate_fires.jsonl'
 
 # Targets memory + papers + substrate docs (anywhere compression claims could be shipped)
@@ -174,22 +188,26 @@ def main() -> int:
         'samples': [(ln, k, m) for ln, k, m in unanchored[:3]],
     })
 
-    samples = '\n  '.join(f"L{ln+1} [{kind}] {match}" for ln, kind, match in unanchored[:3])
-    msg = (
-        '[COMPRESSION-CLAIM VERIFICATION GATE — AMD class-dissolver]\n'
-        f'File: ...{path[-60:]}\n'
-        f'Detected {len(claims)} compression-style claim(s); {len(unanchored)} lack a '
-        f'verification anchor within {ANCHOR_WINDOW} lines.\n'
-        f'Sample(s):\n  {samples}\n'
-        'Per [F·augmented-mechanism-design-paper] applied to measurement-gap class:\n'
-        '  add an anchor near each claim: measured-against / verified-by / tokenizer /\n'
-        '  cache-telemetry / [unverified] / [proxy:cl100k_base] / derived arithmetic from <source>.\n'
-        'Augmentation only. Mark [unverified] to ship explicitly-unverified claims.'
+    samples_list = [f"L{ln+1} [{kind}] {match}" for ln, kind, match in unanchored[:5]]
+    additional_context = emit_critic(
+        violated_constraint=(
+            f"File ...{path[-60:]}: {len(unanchored)} of {len(claims)} compression-style claim(s) "
+            f"lack a verification anchor within {ANCHOR_WINDOW} lines. Unanchored claims violate "
+            f"[F·augmented-mechanism-design-paper] measurement-gap discipline."
+        ),
+        suggested_reformulation=(
+            "Add a verification anchor near each unanchored claim: measured-against / verified-by / "
+            "tokenizer (cl100k_base|o200k_base|Claude BPE) / cache-telemetry / derived-arithmetic-from:<source>. "
+            "Alternatively mark [unverified] or [proxy:cl100k_base] to ship explicitly-flagged estimates."
+        ),
+        severity="high" if len(unanchored) >= 3 else "medium",
+        evidence=samples_list,
+        gate_name="compression-claim-verification-gate",
     )
     print(json.dumps({
         'hookSpecificOutput': {
             'hookEventName': 'PreToolUse',
-            'additionalContext': msg,
+            'additionalContext': additional_context,
         }
     }))
     return 0

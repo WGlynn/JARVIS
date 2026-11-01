@@ -25,6 +25,9 @@ from datetime import datetime, timezone
 
 MEMORY_DIR = Path.home() / ".claude" / "projects" / "C--Users-Will" / "memory"
 GATE_FIRE_LOG = MEMORY_DIR / "_system" / "wwwd_gate_fires.jsonl"
+# Written each turn by hooks/wwwd-prompt-buffer.py (UserPromptSubmit). The Stop
+# payload does NOT deliver the user message, so the detector reads it here.
+PROMPT_BUFFER = MEMORY_DIR / "_system" / "wwwd_last_prompt.json"
 
 # Correction markers — phrases that signal Will is correcting prior output.
 # Tuned over usage; conservative to start (false-positive cost is one stale
@@ -59,10 +62,16 @@ def detect_correction(text: str) -> tuple[bool, list[str]]:
     return (len(matched) > 0), matched
 
 
-def append_correction_to_last_entry(correction_text: str, matched_patterns: list[str]) -> bool:
+def append_correction_to_last_entry(correction_text: str, matched_patterns: list[str],
+                                    max_index: int | None = None) -> bool:
     """Read the gate-fire log, find the most recent entry without a correction,
     set its correction field, and write the log back. Returns True if a write
     happened, False otherwise.
+
+    `max_index`, when provided, restricts attribution to entries with index
+    < max_index. This is the attribution boundary: a correction in this turn's
+    prompt is about the PRIOR turn's output, so we only tag gate-fires that
+    existed before this turn began (recorded by wwwd-prompt-buffer.py).
 
     This is O(N) on the log size; for production we'd want indexed access.
     Prototype is fine for now."""
@@ -77,6 +86,8 @@ def append_correction_to_last_entry(correction_text: str, matched_patterns: list
     # Find the most recent entry without a correction recorded.
     target_idx = None
     for i in range(len(lines) - 1, -1, -1):
+        if max_index is not None and i >= max_index:
+            continue
         try:
             entry = json.loads(lines[i])
         except Exception:
@@ -103,7 +114,14 @@ def append_correction_to_last_entry(correction_text: str, matched_patterns: list
         return False
 
     try:
-        GATE_FIRE_LOG.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        payload_text = "\n".join(lines) + "\n"
+        tmp = GATE_FIRE_LOG.with_name(GATE_FIRE_LOG.name + ".tmp")
+        tmp.write_text(payload_text, encoding="utf-8")
+        # Verify the full line set landed before the atomic swap, so a partial/
+        # crashed write can never truncate the ~5MB gate-fire corpus.
+        if len(tmp.read_text(encoding="utf-8").splitlines()) != len(lines):
+            return False
+        tmp.replace(GATE_FIRE_LOG)  # Path.replace == os.replace (atomic, same dir)
         return True
     except Exception:
         return False
@@ -138,13 +156,37 @@ def main() -> int:
                     )
                 break
 
+    # Primary path: the Stop payload never delivers the user message, so read the
+    # buffer written this turn by wwwd-prompt-buffer.py (UserPromptSubmit). This is
+    # what makes the correction numerator REAL instead of a stuck-at-0 artifact.
+    max_index = None
+    if not user_msg:
+        try:
+            buf = json.loads(PROMPT_BUFFER.read_text(encoding="utf-8"))
+            # Dedup: this Stop hook re-fires on autonomous / story-loop continuation
+            # turns (decision:block) with NO new UserPromptSubmit, so the buffer is
+            # unchanged. Skip if already consumed -- otherwise the detector walks
+            # further back and tags an unrelated older entry (phantom correction).
+            if buf.get("consumed"):
+                print(json.dumps({}))
+                return 0
+            user_msg = buf.get("prompt", "") or ""
+            max_index = buf.get("prior_gate_fire_count")
+            buf["consumed"] = True
+            try:
+                PROMPT_BUFFER.write_text(json.dumps(buf), encoding="utf-8")
+            except Exception:
+                pass
+        except Exception:
+            pass
+
     is_correction, matched = detect_correction(user_msg)
 
     if not is_correction:
         print(json.dumps({}))
         return 0
 
-    wrote = append_correction_to_last_entry(user_msg, matched)
+    wrote = append_correction_to_last_entry(user_msg, matched, max_index=max_index)
 
     # Stop event does NOT support hookSpecificOutput.additionalContext (schema rejects).
     # Logging is the load-bearing behavior; the transparency notice was dev-only.

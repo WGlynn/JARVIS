@@ -27,6 +27,7 @@ import json
 import os
 import re
 import subprocess
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -37,29 +38,26 @@ CONVERSATION_LOG = SHIELD_DIR / "conversation.log"
 HEARTBEAT_FILE = SHIELD_DIR / "heartbeat.json"
 CRASH_MARKERS_DIR = SHIELD_DIR / "crashes"
 LOG_FILE = SHIELD_DIR / "shield.log"
+# Durable recovery artifacts (finding #1 fix, 2026-08-07): the full report the
+# boot hook surfaces, and an append-only monotonic ledger of every crash ever
+# recovered. The ledger is the "external witness" — it grows across sessions
+# independent of the .processed renames, so a missing recovery is LOUD (a gap in
+# a monotonic file) instead of invisible (a marker that silently never fired).
+LAST_RECOVERY_REPORT = SHIELD_DIR / "LAST_RECOVERY_REPORT.md"
+RECOVERY_LEDGER = SHIELD_DIR / "recovery-ledger.jsonl"
 
 # Max conversation log size before rotation (500KB)
 MAX_LOG_SIZE = 500_000
 
-# SHIELD-PERSIST-LEAK defense (2026-04-21): mirror of the NDA keyword list
-# in ~/.claude/bin/nda-[REDACTED-NDA]-gate.py. SOURCE OF TRUTH lives there;
-# this copy is defense-in-depth so SHIELD never commits NDA material even when
-# the PreToolUse gate isn't invoked (SHIELD writes run via the hook pipeline,
-# not through tool-use). Keep these two lists in sync.
-_NDA_KEYWORDS = [
-    "[REDACTED-NDA]",
-    r"[redacted]",
-    "[REDACTED-NDA]",
-    "[REDACTED-NDA]",
-    "[REDACTED-NDA]",
-    "[REDACTED-NDA]",
-    "[REDACTED-NDA]",
-    "[REDACTED-NDA]",
-    "[REDACTED-NDA]",
-    "[REDACTED-NDA]",
-    "[REDACTED-NDA]",
-]
-_NDA_RE = re.compile("|".join(_NDA_KEYWORDS), re.IGNORECASE)
+# SHIELD-PERSIST-LEAK defense (2026-04-21): NDA regex from the single source of truth
+# (leak_patterns.py -> state/private-leak-patterns.txt), STRICT nda tier. Defense-in-depth so
+# SHIELD never commits NDA material even when the PreToolUse gate isn't invoked (SHIELD writes
+# run via the hook pipeline, not through tool-use). Fail-closed: the loader bakes in the cluster
+# if the file is unreadable.
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.expanduser("~/.claude/bin"))
+from leak_patterns import nda_regex
+_NDA_RE = nda_regex()
 
 
 def ensure_dirs():
@@ -405,12 +403,95 @@ def recovery_report():
     return report
 
 
+def append_to_ledger(crashes):
+    """
+    Append surfaced crashes to the monotonic recovery ledger (append-only).
+    This is the external witness: it persists independent of the .processed
+    renames, so the full crash history survives even if markers are cleared,
+    lost, or a boot dies before the summary is read.
+    """
+    try:
+        ensure_dirs()
+        with open(RECOVERY_LEDGER, "a", encoding="utf-8") as f:
+            for c in crashes:
+                entry = {
+                    "surfaced_at": now_iso(),
+                    "crash_ts": c.get("timestamp"),
+                    "error": c.get("error"),
+                    "dirty_files": (c.get("git_status") or {}).get("dirty_files"),
+                    "marker": os.path.basename(c.get("_file", "")),
+                }
+                f.write(json.dumps(entry) + "\n")
+    except Exception as e:
+        log(f"Ledger append error: {e}")
+
+
+def boot_report():
+    """
+    Bounded, self-clearing crash surfacer for SessionStart.
+
+    Unlike recovery_report() (unbounded manual dump), this:
+      - prints a BOUNDED loud summary (grouped by error + 3 most-recent detail
+        lines) so a 90-crash backlog doesn't drown the boot context,
+      - writes the FULL report to a durable file for follow-up,
+      - appends every crash to the monotonic recovery ledger (external witness),
+      - archives the markers to .processed so crashes surface loud-ONCE, not on
+        every boot forever (re-flood = alert fatigue = its own silent failure).
+
+    Returns the summary string, or None when there are no crashes (a clean boot
+    prints nothing).
+    """
+    crashes = check_crashes()
+    if not crashes:
+        return None
+
+    # 1. Durable full report (survives boot-context truncation).
+    full = recovery_report()
+    if full:
+        try:
+            LAST_RECOVERY_REPORT.write_text(full, encoding="utf-8")
+        except Exception as e:
+            log(f"Boot-report file write error: {e}")
+
+    # 2. Monotonic ledger (external witness).
+    append_to_ledger(crashes)
+
+    # 3. Bounded loud summary.
+    n = len(crashes)
+    errs = Counter((c.get("error") or "unknown")[:40] for c in crashes)
+    first_ts = crashes[0].get("timestamp", "?")
+    last_ts = crashes[-1].get("timestamp", "?")
+
+    lines = [
+        "=== API DEATH SHIELD — CRASH RECOVERY (boot) ===",
+        f"{n} unprocessed crash marker(s) recorded since the last clean boot.",
+        f"span: {first_ts}  ..  {last_ts}",
+        "by error: " + ", ".join(f"{k}x{v}" for k, v in errs.most_common()),
+        "most recent:",
+    ]
+    for c in reversed(crashes[-3:]):
+        gs = c.get("git_status") or {}
+        dirty = gs.get("dirty_files", 0)
+        lines.append(
+            f"  - {c.get('timestamp', '?')}  err={c.get('error', '?')}"
+            f"  dirty_files={dirty}"
+        )
+    lines.append(f"full report  -> {LAST_RECOVERY_REPORT}")
+    lines.append(f"ledger       -> {RECOVERY_LEDGER}")
+    lines.append("markers archived to .processed (surfaced once; new crashes re-surface).")
+
+    # 4. Archive so this exact backlog doesn't re-flood next boot.
+    clear_crashes()
+
+    return "\n".join(lines)
+
+
 # ============ Main ============
 
 def main():
     if len(sys.argv) < 2:
         print("Usage: api-death-shield.py <event>", file=sys.stderr)
-        print("Events: stop-failure, user-prompt, stop, pre-compact, check-crashes, clear-crashes, report", file=sys.stderr)
+        print("Events: stop-failure, user-prompt, stop, pre-compact, check-crashes, clear-crashes, report, boot-report", file=sys.stderr)
         return
 
     event = sys.argv[1]
@@ -445,6 +526,16 @@ def main():
             print(report)
         else:
             print("No crashes to report.")
+    elif event == "boot-report":
+        # SessionStart surfacer: bounded, durable, self-clearing. Prints nothing
+        # on a clean boot so it adds zero noise when there's nothing to recover.
+        try:
+            summary = boot_report()
+            if summary:
+                print(summary)
+        except Exception as e:
+            # Never let recovery-surfacing break the boot.
+            log(f"boot-report crashed: {type(e).__name__}: {e}")
     else:
         print(f"Unknown event: {event}")
 

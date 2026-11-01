@@ -30,7 +30,12 @@ END = "<!-- AUTO-HANDOFF:END -->"
 
 
 def parse_latest():
-    info = {"ctx": "?", "session": "?", "cwd": "?", "directive": "(none captured)"}
+    info = {"ctx": "?", "session": "?", "cwd": "?", "directive": "(none captured)",
+            "recent_turns": "", "mtime": None}
+    try:
+        info["mtime"] = os.path.getmtime(LATEST)
+    except Exception:
+        pass
     try:
         text = open(LATEST, encoding="utf-8").read()
     except Exception:
@@ -47,22 +52,83 @@ def parse_latest():
     if m:
         first = m.group(1).strip().splitlines()[0]
         info["directive"] = first[:200]
+    # Capture the whole recent-turns block -- the fresh thread, so a stale rich
+    # handoff below can be demoted without losing where the last window actually was.
+    rt = re.search(r"(## Recent user turns.*)", text, re.S)
+    if rt:
+        block = rt.group(1).strip()
+        info["recent_turns"] = block[:1600]
     return info
+
+
+def latest_handoff():
+    """Newest ~/Desktop/SESSION-HANDOFF-*.md -> (name, mtime_str, bounded_text), or None.
+
+    Per [F.always-embed-handoff-in-session-state-top-priority] (Will 2026-06-30):
+    the top-priority block must EMBED the rich handoff inline, not just point at it.
+    """
+    try:
+        import glob
+        desktop = os.path.expanduser("~/Desktop")
+        files = glob.glob(os.path.join(desktop, "SESSION-HANDOFF-*.md"))
+        if not files:
+            return None
+        newest = max(files, key=os.path.getmtime)
+        raw_mt = os.path.getmtime(newest)
+        mtime = datetime.datetime.fromtimestamp(raw_mt).strftime("%Y-%m-%d %H:%M")
+        text = open(newest, encoding="utf-8").read().strip()
+        if len(text) > 4000:
+            text = text[:4000] + "\n\n…(truncated — full file on Desktop)"
+        return (os.path.basename(newest), mtime, text, raw_mt)
+    except Exception:
+        return None
+
+
+# If the mechanical floor is newer than the newest rich handoff by more than this
+# many minutes, the last window wrote no rich handoff -> the embedded rich file is
+# stale. Flag it and lead with the fresh mechanical recent-turns instead of lying
+# "never stale." (Root-cause fix 2026-08-12, parallel to handoff-first.py.)
+FRESH_DELTA_MIN = 20
 
 
 def build_block(info):
     ts = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
+    rich = latest_handoff()
+    if rich:
+        name, mtime, text, rich_mt = rich
+        mech_mt = info.get("mtime")
+        stale = (mech_mt is not None and (mech_mt - rich_mt) > FRESH_DELTA_MIN * 60)
+        if stale:
+            stale_h = (mech_mt - rich_mt) / 3600.0
+            fresh = ""
+            if info.get("recent_turns"):
+                fresh = (
+                    f"\n**Fresh thread — last window (mechanical floor, {info['cwd']}):**\n\n"
+                    f"{info['recent_turns']}\n"
+                )
+            embedded = (
+                f"{fresh}\n"
+                f"<details><summary>Prior written rich handoff `{name}` (saved {mtime}, "
+                f"STALE by ~{stale_h:.1f}h — may NOT reflect your last window)</summary>\n\n"
+                f"{text}\n\n</details>\n"
+            )
+        else:
+            embedded = f"\n**Embedded handoff** (newest `{name}`, saved {mtime}):\n\n{text}\n"
+    else:
+        embedded = (
+            "\n- rich handoff: `~/Desktop/SESSION-HANDOFF-*.md` + "
+            "`memory/project_session-*.md`\n"
+        )
     return (
         f"{START}\n"
         f"## ⚠ NEXT SESSION — TOP PRIORITY (auto-refreshed {ts})\n\n"
-        f"> Machine-written every Stop from the mechanical handoff — never stale. "
-        f"The curated block below is the quality layer; this is the floor.\n\n"
+        f"> Machine-written every Stop from the mechanical handoff + newest rich handoff. "
+        f"Mechanical floor is never stale; the rich handoff is flagged if it lags the last window.\n\n"
         f"- context at last stop: {info['ctx']}\n"
         f"- session: {info['session']}  ·  cwd: {info['cwd']}\n"
         f"- latest directive: {info['directive']}\n"
-        f"- rich handoff: `~/Desktop/SESSION-HANDOFF-*.md` + "
-        f"`memory/project_session-*.md`  ·  mechanical floor: "
-        f"`~/.claude/hooks/.ctx-handoff/LATEST.md`\n\n"
+        f"- mechanical floor: `~/.claude/hooks/.ctx-handoff/LATEST.md`\n"
+        f"{embedded}\n"
         f"{END}"
     )
 

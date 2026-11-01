@@ -183,7 +183,14 @@ def main() -> int:
         sig = _sign_root(root)
         if sig:
             manifest.update(sig)
-        json.dump(manifest, open(MANIFEST, "w", encoding="utf-8", newline="\n"), indent=2)
+        # Atomic: tmp + verify + os.replace, so a crash mid-write can't truncate the
+        # tamper-evidence root (Merkle root + Ed25519 sig) into an unrecoverable state.
+        _mtmp = str(MANIFEST) + ".tmp"
+        with open(_mtmp, "w", encoding="utf-8", newline="\n") as _mf:
+            _mf.write(json.dumps(manifest, indent=2))
+        with open(_mtmp, encoding="utf-8") as _mf:
+            json.load(_mf)  # verify before swap
+        os.replace(_mtmp, MANIFEST)
         sig_state = "SIGNED" if sig else "UNSIGNED (no key -- evidence only)"
         print(f"ATTESTED [{sig_state}] root={root[:16]}... over {len(leaves)} governed files {counts}")
         return 0

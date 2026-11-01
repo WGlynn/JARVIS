@@ -14,6 +14,16 @@ import json
 import re
 import sys
 
+# LOOP 2 structured-critic (graceful fallback if _critic is unavailable) --------
+from pathlib import Path as _TLGPath
+sys.path.insert(0, str(_TLGPath(__file__).parent))
+try:
+    from _critic import emit_critic as _tlg_emit_critic
+except Exception:
+    def _tlg_emit_critic(violated_constraint, suggested_reformulation,
+                         severity="medium", evidence=None, gate_name=""):
+        return f"[TIME-LOGIC] {violated_constraint}\nSuggestion: {suggested_reformulation}"
+
 
 # Patterns that introduce a temporal claim. Each one fires the gate.
 TEMPORAL_PATTERNS = [
@@ -123,26 +133,26 @@ def main():
         print(json.dumps({}))
         return
 
-    # Cap surfaced hits to first 3 so the message stays scannable
-    lines = [
-        f"[TIME-LOGIC GATE] {len(hits)} temporal claim(s) without nearby anchor "
-        f"in {path}. Per [P·time-logic-anti-hallucination-gate], verify-then-assert "
-        f"or mark [unverified]. Anchors accepted: ISO date, year, today/yesterday, "
-        f"commit SHA, file mtime, user-stated, system clock.",
-        "",
-        "Triggered passages:",
-    ]
-    for trigger, snippet in hits[:3]:
-        lines.append(f"  - `{trigger}` near: ...{snippet}...")
-    if len(hits) > 3:
-        lines.append(f"  - (+{len(hits) - 3} more)")
-    lines.append("")
-    lines.append("Augmentation, not block. Revise or tag, then proceed.")
-
+    evidence_items = [f"`{trigger}` near: ...{snippet[:80]}..." for trigger, snippet in hits[:5]]
+    additional_context = _tlg_emit_critic(
+        violated_constraint=(
+            f"{len(hits)} unanchored temporal claim(s) in {path}. Per "
+            f"[P·time-logic-anti-hallucination-gate], temporal claims without a verifiable date "
+            f"anchor risk hallucinated chronology."
+        ),
+        suggested_reformulation=(
+            "Add an explicit anchor near each flagged claim: an ISO date (YYYY-MM-DD), a year, a "
+            "commit SHA, file mtime, user-stated, or system clock; or mark [unverified]. "
+            "Examples: 'since 2026-04' / 'as of 2026-07-17' / '[unverified duration]'."
+        ),
+        severity="medium",
+        evidence=evidence_items,
+        gate_name="time-logic-gate",
+    )
     out = {
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
-            "additionalContext": "\n".join(lines),
+            "additionalContext": additional_context,
         }
     }
     print(json.dumps(out))

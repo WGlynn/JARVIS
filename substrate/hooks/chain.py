@@ -54,8 +54,21 @@ def load_index():
     return {"blocks": [], "head": None, "created": now_iso()}
 
 
+def atomic_write_json(path, data):
+    """Write JSON to `path` atomically: write a sibling .tmp, verify it parses
+    back as strict JSON, then os.replace() it into place. A crash mid-write can
+    then only ever leave a stray .tmp — never a truncated/zeroed live file.
+    Pattern copied from cron-keeper.py:92-95 and _seen_set.py:106-111.
+    """
+    text = json.dumps(data, indent=2)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text)
+    json.loads(tmp.read_text())  # verify strict-JSON before the swap
+    os.replace(tmp, path)  # atomic swap: crash mid-write can't corrupt live file
+
+
 def save_index(index):
-    INDEX_FILE.write_text(json.dumps(index, indent=2))
+    atomic_write_json(INDEX_FILE, index)
 
 
 def now_iso():
@@ -95,11 +108,11 @@ def get_current_session():
 
 
 def set_current_session(session_id):
-    """Write the current session ID."""
-    SESSION_FILE.write_text(json.dumps({
+    """Write the current session ID (atomic: tmp + verify + os.replace)."""
+    atomic_write_json(SESSION_FILE, {
         "session_id": session_id,
         "started": now_iso(),
-    }))
+    })
 
 
 def is_new_session():
@@ -125,9 +138,9 @@ def append_block(prompt_summary, response_summary):
     }
     block["hash"] = compute_hash(block)
 
-    # Write block file
+    # Write block file (atomic: tmp + verify + os.replace)
     block_file = BLOCKS_DIR / f"block-{block['id']:04d}.json"
-    block_file.write_text(json.dumps(block, indent=2))
+    atomic_write_json(block_file, block)
 
     # Update index
     index["blocks"].append({

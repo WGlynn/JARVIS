@@ -49,13 +49,24 @@ from pathlib import Path
 MEMORY_DIR = Path.home() / ".claude" / "projects" / "C--Users-Will" / "memory"
 ENTITY_INDEX_PATH = MEMORY_DIR / "_system" / "entity_index.json"
 
-# Telemetry
+# Telemetry + LOOP-2 structured critic
 _HOOKS_DIR = Path(__file__).parent
 sys.path.insert(0, str(_HOOKS_DIR))
 try:
     from _telemetry import log_event
 except Exception:
     def log_event(*a, **kw): pass
+try:
+    from _critic import emit_critic
+except Exception:
+    # Graceful fallback: _critic unavailable → plain prose (pre-LOOP-2 behaviour)
+    def emit_critic(violated_constraint, suggested_reformulation,
+                    severity="medium", evidence=None, gate_name=""):
+        parts = [f"[{gate_name.upper() or 'CRITIC'}] {violated_constraint}",
+                 f"Suggestion: {suggested_reformulation}"]
+        if evidence:
+            parts += [f"  - {e}" for e in evidence[:5]]
+        return "\n".join(parts)
 
 # Same content trigger as AA#3 — only fire on entity-list / outreach /
 # claim-shaped writes
@@ -290,45 +301,59 @@ def main():
         seen.add(key)
         deduped.append((entity, filepath, snippet))
 
+    entity_count = len(set(e for e, _, _ in deduped))
+    conflict_count = len(deduped)
+
     log_event("conflict-detector", "conflict",
               matches=[f"{e}:{p}" for e, p, _ in deduped[:10]],
-              meta={"entity_count": len(set(e for e, _, _ in deduped)),
-                    "conflict_count": len(deduped)})
+              meta={"entity_count": entity_count,
+                    "conflict_count": conflict_count})
 
-    lines = [
-        "[CONFLICT DETECTOR — potential contradiction with memory]",
-        "",
-        "The content being written contains entities that memory mentions WITH NEGATION",
-        "LANGUAGE NEARBY. This is stronger signal than the AA#3 cross-reference: memory",
-        "may contain a contradictory statement about these entities. Verify before delivery.",
-        "",
-        "Potential conflicts (entity, memory file, contradicting snippet):",
-        "",
-    ]
-    by_entity = {}
+    # ── LOOP-2: structured critic output ──────────────────────────────────
+    # Build evidence list: "EntityName: `file.md` — snippet"
+    evidence_lines: list[str] = []
+    by_entity: dict = {}
     for entity, filepath, snippet in deduped:
         by_entity.setdefault(entity, []).append((filepath, snippet))
 
     for entity, items in by_entity.items():
-        lines.append(f"**{entity}**:")
         for filepath, snippet in items[:3]:
-            lines.append(f"  - `{filepath}` — {snippet}")
-        lines.append("")
+            evidence_lines.append(f"{entity}: `{filepath}` — {snippet}")
 
-    lines.extend([
-        "Reconciliation checklist:",
-        "- Is the draft consistent with the memory state? (memory may be wrong, draft may be wrong, or both may be true in different contexts)",
-        "- If memory is correct and draft contradicts, REVISE the draft",
-        "- If draft is correct and memory is stale, UPDATE the memory entry (separate atomic action)",
-        "- If both can be true (different contexts, different timeframes), add a context qualifier to the draft",
-        "",
-        "Detected via negation markers within 40 chars of entity references in matched memory files, restricted to same-clause matches.",
-    ])
+    # Violated constraint: one specific, actionable description of what rule broke.
+    violated = (
+        f"Draft references {entity_count} entity/entities that memory contradicts "
+        f"via nearby negation language ({conflict_count} conflict(s) detected). "
+        f"Entities whose positive use in the draft conflicts with abandonment/failure "
+        f"signals in memory must be reconciled before delivery."
+    )
+
+    # Suggested reformulation: concrete fix path, not generic advice.
+    reformulation = (
+        "For each flagged entity: (a) if memory is correct → revise the draft to "
+        "reflect the current status (abandoned/deprecated/moved-off); "
+        "(b) if the draft is correct and memory is stale → first update the memory "
+        "entry as a separate atomic Write, then proceed with the draft; "
+        "(c) if both are true in different contexts → add an explicit context qualifier "
+        "to the draft sentence (e.g., 'for the legacy path only')."
+    )
+
+    # Severity: high when ≥2 entities flagged (strong structural contradiction risk),
+    # medium for a single entity (could be a narrow clause-boundary false positive).
+    sev = "high" if entity_count >= 2 else "medium"
+
+    additional_context = emit_critic(
+        violated_constraint=violated,
+        suggested_reformulation=reformulation,
+        severity=sev,
+        evidence=evidence_lines[:5],
+        gate_name="conflict-detector",
+    )
 
     out = {
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
-            "additionalContext": "\n".join(lines),
+            "additionalContext": additional_context,
         }
     }
     print(json.dumps(out))

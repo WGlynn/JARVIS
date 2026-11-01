@@ -58,8 +58,16 @@ except Exception:
 
 
 # Hard cap on injected payload to avoid swamping additionalContext.
-# Sub-indexes combined currently ~30-40KB; cap at 60KB for headroom.
-MAX_BYTES = 60_000
+# Sub-index payload grew to ~87KB (MEMORY_INDEX_ACTIVE alone is ~63KB), which
+# blew past the old 60KB cap. Cap raised to 100KB so the full expanded index
+# reaches boot. The cap loop below is greedy-skip (not break-on-first-oversize)
+# so a single fat file can never again starve the whole injection to zero.
+MAX_BYTES = 100_000
+
+# Priority prefix: these sub-indexes are injected FIRST, regardless of size, so
+# the fail-closed safety set (PREFLIGHT) always lands even if the cap trims the
+# tail. Everything else follows, smallest-first, to maximize files-under-cap.
+PRIORITY_ORDER = ("MEMORY_INDEX_PREFLIGHT.md",)
 
 
 def collect_sub_indexes() -> tuple[list[tuple[str, str]], int]:
@@ -118,14 +126,23 @@ def main() -> int:
                   meta={"reason": "no_sub_indexes"})
         return 0
 
+    # Order: PRIORITY_ORDER files first (safety set survives any trim), then the
+    # rest smallest-first so the cap maximizes how many sub-indexes get in.
+    def _rank(item):
+        name, content = item
+        pri = PRIORITY_ORDER.index(name) if name in PRIORITY_ORDER else len(PRIORITY_ORDER)
+        return (pri, len(content.encode("utf-8")))
+    sub_indexes = sorted(sub_indexes, key=_rank)
+
     if total > MAX_BYTES:
-        # Trim from the end (alphabetical order) until under cap
+        # Greedy-fit: SKIP a file too big to fit, but keep going — one oversized
+        # file must never zero-out the whole injection (the 2026-08 regression).
         accumulated = 0
         kept = []
         for name, content in sub_indexes:
             size = len(content.encode("utf-8"))
             if accumulated + size > MAX_BYTES:
-                break
+                continue
             kept.append((name, content))
             accumulated += size
         sub_indexes = kept
