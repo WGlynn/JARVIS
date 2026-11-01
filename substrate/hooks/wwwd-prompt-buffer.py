@@ -41,6 +41,15 @@ def main() -> int:
         return 0
 
     prompt = data.get("prompt") or data.get("user_prompt") or ""
+    # The buffer is tracked in the memory repo and goes out with every snapshot commit, so key
+    # shapes are redacted first (two-way protocol secret gate, 2026-11-01). Hooks run in parallel,
+    # so inbox-capture.py blocking the message does not stop this write on its own.
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from _inbox import redact_secrets
+        prompt = redact_secrets(prompt)
+    except Exception:
+        pass
 
     # Count entries that exist BEFORE this turn's gate-fires -> attribution
     # boundary for the detector (a correction is about the PRIOR turn).

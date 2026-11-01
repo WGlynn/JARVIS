@@ -100,6 +100,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 
 | Hook | Role | What it does |
 |---|---|---|
+| `inbox-capture.py` | Gate | Two-way protocol, inbound side (2026-11-01). Blocks a message that carries a key shape before the model sees it and says to rotate it (Constitution 2.4; `#allow-secret` overrides); writes every message to `~/.claude/state/inbox/` the moment it is sent; starts `inbox-prep.py` detached so the queue wait becomes prep time. Hooks run in parallel, so the block cannot stop sibling hooks from reading the prompt; `wwwd-prompt-buffer.py` redacts key shapes itself. |
 | `clock-injector.py` | Loader | Injects the current clock. |
 | `api-death-shield.py user-prompt` | Closer | Saves state against API-death mid-turn. |
 | `session-directive-forcer.py` | Gate | First-turn boot-directive application check. |
@@ -115,7 +116,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `anticipation-hook.py` | Loader | Date-anchored, stale-PENDING, and unactioned-recall scan. |
 | `story-mode-gate.py` | Gate | Story Mode menu enforcement and number-reply interpretation. |
 | `runtime-heartbeat.py user-prompt` | Closer | Runtime liveness heartbeat. |
-| `wwwd-prompt-buffer.py` | Loader | Buffers the current prompt so the Stop-time WWWD correction detector can read it. |
+| `wwwd-prompt-buffer.py` | Loader | Buffers the current prompt so the Stop-time WWWD correction detector can read it. The buffer is tracked in the memory repo, so key shapes are redacted first (2026-11-01). |
 | `oversell-primer.py` | Gate | One-line "teammate, not salesman" tripwire every turn (conversational twin of `oversell-gate.py`). |
 | `deep-context-mode-activator.py` | Loader | Past 500k tokens, injects the deep-context behavior switch so the model manages its own context. |
 | `cron-fire-heartbeat.py` | Gate | Records cron-injected prompts as fire evidence for the cron productivity witness. |
@@ -163,6 +164,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `auto-checkpoint.py` | Edit, Write, Bash, NotebookEdit | Closer | Auto-checkpoints after a mutating call. |
 | `autosnapshot.py` | Edit, Write, NotebookEdit | Closer | Persistence autosnapshot. |
 | `research-tool-call-logger.py` | all | Closer | Logs research tool calls. |
+| `inbox-deliver.py` | all | Loader | Two-way protocol (2026-11-01): hands the model any prep `inbox-prep.py` finished for this session's queued messages, at the tool boundary where queued messages land; each prep is delivered once (atomic rename) and expires after 20 minutes. `inbox-prep.py` is the background worker it reads from (deterministic: message kind, standing-rule words, references resolved, handoff items and memory lines it touches; no model calls). |
 | `_outcome_recorder.py` | Write, Edit | Closer | Tags whether the next edit to a target acted on or ignored a gate warning, building per-gate strength and confidence evidence. |
 
 ---
