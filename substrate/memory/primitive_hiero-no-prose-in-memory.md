@@ -1,9 +1,12 @@
 ---
 name: HIERO — No Prose In Memory (Cannon Law Gate)
-description: 2026-04-25 cannon law. Memory writes (memory/, GKB, SKB) must be logic-primitives in compressed/glyph form, never prose. Prose violates Cognitive-Economy on density × stability × match-speed. Glyph dereferences internalized weight; paragraph drifts across sessions and burns parse-cost. Hook-layer enforcement pending. Recursive: this file is itself compressed.
+description: RETIRED 2026-07-20 (kept as a record). 2026-04-25 cannon law. Memory writes (memory/, GKB, SKB) must be logic-primitives in compressed/glyph form, never prose. Prose violates Cognitive-Economy on density × stability × match-speed. Glyph dereferences internalized weight; paragraph drifts across sessions and burns parse-cost. Hook-layer enforcement pending. Recursive: this file is itself compressed.
 type: primitive
 originSessionId: 2c141eb5-a66e-4f16-a63c-d2c41acddbdc
 ---
+
+**RETIRED 2026-07-20.** Will dropped the HIERO glyph format ("done with the glyph symbols because it just makes my code unreadable"), and glyphs had already measured at about 2 tokens each, so the density gain did not hold. Memory, code and docs are plain words now; see [[done-with-glyph-symbols-in-code]]. This file is kept as a record and as the key for reading older entries.
+
 # HIERO — No Prose In Memory
 
 ## Glyph

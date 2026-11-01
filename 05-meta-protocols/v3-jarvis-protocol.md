@@ -2,6 +2,8 @@
 
 *Canonical V3 capstone. Three layers, one protocol. Named 2026-05-24.*
 
+> **Update 2026-11-01: HIERO is retired.** This spec names HIERO, the glyph memory format, as the persistence format. Will retired that format on 2026-07-20 because it made memory and code hard to read, and memory is written in plain words again. Read "HIERO state" below as "the memory corpus": an attestation hash covers memory whatever its encoding. One argument does change. The write-time gate is now a non-blocking readability nudge, so the "hook-enforced format" half of the corruption argument under *HIERO as the encoded state* no longer holds; that defense would rest on the attestation hash alone.
+
 ## What V3 is
 
 V3 JARVIS is the integration of three substrate layers into a single executable protocol. Each layer has been developed and battle-tested independently over the prior year. V3 names their composition and specifies the code-level interfaces between them. After V3, the architecture is closed; what runs on top is unbounded.
@@ -12,7 +14,7 @@ The three layers (numbered by structural position, not by development order):
 
 - **State-attestation surface (hosting integrity)**: NCI bonded validators sign BLS12-381 threshold attestations of shard state (archive-head-hash, memory-write-hash, liveness). False state attestation or extended offline-without-grace gets slashed. The same primitive that secures VibeSwap's canonical burn-and-mint cross-chain messaging (the LayerZero replacement, currently deployed on Base mainnet per `project_nci-l1-trajectory.md`, with broader L2 + Ethereum mainnet trajectory in flight) secures JARVIS hosting.
 - **Output-attestation surface (cognition consensus)**: shards process queries independently and commit-then-reveal their reasoning outputs. Pairwise comparison across shards. Mismatches trigger dispute resolution; outputs that lose disputes slash the producing shard. The same pattern vibeswap/jarvis-bot's multi-shard mind network already uses for BFT consensus on agent outputs.
-- **Persistence format**: HIERO. Operator-density memory format that the state-attestation surface attests over. Hook-enforced. The format itself is hosting-agnostic; the meta-protocol attests to the state HIERO encodes. Canonical external share doc: `Desktop/usd8-rick-hiero-compression-share-2026-05-19.md` (v1.1 to Rick at USD8).
+- **Persistence format**: HIERO at the time of writing (retired 2026-07-20; see the update note above). Operator-density memory format that the state-attestation surface attests over. Hook-enforced. The format itself is hosting-agnostic; the meta-protocol attests to the state HIERO encodes. Canonical external share doc: `Desktop/usd8-rick-hiero-compression-share-2026-05-19.md` (v1.1 to Rick at USD8).
 
 The two attestation surfaces are economically unified. One stake serves both. Bonded operators are simultaneously hosting providers AND cognition validators. This is substrate-reuse applied to the protocol layer itself: same crypto primitives, same validator set, same audit envelope, two orthogonal security properties.
 
@@ -72,7 +74,7 @@ Two attestation surfaces with one shared bond is structurally more elegant than 
 3. **No artificial layer boundary**. State-attestation and output-attestation address orthogonal failure modes (is the host honest? is the output sound?) but they are the same kind of attestation. Treating them as separate layers would force unnecessary protocol surface duplication.
 4. **Substrate-port to ourselves**. NCI was VibeSwap's cross-chain primitive. Pairwise commit-reveal was JARVIS's mind-network primitive. Both were already deployed inside Will's protocol stack. V3 merges them into one meta-consensus rather than maintaining two parallel ones.
 
-### HIERO as the encoded state
+### HIERO as the encoded state (retired 2026-07-20; see the update note at the top)
 
 HIERO is the persistence format the state-attestation surface attests over. Every memory write is HIERO-format (operator-density, hook-enforced via `~/.claude/session-chain/hiero-gate.py`). The state hashes the meta-consensus signs are hashes over HIERO-encoded state.
 
@@ -110,7 +112,7 @@ V3 names this trajectory; it does not depend on the native-chain port being comp
 
 3. **Output-attestation protocol**. Commit-reveal pairwise comparison between shards on query outputs. Disputes resolved via the bonded validator set. Slashing on lost disputes.
 
-4. **HIERO write enforcement**. The existing hook gate at `~/.claude/session-chain/hiero-gate.py` ensures every memory write is operator-density compliant. The state-attestation surface attests over the resulting HIERO state.
+4. **HIERO write enforcement** (retired 2026-07-20; the gate is now a non-blocking readability nudge). The existing hook gate at `~/.claude/session-chain/hiero-gate.py` ensures every memory write is operator-density compliant. The state-attestation surface attests over the resulting HIERO state.
 
 5. **State portability**. HIERO memory + jsonl archive are hosting-agnostic by construction. When a shard goes offline, another peer with sufficient stake can claim the slot, sync state from the attested checkpoint, and continue serving without code-level provider dependency.
 

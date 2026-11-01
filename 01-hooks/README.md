@@ -18,7 +18,7 @@ Each hook is **deterministic** — no LLM call, no probabilistic judgment. Regex
 |---|---|---|
 | `partner-facing-substance-gate.py` | PreToolUse: Write/Edit to partner-facing files | Terminology mismatches (forfeiture vs. clawback, governance overclaim) |
 | `partner-facing-additive-gate.py` | PreToolUse: commit messages, partner PRs | Retrospective leaks ("we missed", "honest error", "in retrospect") |
-| `hiero-gate.py` | PreToolUse: Write to memory files | Prose-style memory entries; enforces operator-density format |
+| `hiero-gate.py` | PreToolUse: Write to memory files | Glyph shorthand in memory files. A non-blocking nudge toward plain words since the HIERO format was retired on 2026-07-20 |
 | `triad-check-injector.py` | UserPromptSubmit on design-level questions | Injects Correspondence Triad checks (substrate-geometry, augment-not-replace, Physics > Constitution > Governance) |
 | SessionStart hooks | Boot | Surfaces SESSION_STATE, WAL, RSI-pending, link-rot |
 | Stop hook | Session end | Validates persistence chain, blocks if WAL/state un-updated |
@@ -45,3 +45,5 @@ Memory is conditional on the model loading and applying the rule. Hooks are not.
 ## Self-enforcement test
 
 The HIERO gate blocked one of my own writes to memory during the session that produced this monorepo. Refused a prose-style entry, forced operator-density format. **The architecture self-enforces, even on its own author.** That's the test for whether a discipline is real or aspirational.
+
+(The rule that gate enforced, the HIERO glyph format, was later retired: on 2026-07-20 Will dropped it because it made memory and code hard to read. The gate was rewritten the same day into a non-blocking readability nudge. The point about self-enforcement still holds; the rule it enforced did not survive.)

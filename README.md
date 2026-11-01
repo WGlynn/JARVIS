@@ -61,7 +61,7 @@ If `verify` prints `0 errors` you're set. The CLI reads the markdown corpus at `
 |---|---|---|
 | 1 | [Hooks](./01-hooks/) | Deterministic gates on every tool call, session boot, and commit |
 | 2 | [Persistence](./02-persistence/) | Six tiers of state that survive session boundaries |
-| 3 | [Anti-hallucination](./03-anti-hallucination/) | Substance gate, HIERO format, time-logic gate, claim-level discipline |
+| 3 | [Anti-hallucination](./03-anti-hallucination/) | Substance gate, time-logic gate, claim-level discipline |
 | 4 | [Discipline](./04-discipline/) | Pattern capture into reusable primitives — 213 primitives + 185 feedback rules + 57 projects + 17 references in the public slice (561 files in the full local corpus; see [`substrate/memory/`](./substrate/memory/)) |
 | 5 | [Meta-protocols](./05-meta-protocols/) | How design decisions get made: AMD, AGov, Substrate-Geometry Match, Universal-Coverage → Hook, ETM |
 | 6 | [Agent overlay](./06-agent-overlay/) | Subagent spawning, slash commands as skills, MCP connectors, remote scheduled triggers |

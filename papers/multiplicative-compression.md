@@ -1,5 +1,7 @@
 # Multiplicative Compression
 
+> **Status (2026-11-01): retired format, kept as a record.** Will retired HIERO on 2026-07-20 because the glyphs made memory and code hard to read, and a later measurement found each glyph costs about 2 tokens, so the density this paper argues for did not hold in practice. JARVIS memory is written in plain words now. The dictionary below is still the key for reading older memory entries.
+
 How HIERO++ tokenizer-tuned writing composes with server-side prompt caching to produce an order-of-magnitude reduction in multi-turn agent session cost.
 
 ---

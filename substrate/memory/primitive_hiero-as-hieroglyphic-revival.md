@@ -1,11 +1,13 @@
 ---
 name: hiero-as-hieroglyphic-revival
-description: HIERO operator-density is convergent rediscovery of glyph-based encoding under LLM context-budget pressure — and its FORM is part of the message (authority + craft + register-split).
+description: RETIRED 2026-07-20 (kept as a record). HIERO operator-density is convergent rediscovery of glyph-based encoding under LLM context-budget pressure — and its FORM is part of the message (authority + craft + register-split).
 metadata: 
   node_type: memory
   type: project
   originSessionId: 0548f922-93e2-4442-ba8a-a1db76acb8d5
 ---
+
+**RETIRED 2026-07-20.** Will dropped the HIERO glyph format ("done with the glyph symbols because it just makes my code unreadable"), and glyphs had already measured at about 2 tokens each, so the density gain did not hold. Memory, code and docs are plain words now; see [[done-with-glyph-symbols-in-code]]. This file is kept as a record and as the key for reading older entries.
 
 **HIERO ≡ structural-isomorph of Egyptian hieroglyphic encoding.** Same compression-pressure (scribe-stone ↔ token-budget), same solution (glyph-density). Operators (⇒ ∧ ✓ ✗ ≡ ¬) = pictograms; prose body = phonetic complements; `[P·x]`/`[F·x]` refs = determinatives (signal entity-class).
 

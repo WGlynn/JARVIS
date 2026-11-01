@@ -1,9 +1,12 @@
 ---
 name: HIERO System Share Template — Format + Substrate, Not Just Format
-description: ∀ external HIERO compression share ⇒ ship format spec + memory tiering + hook stack + examples + validation criteria. NOT just the operator dictionary. JARVIS substrate is load-bearing for 0.99 density; glyphs alone is just notation. Canonical artifact: Desktop/usd8-rick-hiero-compression-share-2026-05-19.md (2026-05-19 Rick share via TG, comprehensive one-shot-implementable form for partner's agent).
+description: RETIRED 2026-07-20 (kept as a record). ∀ external HIERO compression share ⇒ ship format spec + memory tiering + hook stack + examples + validation criteria. NOT just the operator dictionary. JARVIS substrate is load-bearing for 0.99 density; glyphs alone is just notation. Canonical artifact: Desktop/usd8-rick-hiero-compression-share-2026-05-19.md (2026-05-19 Rick share via TG, comprehensive one-shot-implementable form for partner's agent).
 type: primitive
 originSessionId: 3b8518ae-70b7-44ca-ba7e-652354ab8320
 ---
+
+**RETIRED 2026-07-20.** Will dropped the HIERO glyph format ("done with the glyph symbols because it just makes my code unreadable"), and glyphs had already measured at about 2 tokens each, so the density gain did not hold. Memory, code and docs are plain words now; see [[done-with-glyph-symbols-in-code]]. This file is kept as a record and as the key for reading older entries.
+
 # HIERO System Share Template
 
 > *"the jarvis logic itself is a necessity for the compression process. it doesnt work as good by itself"* — Will 2026-05-19

@@ -70,7 +70,7 @@ def render_boot_screen() -> str:
 ┌─[ PROTOCOLS ]───────────────────────────────────────────────────────┐
 │ WWWD  ········ What Would Will Do?  (cognition gate · V3 capstone)  │
 │ RSAW  ········ Recursive Self-Audit via WWWD  (TRP methodology)     │
-│ HIERO ········ Operator-density memory format (hook-enforced)       │
+│ PLAIN ········ Plain-words memory (HIERO glyphs retired 2026-07-20) │
 │ NCI   ········ Bonded-validator meta-consensus (L0+L1 unified)      │
 │ ETM   ········ Economic Theory of Mind (substrate-of-mind axis)     │
 │ CCP   ········ Cross-Context Protocol (multi-context cross-ref)     │
@@ -89,7 +89,7 @@ def render_boot_screen() -> str:
 
 ┌─[ GATES ]───────────────────────────────────────────────────────────┐
 │ ▸ WWWD-gate          PreToolUse Write│Edit│Agent  (Will-emulation) │
-│ ▸ HIERO-gate         PreToolUse Write│Edit        (density check)  │
+│ ▸ Readability nudge  PreToolUse Write│Edit        (plain words)    │
 │ ▸ NDA-[REDACTED-NDA]-gate     PreToolUse Bash(git *)       (NDA scrub)      │
 │ ▸ Em-dash-gate       PostToolUse Write│Edit       (partner-draft)  │
 │ ▸ Conflict-detector  PreToolUse Write│Edit        (memory contra.) │

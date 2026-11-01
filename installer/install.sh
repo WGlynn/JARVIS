@@ -15,7 +15,7 @@
 #     jarvis-os-boot-screen.py     — SessionStart
 #
 #   Layer 3 — Anti-hallucination chain (deterministic gates):
-#     hiero-gate.py                       — PreToolUse Write|Edit
+#     hiero-gate.py                       — PreToolUse Write|Edit (readability nudge, non-blocking)
 #     partner-facing-substance-gate.py    — PreToolUse Write|Edit
 #     strategic-framing-filter.py         — PreToolUse Write|Edit
 #     entity-context-cross-reference.py   — PreToolUse Write|Edit
@@ -253,7 +253,7 @@ add_hook("PreToolUse",   "Write|Edit|Agent",  "wwwd-gate.py",                  "
 add_hook("Stop",         None,                "wwwd-correction-detector.py",   "WWWD correction detector...", timeout=5)
 
 # Layer 3 — anti-hallucination
-add_hook("PreToolUse",   "Write|Edit",        "hiero-gate.py",                       "HIERO gate: memory density...", timeout=5)
+add_hook("PreToolUse",   "Write|Edit",        "hiero-gate.py",                       "Readability nudge: memory write...", timeout=5)
 add_hook("PreToolUse",   "Write|Edit",        "partner-facing-substance-gate.py",    "Substance gate: claim-handshake...")
 add_hook("PreToolUse",   "Write|Edit",        "strategic-framing-filter.py",         "Strategic framing filter...", timeout=5)
 add_hook("PreToolUse",   "Write|Edit",        "entity-context-cross-reference.py",   "Entity cross-reference (AA#3 / CCP)...", timeout=10)

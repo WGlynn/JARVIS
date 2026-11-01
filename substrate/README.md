@@ -33,7 +33,7 @@ The discrete memory primitives bundled here are the ones load-bearing for the pu
 Selected hooks. They run from a Claude Code (Anthropic CLI) configuration that fires on tool-use events.
 
 - `em-dash-augmentation-gate.py` — scans partner-facing drafts for em-dashes and surfaces a scrub-warning. Generic partner patterns shipped; fork users plug in their own handles.
-- `hiero-gate.py` — enforces operator-dense, short-line format for memory primitives. Blocks writes that read as prose.
+- `hiero-gate.py` — non-blocking readability nudge for memory writes. Until 2026-07-20 it enforced the HIERO glyph format, which is now retired.
 - `atomic-reflection-gate.py` — fires on tool errors and timeouts; surfaces a pause-and-extract reminder so the agent does not paper over root causes.
 - `memory-preprocessor.py` — at SessionStart, expands a hierarchical memory index by loading sub-indexes relevant to the active task. Keeps the always-loaded core small while making situation-matched memory available.
 - `corpus-cache-warmer.py` — at SessionStart, loads the BPE-pre-encoded token cache (`_system/corpus.tokens.jsonl`), detects sha256 drift, auto-refreshes if stale, emits per-file token cost + boot-budget visibility into boot context. Shipped 2026-06-10 as L4 of the compression-layer stack.
@@ -41,7 +41,7 @@ Selected hooks. They run from a Claude Code (Anthropic CLI) configuration that f
 - `_terse_ops.py` — L3 module: APL/J/K-style 1-char hot-path ops for hook-internal scoring math. Importable from any hook. First consumer: AA#4 `recent_research_count`.
 
 ### `scripts/`
-- `profile_hiero_tokens.py` — measures cl100k_base token cost for HIERO Unicode operators vs ASCII alternatives. Built the empirical case for the HIERO++ swap dictionary (42% reduction on the operator set).
+- `profile_hiero_tokens.py` — measures cl100k_base token cost for HIERO Unicode operators vs ASCII alternatives. Built the empirical case for the HIERO++ swap dictionary (42% reduction on the operator set). HIERO is retired (2026-07-20); the script stays as the measurement record.
 - `pretokenize_corpus.py` — builds the L4 Z-token cache. Reads MEMORY.md + sub-indexes + WWWD priority cache, encodes via cl100k_base BPE, writes `_system/corpus.tokens.jsonl` with sha256-incremental updates.
 - `measure_savings.py` — honest accounting of compression deltas per layer. Distinguishes operator-set savings from real-prose savings; distinguishes infrastructure cost from realized win.
 - `render_memory_graph.py` — generates a clickable HTML graph of the memory corpus with type filters and search. DOM `createElement` + `textContent` (XSS-immune by construction).

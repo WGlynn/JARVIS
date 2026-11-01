@@ -37,7 +37,9 @@ When a pattern repeats 3+ times in a session, it gets named, captured into a pri
 
 This is what the wrapper accusation misses. The model is amnesic. The system is not.
 
-## HIERO compression
+## HIERO compression (retired 2026-07-20)
+
+HIERO was retired on 2026-07-20: the glyph format hurt readability, and a later measurement found each glyph costs about 2 tokens, so the density gain did not hold. Memory is written in plain words again. The record below stays because it happened.
 
 `MEMORY.md` was compressed from **31.8 KB → 21.3 KB (33% reduction)** by rewriting prose-style entries in HIERO operator-density format. Detail preserved in the linked topic files; index shrunk so more of it fits in the boot context window.
 

@@ -17,7 +17,7 @@ Born from a real incident: a partner-facing doc said `clawback` but the mechanis
 | Mechanism | What it enforces | Where |
 |---|---|---|
 | **Substance gate** | Flagged terms must have correct context disambiguators (closed-set terminology) | `partner-facing-substance-gate.py` |
-| **HIERO format** | Memory writes use operator-density (`⇒ ¬ ∧ ∨ ✓ ✗ →`), not prose | `hiero-gate.py` |
+| **Readability nudge** | Memory writes use plain words; the HIERO glyph format was retired on 2026-07-20. Non-blocking | `hiero-gate.py` |
 | **Time-logic gate** | Temporal claims (duration / since-when / implied history) verify-then-assert against git log / file mtime / user-stated / session-clock; absent anchor ships as `[unverified]` | See [`time-logic-gate.md`](./time-logic-gate.md) |
 | **Entity-attribution gate** | Open-set `@<handle>` attributions verify against the platform's API (gh api, etc.) before assert; never confabulate plausible-sounding handles | See [`entity-attribution-gate.md`](./entity-attribution-gate.md) |
 | **Verification-before-deny gate** | Default to WebSearch / WebFetch when user surfaces a current-event claim, before saying "I don't know" | See [`verification-before-deny.md`](./verification-before-deny.md) |
@@ -43,11 +43,13 @@ Sample entries (sanitized):
 
 - **Terminology drift before it becomes a Solidity 4-byte selector.** A `clawback` function name is a permanent on-chain commitment. Catching it at write-time saves a deploy-time fork.
 - **Governance overclaim.** "DAO can change X" written without "within mathematical invariants" implies authority the architecture explicitly bounds.
-- **Prose-style memory entries.** Memory is a high-leverage surface; prose entries cost context on every boot. HIERO operator-density compression is hook-enforced.
+- **Unreadable memory entries.** Memory is a high-leverage surface loaded on every boot. Until 2026-07-20 this meant forcing the HIERO glyph format; that format was retired for hurting readability, and the gate now nudges toward plain words without blocking.
 
 ## The test for "real discipline"
 
 > The HIERO gate blocked one of my own writes earlier today.
+
+(Written while HIERO was live. The format has since been retired; the gate still fires, now as a nudge.)
 
 A discipline that fires only when you remember it isn't a discipline. A discipline that fires regardless is. Hook-enforced anti-hallucination is the latter.
 

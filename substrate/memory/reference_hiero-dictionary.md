@@ -1,9 +1,12 @@
 ---
 name: HIERODictionary
-description: 2026-05-04 — canonical HIERO format dictionary. Operators, prefixes, sections, idioms. Capstone of JARVIS — converts personal compression scheme to public protocol via published dictionary.
+description: RETIRED 2026-07-20 (kept as a record). 2026-05-04 — canonical HIERO format dictionary. Operators, prefixes, sections, idioms. Capstone of JARVIS — converts personal compression scheme to public protocol via published dictionary.
 type: reference
 originSessionId: f5377dec-4447-4d25-8838-009c9a8f663a
 ---
+
+**RETIRED 2026-07-20.** Will dropped the HIERO glyph format ("done with the glyph symbols because it just makes my code unreadable"), and glyphs had already measured at about 2 tokens each, so the density gain did not hold. Memory, code and docs are plain words now; see [[done-with-glyph-symbols-in-code]]. This file is kept as a record and as the key for reading older entries.
+
 **Source-of-truth paper**: `papers/hiero.md` (mirrored: Desktop/JARVIS-repo/vibeswap-docs).
 
 **Layer 1 — Universal operators** (math/logic notation):

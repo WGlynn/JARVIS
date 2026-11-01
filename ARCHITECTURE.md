@@ -1,6 +1,6 @@
 # Architecture
 
-JARVIS is **eight layers**, all live, all producing artifacts in production today. Last refresh: 2026-06-10.
+JARVIS is **eight layers**, all live, all producing artifacts in production today. Last refresh: 2026-06-10 (HIERO retirement noted 2026-11-01).
 
 Substrate layers are orthogonal to the **compression-layer stack (L0..L6)** that runs across all eight. The 8-layer stack describes what JARVIS IS; the L0..L6 stack describes how every byte stored, every token loaded, and every hook fired is compressed. Both ship together in production. See [papers/multiplicative-compression.md](papers/multiplicative-compression.md) for the empirical evidence that the byte-side compression (HIERO++) composes multiplicatively with API-side caching to produce order-of-magnitude session cost cuts.
 
@@ -28,7 +28,7 @@ Substrate layers are orthogonal to the **compression-layer stack (L0..L6)** that
 │  │  │  │  │     · 17 ref); 458 verify-pass       │  │  │  │  │
 │  │  │  │  │  ┌────────────────────────────────┐  │  │  │  │  │
 │  │  │  │  │  │ 3. Anti-hallucination          │  │  │  │  │  │
-│  │  │  │  │  │    Substance · HIERO · entity- │  │  │  │  │  │
+│  │  │  │  │  │    Substance gate · entity-    │  │  │  │  │  │
 │  │  │  │  │  │    cross-ref · conflict-detect │  │  │  │  │  │
 │  │  │  │  │  │    · time-logic · em-dash      │  │  │  │  │  │
 │  │  │  │  │  │    · directive-verb-class      │  │  │  │  │  │
@@ -63,9 +63,9 @@ Substrate layers are orthogonal to the **compression-layer stack (L0..L6)** that
 ## Compression-layer stack (orthogonal to the 8 substrate layers)
 
 ```
-L0  prose                       (BANNED in memory writes; hiero-gate enforced)
-L1  HIERO Unicode               (operator-density format · R·hiero-dictionary)
-L2  HIERO++ ASCII-tuned         (tokenizer-aware swaps · 4-7% prose, 42% op-set)
+L0  plain words                 (the memory default again since 2026-07-20)
+L1  HIERO Unicode               (RETIRED 2026-07-20; glyph operator format)
+L2  HIERO++ ASCII-tuned         (RETIRED 2026-07-20 with L1)
 L3  APL-style hot-path ops      (_terse_ops.py · hook-internal scoring)
 L4  Z-token pre-encoded cache   (corpus.tokens.jsonl + corpus-cache-warmer.py)
 L5  Schelling canonical IDs     (P·/F·/R·/J· prefix system · partial deploy)
@@ -74,15 +74,17 @@ L6  SK combinator genome        (bootstrap-only · future for substrate fork)
 
 | Layer | Readability | Win | Status |
 |---|---|---|---|
-| L0 | full | baseline | banned |
-| L1 | high | ~30% vs prose | live |
-| L2 | high | +4-7% on real prose, 42% on operator set | live |
+| L0 | full | baseline | default since 2026-07-20 |
+| L1 | high | ~30% vs prose (claimed) | retired 2026-07-20 |
+| L2 | high | +4-7% on real prose, 42% on operator set | retired 2026-07-20 |
 | L3 | debug-only | up to ~70% src-tok on dot-product call-sites; net-negative on first single-call-site refactor (import boilerplate) | module live, 1 consumer (AA#4); positive once N hooks consume |
 | L4 | machine-only | drift detect + boot-budget visibility today; encode-pass skip future | live (corpus-cache-warmer registered) |
 | L5 | renderer-expanded | port-stable identifiers across substrates | partial |
 | L6 | bootstrap-only | substrate-portable kernel export | future |
 
-See [papers/multiplicative-compression.md](papers/multiplicative-compression.md) for the empirical case that L1/L2 (byte side) × API prompt caching (read side) is multiplicative.
+**HIERO retired (2026-07-20).** Will dropped the glyph format because it made code, docs and memory hard to read, and a later measurement found each glyph costs about 2 tokens, so the density it promised did not hold. Memory, code and docs are written in plain words again. `hiero-gate.py` was rewritten that day into a non-blocking readability nudge. L1 and L2 are kept above as a record; older memory entries still contain glyphs, and [`substrate/memory/reference_hiero-dictionary.md`](substrate/memory/reference_hiero-dictionary.md) remains the key for reading them.
+
+See [papers/multiplicative-compression.md](papers/multiplicative-compression.md) for the earlier argument that L1/L2 (byte side) and API prompt caching (read side) compound. It predates the retirement.
 
 ## The kernel framing
 

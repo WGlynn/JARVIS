@@ -1,9 +1,12 @@
 ---
 name: HIERO++ tokenizer-tuned dictionary
-description: Path-5 HIERO variant. ASCII-swap subset for 3-tok Unicode operators; keep Unicode where already 1-tok or semantically load-bearing. 42% operator-token reduction empirically (cl100k_base BPE proxy). Companion to [P·hiero-no-prose-in-memory].
+description: RETIRED 2026-07-20 (kept as a record). Path-5 HIERO variant. ASCII-swap subset for 3-tok Unicode operators; keep Unicode where already 1-tok or semantically load-bearing. 42% operator-token reduction empirically (cl100k_base BPE proxy). Companion to [P·hiero-no-prose-in-memory].
 type: reference
 originSessionId: d3ae9e64-adfb-4ba8-aa55-fee4f96e0207
 ---
+
+**RETIRED 2026-07-20.** Will dropped the HIERO glyph format ("done with the glyph symbols because it just makes my code unreadable"), and glyphs had already measured at about 2 tokens each, so the density gain did not hold. Memory, code and docs are plain words now; see [[done-with-glyph-symbols-in-code]]. This file is kept as a record and as the key for reading older entries.
+
 # HIERO++ — Tokenizer-Tuned Dictionary
 
 ## Glyph
