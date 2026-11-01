@@ -8,6 +8,8 @@ These are what people see. The TG bot is the most visible. It is **not** the mos
 
 ### Telegram bot suite
 
+**Current state (2026-11-01):** since 2026-10-27 the bot runs on Will's PC on free-tier model providers. The OS task `JARVIS-BotKeeper` restarts it after any exit, and it shares state with Claude Code through a local folder; see [`telegram-feed-loop.md`](./telegram-feed-loop.md). The hosted multi-region deployment described below came before that.
+
 Production endpoint: `@JarvisMind1828383bot` on the `jarvis-vibeswap` fly app.
 
 **Architecture**:

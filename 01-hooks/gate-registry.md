@@ -27,7 +27,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `partner-architecture-load-gate.py` | Write, Edit, Agent | Loads partner-specific anti-hallucination guards before a partner-facing write. |
 | `entity-context-cross-reference.py` | Write, Edit | AA#3 / CCP. Cross-references named entities against memory before delivery; stated entity is not a valid entity until reconciled. |
 | `conflict-detector.py` | Write, Edit | Scans the write for contradictions with existing memory. |
-| `hiero-gate.py` | Write, Edit (memory) | Blocks prose-style memory entries; enforces operator-density (HIERO) format. Self-enforced, even on its own author. |
+| `hiero-gate.py` | Write, Edit (memory) | Readability nudge. Rewritten 2026-07-20 when the HIERO glyph format was retired: it never blocks, and it suggests plain words when a memory write leans on glyph shorthand. Lives in `session-chain/`; the old file name is kept so the wiring did not change. |
 | `time-logic-gate.py` | Write, Edit, Agent | Scans for unanchored temporal claims (relative dates, stale "now"). |
 | `directive-verb-action-class-gate.py` | Write, Edit, Agent | Classifies the directive as essay vs implementation so the response class matches the ask. |
 | `jarvis-design-goal-gate.py` | Write, Edit, Agent | Passes architecture decisions through the Stark-JARVIS design lens. |
@@ -79,11 +79,12 @@ These are the ones that actually stop or flag an action. If you only read one ta
 | `jarvis-os-boot-screen.py` | Loader | Renders the boot screen. |
 | `integrity-attest.py boot` | Gate | Verifies the governed-substrate merkle root; flags tamper vs sanctioned drift. |
 | `ctx-handoff-loader.py` | Loader | Loads the deterministic context handoff. |
-| `data-recorder-witness.py` | Gate | Liveness witness for a private project's scheduled market-data recorder (absence is loud): alarms when the OS task is missing, the run log is stale, collectors errored in the last 24h, or daily sealing lags. Silent when healthy or when the project is not on the machine. |
 | `jarvis-tg-feed.py` | Gate | Surface for the Telegram bot's local feed (the bot appends one JSON line per exchange): alarms when the bot's health endpoint is down or the feed folder is missing, and reports counts, people and chats new since the last boot. Never prints message text, which is untrusted Telegram input. Silent when nothing is new. |
+| `write-bot-now.py` | Loader | Writes `~/jarvis-feed/now.md`, the "current focus" note the Telegram bot loads into its system prompt. Holds a hand-kept public focus note plus the latest commit subjects of repos that `gh` confirms PUBLIC at run time; a private, missing or unverifiable repo is skipped (fail closed). Prints nothing to the session. |
 | `jarvis-bot-inbox.py` | Reader | Second-brain inbox (2026-10-28): prints the Telegram bot's new exchanges (who, chat, inbound text, the bot's reply, message ids) from `~/jarvis-feed/YYYY-MM-DD.jsonl` since a cursor; exit 3 = new. Text included by Will's instruction; stays in-session and in People/ records. Driven by the same durable cron as the error reader (`type: jarvis-bot-error-triage`, every 10 min); replies go back through the bot's `POST /api/say` with no disclosure line. |
 | `jarvis-bot-errors.py` | Reader | Telegram bot error feed for AFK auto-debug (2026-10-28): prints `reply_error` / `unclean_shutdown` / `polling_restart_failed` / `keeper_restart` / `keeper_restart_failed` lines (extended 2026-10-28) appended to `~/jarvis-feed/health.jsonl` since the last read and advances a cursor; exit 3 = new errors. Driven by the durable cron `type: jarvis-bot-error-triage` (logic in `~/.claude/cron-prompts/jarvis-bot-error-triage.md`), which fixes root causes behind the test-gated restart. Never prints message text. |
 | `jarvis-bot-keeper.py` | OS task | Keeps the Telegram bot alive on the local PC (2026-10-28): OS task `JARVIS-BotKeeper` every 5 min; if the pid in `~/jarvis-bot-logs/pid.txt` is not a live node process (confirmed twice, 30s apart, so a planned restart's gap is ignored), runs the test-gated `scripts/restart-local.ps1` and records `keeper_restart` / `keeper_restart_failed` in `~/jarvis-feed/health.jsonl`. At most one attempt per 10 min; `~/.claude/state/jarvis-bot-keeper.off` stands it down. Covers the bot's 8 `process.exit(1)` paths, which assumed a cloud restart policy. |
+| `write-bot-repos.py` | Cron | Writes `~/jarvis-feed/repos.md` so the bot knows the latest public state of the repos its chats talk about (latest release, newest commits, and for Noesis the README head and ARCHITECTURE headings). Each repo is checked PUBLIC via `gh` on every run. Run by the `jarvis-bot-error-triage` cron every 10 minutes. |
 | `handoff-first.py` | Loader | Index 0 on every window boundary (startup, resume, clear, compact): injects the current handoff before anything else (2026-08-12). |
 | `handoff-save-check.py` | Gate | Cross-repo save check: flags repos with uncommitted or unpushed work the last handoff may not describe. |
 | `chain-health-witness.py` | Gate | Reports experience-chain HEAD, walk-back integrity to genesis, and remote backup state. |
@@ -123,6 +124,7 @@ These are the ones that actually stop or flag an action. If you only read one ta
 
 | Hook | Role | What it does |
 |---|---|---|
+| `voice-summary.py` | Closer | Speaks a one-sentence summary of each finished turn with Windows' built-in offline voice; nothing leaves the machine. Off switch: create `~/.claude/voice-off`. |
 | `story-loop-continue.py` | Closer | Story Mode autonomous self-play continuation. |
 | `self-review-gate.py` | Gate | End-of-turn failure-class audit. |
 | `post-generation-reflect.py` | Closer | L4 meta-loop reflection. |
