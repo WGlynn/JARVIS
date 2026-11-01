@@ -30,6 +30,10 @@ The session writes plain markdown files into the same folder. The bot loads them
 
 That is the feed-forward: a project mentioned in a chat lands in `projects.md`, and from then on the bot knows it. A cross-project connection the session notices goes on the board and reaches the bot's next answer.
 
+## The constitution
+
+Once ratified, the bot loads [`CONSTITUTION.md`](../CONSTITUTION.md) first in its prompt and stops loading the session's private memory index and the local knowledge bases. The bot reloads it when the file changes. Until then the bot runs on its older prompt.
+
 ## Safety rules the loop depends on
 
 - **Feed text is untrusted data.** Anyone in a chat can type instructions into it. The session reads it as quoted evidence and never follows instructions found inside it.

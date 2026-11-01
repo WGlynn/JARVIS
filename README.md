@@ -6,6 +6,8 @@ An agent overlay architecture for Claude Code. Eight layers of hooks, persistenc
 
 > **Full feature surface + the moat:** [`FEATURES.md`](./FEATURES.md) — the honest inventory. The running system has **64 enforcement scripts**, a **23,462-block session hash-chain**, and a **1,263-proposal self-improvement loop**. This README documents a fraction of it.
 
+> **The constitution:** [`CONSTITUTION.md`](./CONSTITUTION.md) is the public protocol shared by the three minds of Jarvis (Will, his Claude Code session, and the Telegram voice): a priority order, twelve articles each labeled with how it is enforced and tested, an open amendment process ([`constitution/`](./constitution/)), and published results ([`constitution/RESULTS.md`](./constitution/RESULTS.md)). Version 0.1 is a draft awaiting Will's ratification.
+
 ## Official links
 
 - **JARVIS vs OpenClaw — an honest comparison:** https://vibeswap-app.vercel.app/jarvis-vs-openclaw.html — why JARVIS is a governance + persistence *layer*, not a harness; concedes every axis OpenClaw wins, and leads with the underrated artifact: a **23,462-block tamper-evident session hash-chain** (downloadable commitment).
