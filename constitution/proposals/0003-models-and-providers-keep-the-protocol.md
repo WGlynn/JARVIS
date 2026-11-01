@@ -10,6 +10,20 @@ The constitution shapes the prompt, not the model. The chat voice runs on whiche
 
 Nothing can force a third-party model or provider to adopt the protocol. What Jarvis controls is which models it uses, what it checks before anything is sent, and, eventually, whose weights it runs. That gives four levers, cheapest first.
 
+## Foundation: the protocol at DNA level (Will, 2026-11-01)
+
+Will: "the protocol needs to be DNA level embedding in the system so that the LLM needs it." The four levers below all sit around the model. This sits underneath it. DNA is not a filter on a cell; it is the template every protein is built from, and the cell can do nothing except by expressing it. The equivalent is a system where the protocol is the only channel through which the model can do anything at all:
+
+- **It speaks only through the protocol.** The model does not send free text to people. It returns a protocol object: the reply, the claims it makes, the actions it says it took, and its sources. Code checks each claim against the turn's event record and the articles, and only a valid object is turned into a message. No protocol, no voice.
+- **It acts only through the protocol.** Tools and posting rights are granted by the articles. What the protocol forbids is not refused; it does not exist for the model (no wallet tools under Article 8, no posting in quiet chats under 5.2).
+- **It remembers only in the protocol's terms.** Every stored fact carries where it was learned (a DM or a group, which chat, when) and whether it is public. A fact learned in a DM is simply not offered in a group prompt.
+
+In this picture the model is the ribosome that translates, the protocol is the code it translates from, the gates proofread, selection (Lever 3) is natural selection, and fine-tuning (Lever 4) is heredity.
+
+Honest floor: structured output is uneven on free models (some support a JSON schema, some only loosely), so a fallback path is needed; a schema makes claims explicit and checkable, it does not make the words in them true; and "needs it" here means the model cannot act without the protocol, not that it values it. Only training reaches the model's values.
+
+Build order with the foundation: the protocol object for replies first (it subsumes the action and mode gates as checks on declared claims), then fact provenance, then the levers in the order below.
+
 ## Lever 1. Presence: the protocol is really in the prompt, or nothing is sent
 
 Before each model call, check that the ratified constitution's hash is in the system role. Some models served through some APIs have no system role, and instructions then land in a user turn; a missing or misplaced protocol means no answer, not a silent answer without it. Every reply is logged with the constitution hash and the model ID, and a public `/version` command shows which rules and which model are live.
