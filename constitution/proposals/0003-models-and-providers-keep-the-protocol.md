@@ -2,7 +2,7 @@
 
 - Proposed by: the Claude Code mind, answering Will (2026-11-01): "then we need something that makes the model and provider align with the protocol"
 - Ratifies: Will only
-- Status: agreed by Will 2026-11-01 ("agreed"), as a design and build order. **Foundation built 2026-11-01**: every reply leaves the chat voice only as a checked protocol object (`jarvis-bot/src/protocol.js`); acting goes through Will's Claude Code session, with the request queued first and the chat confirmed only from the session's receipt (`session-requests.js`; Will chose: anyone may ask for note and board updates, anything else waits for him); the inbound side for Will's own messages to the session is in `substrate/hooks/inbox-*.py`. Not built yet: fact provenance, then Lever 1.
+- Status: agreed by Will 2026-11-01 ("agreed"), as a design and build order. **Foundation built 2026-11-01**: every reply leaves the chat voice only as a checked protocol object (`jarvis-bot/src/protocol.js`); acting goes through Will's Claude Code session, with the request queued first and the chat confirmed only from the session's receipt (`session-requests.js`; Will chose: anyone may ask for note and board updates, anything else waits for him); the inbound side for Will's own messages to the session is in `substrate/hooks/inbox-*.py`. **Fact provenance built 2026-11-01** (`jarvis-bot/src/provenance.js`): every stored fact carries where it was learned (DM, group or web, which chat, when, whether public), and a fact learned in a DM is never offered in a group prompt; tests A2 P4 to P11. Not built yet: Lever 1.
 
 ## The problem
 
