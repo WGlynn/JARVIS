@@ -88,6 +88,11 @@ def describe(r):
     else:
         rule = "check with Will"
     details = f" | details: {r.get('details')}" if r.get("details") else ""
+    chat_id = (r.get("chat") or {}).get("id")
+    # 2026-11-03: a receipt written as a note to self ("personal parts of the June conversation kept out")
+    # was reworded into a group by the bot's confirmation. Say who reads it, and how to skip it.
     return (f"  #{r.get('id')} {r.get('ts', '')[:16]} from {who}{' (Will)' if owner else ''} in {chat}: "
             f"{r.get('action')}: {r.get('summary')}{details}\n"
-            f"    -> {rule}. When handled: python ~/.claude/hooks/session-receipt.py {r.get('id')} done|declined \"what changed, or why not\"")
+            f"    -> {rule}. When handled: python ~/.claude/hooks/session-receipt.py {r.get('id')} done|declined \"what changed, or why not\"\n"
+            f"       The bot rewords that line into a reply in {chat}, so write it for the people there: no message numbers, nothing about what you left out. "
+            f"If you answer in the chat yourself (POST /api/say with chatId {chat_id} and replyToMessageId {r.get('messageId')}), the bot posts nothing more.")
