@@ -99,7 +99,11 @@ def main():
     seen_path = os.path.join(SEEN_DIR, f"{session}.json")
     seen = set(json.load(open(seen_path))) if os.path.isfile(seen_path) else set()
 
-    pasted = pasted_files(payload.get("prompt", "") or "")
+    # 2026-11-13: cron pointers and task notifications name shared ledgers (INTEGRATION-IDEAS.md,
+    # _primitives-pending.md) whose text mentions many people, so their files were copied into every
+    # matching inbox on each fire. Only a prompt Will types can paste a file into a record.
+    automated = low.lstrip().startswith("type: ") or "<task-notification>" in low or "[system notification" in low
+    pasted = [] if automated else pasted_files(payload.get("prompt", "") or "")
     parts = []
     for name, d, thread, state, aliases in records():
         hit = lambda text: any(re.search(r"(?<![a-z0-9])" + re.escape(a) + r"(?![a-z0-9])", text) for a in aliases)
