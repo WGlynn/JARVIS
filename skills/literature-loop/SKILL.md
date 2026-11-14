@@ -17,11 +17,13 @@ Input: `$ARG` = a paper path (one-paper mode) or a directory or list of papers (
 7. **Plain words, no em or en dashes** in new text. Each paper keeps its own register.
 8. **Two agents at a time, maximum.** Reviews are read-only and can run in parallel; exactly one fixer edits a working copy at a time.
 9. **Every round's output is new and dated** (review files, PDFs named `<Name>-vNEXT-rN-YYYY-MM-DD-HHMM.pdf`). Never overwrite an earlier round.
-10. **Log everything** in `~/Desktop/<Name>-vNEXT-LOOP.md`: one line per round, plus a "Decisions for Will" list for items that are design choices rather than text fixes.
+10. **Reviews are claims, not facts.** A fixer verifies every review finding against the code before applying it, and a fact-check round follows every fixer: it checks each claim the fixer added or changed, independently. (In the Noesis v5.7 loop, round 1 applied a reviewer's misreading and reversed a correct result in three places; the fact-check caught it, 12 bad claims out of 112.)
+11. **Log everything** in `~/Desktop/<Name>-vNEXT-LOOP.md`: one line per round, plus a "Decisions for Will" list for items that are design choices rather than text fixes.
 
 ## One-paper mode: the rounds
 - **0. Audit:** everything outdated, wrong, overclaimed or missing against the authority order; plus the overlap map with sibling papers (scope each owns, shared claims with locations, current contradictions with reconciled facts and per-paper wording).
 - **Reader lenses (read-only, run two at a time):** skeptical researcher (support, sourcing, proofs, referee objections); adversary (for each claimed defense: cheapest attack, does the code stop it, HOLDS / PARTIAL / CLAIMED-ONLY); newcomer (structure, plain language, can an outsider follow it); internal coherence (claim table: every load-bearing claim and every place it is stated, flag disagreements); cross-paper coherence (against the overlap map).
+- **Fact-check (after every fixer):** verify each new or changed claim independently against the code; verdicts CORRECT, WRONG, UNSUPPORTED, MISLABELED, plus "says missing but the code has it".
 - **Fixers:** each applies all finished reviews in one pass, verifies every number, then reads the whole paper start to finish and aligns every restatement before finishing. Rebuilds the PDF if a TeX toolchain works; never fakes one.
 - **Stop rule:** stop after a round whose reviews find only MINOR items, or after 6 rounds in a session. Three rounds in a row with zero new findings means the paper has hit its discovery ceiling; move attention elsewhere.
 - **Approval:** Will reads the last PDF and the Decisions list. Only then does the working copy replace the repo version, as a new version number, with a changelog entry.
