@@ -19,6 +19,7 @@ Input: `$ARG` = a paper path (one-paper mode) or a directory or list of papers (
 9. **Every round's output is new and dated** (review files, PDFs named `<Name>-vNEXT-rN-YYYY-MM-DD-HHMM.pdf`). Never overwrite an earlier round.
 10. **Reviews are claims, not facts.** A fixer verifies every review finding against the code before applying it, and a fact-check round follows every fixer: it checks each claim the fixer added or changed, independently. (In the Noesis v5.7 loop, round 1 applied a reviewer's misreading and reversed a correct result in three places; the fact-check caught it, 12 bad claims out of 112.)
 11. **Log everything** in `~/Desktop/<Name>-vNEXT-LOOP.md`: one line per round, plus a "Decisions for Will" list for items that are design choices rather than text fixes.
+12. **Fixers edit in small steps and report as they go.** Small Edit calls only, never a whole-file rewrite; one progress line in the LOOP file per finished item, so a stalled fixer is visible. Apply a fact-check before any restructuring review, while its locations still match the text. (In the Noesis v5.7 loop, the restructuring fixer went silent for over an hour after its first edits and had to be stopped.)
 
 ## One-paper mode: the rounds
 - **0. Audit:** everything outdated, wrong, overclaimed or missing against the authority order; plus the overlap map with sibling papers (scope each owns, shared claims with locations, current contradictions with reconciled facts and per-paper wording).
