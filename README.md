@@ -72,6 +72,8 @@ If `verify` prints `0 errors` you're set. The CLI reads the markdown corpus at `
 
 Each layer directory has its own README with the concrete artifacts that implement it.
 
+The same system cut by purpose instead of mechanism (values, truthfulness, behavior, memory, coordination, and why only the first is uniquely Will's): [`LAYERS.md`](./LAYERS.md).
+
 ## Modules (runnable / installable)
 
 The eight layers above describe the architecture. The modules below are concrete: each subdirectory is self-contained, has its own README, and can be used independently.
