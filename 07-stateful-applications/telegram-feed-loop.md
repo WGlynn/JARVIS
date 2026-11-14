@@ -14,7 +14,7 @@ Both programs run on the same machine, so the bridge is a local folder (`~/jarvi
 
 1. The bot appends one JSON line per exchange to `~/jarvis-feed/YYYY-MM-DD.jsonl`: who, which chat, what was said, the bot's reply, and message ids. Failures go to `health.jsonl` as error kinds with stack traces and never include message text.
 2. At SessionStart, `jarvis-tg-feed.py` reports what is new: counts, people and chats since the last boot, and a loud alarm if the bot is down. It never prints message text.
-3. While a session is open, a scheduled loop runs `jarvis-bot-inbox.py`, which prints new exchanges since a cursor, and `jarvis-bot-errors.py`, which prints new failures for auto-debugging. The session reads them, updates people records and the project board, and answers in the chat only when it has something substantive to add.
+3. While a session is open, a scheduled loop runs `jarvis-bot-inbox.py`, which prints new exchanges since a cursor, and `jarvis-bot-errors.py`, which prints new failures for auto-debugging. The session reads them, updates people records and the project board, and answers in the chat only when it has something substantive to add. When the bot's fake-action guard has replaced a claim with its fallback (which tells the chat the session will act), the session does the real thing and answers in that chat; the loop runs about every 10 minutes, so that is the hand-off's latency ([FM-001](../FAILURE-MODES.md)).
 
 **Outbound: Claude Code to the bot**
 
