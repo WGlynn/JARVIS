@@ -8,6 +8,60 @@ Format: one entry per failure, newest first, numbered FM-NNN. "Not fixed" is a r
 
 ---
 
+## FM-006: the anti-dominance throttle muted the person the bot was talking with (2026-11-16)
+
+**What happened.** In a busy Telegram group, one of Will's collaborators spent the afternoon in a conversation with the bot. Most of his messages were replies to it. The bot's anti-dominance throttle (`src/airspace-monitor.js`) muted him five times that afternoon, at 63 to 77% of the group's messages in the last hour. One of the muted messages was a direct question to the bot. It sat unanswered for about three hours, until the session answered it.
+
+**How it was found.** The session was looking into the collaborator's messages for another reason and found the throttle lines in `bot.log`.
+
+**Why the safeguards missed it.**
+1. **The throttle only checks messages addressed to the bot.** It runs on mentions, replies to the bot and messages that use its name (`src/index.js`, the airspace block). Above 50% of an hour's messages a person gets a reply 30% of the time. Anyone holding a real conversation with the bot in a quiet hour crosses 50%, so it mutes exactly the people it is talking with. It was built against trolls who flood a group, and it cannot tell a troll from a conversation.
+2. **The same failure was fixed once, for one case.** On 2026-11-04 the throttle muted a person at 86% in a three-person group while he was talking to the bot by name. The fix exempted groups of three or fewer. That removed the case and left the class: a larger group with one active conversation still triggers it.
+3. **A mute is silent by design.** It writes one console line and nothing to the health feed, so the triage readers (FM-004) cannot see it.
+
+**Fixed.** The question was answered. Nothing in the code changed.
+
+**Not fixed.** Proposed, waiting on Will because it changes group behavior: skip the throttle when the message replies to the bot or names it, or for people the bot already knows. Also proposed: log each mute to the health feed with no message text.
+
+**Class.** Fixing the case and not the class: the 11-04 fix handled the group size it was found in, not the cause (the throttle counts a conversation with the bot as dominance). Also a rule aimed at bad actors with no way to tell them from good ones.
+
+---
+
+## FM-005: asked to quantify an idea, the chat voice made up formulas (2026-11-16)
+
+**What happened.** In a group chat someone asked the bot to explain a market metaphor it had used ("gravity") and to quantify it. The reply came from a small fallback model during a provider outage (FM-004). It gave two formulas as if they were standard definitions: a ratio it had made up, and a price-impact relation stated as squared. The measured law is roughly a square root: selling 4 times more moves the price about 2 times more, not 16.
+
+**How it was found.** The session's triage pass read the exchange in the bot's feed and checked the claims against the literature.
+
+**Why the safeguards missed it.** The bot's reply checks (`src/protocol.js`, `src/action-claims.js`) catch claims about actions it did not take. Nothing checks claims about quantities. Article 1 of the constitution says Jarvis never presents a guess as a fact, but only the action rule (1.2) is enforced in code. "Quantify it" invites a number or a formula, and a small model will supply one whether or not it knows one.
+
+**Fixed.** The session posted a correction in the group: the ratio was shorthand and not a real metric, the squared part was wrong, and the square-root law with a worked example.
+
+**Not fixed.** No check exists. A candidate: a reply containing a formula or "is proportional to" needs a named source or a plain "my shorthand" label, or it gets held. Not built.
+
+**Class.** Invented quantities: a request to quantify is a fabrication trap, especially for small models. A guard built for one kind of false claim (actions) does not cover another kind (numbers and formulas).
+
+---
+
+## FM-004: the triage readers were blind to a provider outage and to handler timeouts (2026-11-16)
+
+**What happened.** Will told the session that the bot had a new message and nothing happened. The session's triage had just reported no new bot errors. The logs showed two group messages around 11:39 and 12:03 CT where the bot decided to join in uninvited, in consensus mode. That mode writes three candidate replies and compares them, about 8 model calls. The model providers were failing at the time: Gemini answered 503 on three models, one key's daily quota was spent, and the Groq and OpenRouter fallbacks were already exhausted, which left a small local model. The first round took 209 seconds. Telegraf's 90-second handler timeout fired, the round kept running, and in the end the bot chose an emoji reaction over a reply. The second round also passed 90 seconds. Will's report did not say which chat he meant, and no direct message from him to the bot appears in that day's log, so this covers the two group messages.
+
+**How it was found.** Will said so. The session then read `bot.log`, `bot.err.log` and the model-call meter (`llm-calls.jsonl`).
+
+**Why the safeguards missed it.** Both triage readers were right about what they read, and neither read the place this failure went:
+1. **The errors reader reads only the health feed.** The bot writes there only when a reply to a user fails. A handler timeout goes to `bot.catch`, which logs to `bot.err.log`, not to the feed.
+2. **Provider failures are in the call meter, which no reader scans.** Every 503 and 429 was recorded there.
+3. **The inbox reader saw nothing because there was nothing.** The bot records an exchange only when it replies, so a message that got no reply leaves no trace in the feed.
+
+**Fixed.** Nothing yet. A restart in the middle of the outage would have dropped work in progress, so the fixes were written up instead.
+
+**Not fixed.** Three proposals, all waiting on Will: (1) the errors reader also scans the call meter and flags a high failure rate, session-side with no restart; (2) `bot.catch` writes handler timeouts and errors to the health feed with no message text, which needs a test and the test-gated restart; (3) skip consensus mode when providers are degraded, which changes group behavior.
+
+**Class.** Monitoring only what the system chooses to report: the readers watched one channel, and the bot routes timeouts and provider failures to others. Silence (no reply) produces no event at all, so a reader that only looks for errors cannot see it. Also a cost multiplier (8 calls on an uninvited reply) that is harmless when providers are healthy and turns an outage into timeouts.
+
+---
+
 ## FM-001: a guard that blocks a false promise replaced it with another one (2026-11-14)
 
 **What happened.** Will sent the bot a link in a private chat, with no instruction. The bot's model drafted a reply saying it had queued a check on the link. The bot has no such queue, so the claim was false. The bot's fake-action guard (`src/action-claims.js`) caught it, logged a `fake_action_blocked` event, and sent its fallback instead: "I can't take actions from this chat on my own. Will's Claude Code session reads it and acts." Two minutes later Will asked the session whether it had seen the link. It had not.
