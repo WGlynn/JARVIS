@@ -24,15 +24,15 @@ Compacted from its first run (2026-06-16 session): one command replaces the prom
 4. **DERIVE** — build each in the convergent form:
    - **gate/hook** → `~/.claude/hooks/*.py` (PreToolUse/PostToolUse)
    - **cron** → durable `CronCreate` + `~/.claude/cron-prompts/*.md` canonical (pointer+logic split)
-   - **primitive** → `memory/<type>_<slug>.md` (HIERO-dense) + MEMORY pointer
+   - **primitive** → `memory/<type>_<slug>.md` (plain words; HIERO density retired 2026-07-20) + MEMORY pointer
    - **skill** → `~/.claude/skills/<name>/SKILL.md`
    - **anchor** → Schelling/reference point in the relevant doc/memory
 5. **TEST** — trust-boundary components (hooks/gates fire on every tool call) are dry-run tested against real input shapes BEFORE wiring. Never ship an untested gate; risky ones ship disabled with a note.
 6. **WIRE** — hook → `settings.json` (re-validate JSON, utf-8, after); cron → durable; primitive → commit memory + pointer; skill → skills dir. A bad wire can break the session, so validate.
-7. **COMMIT** — per-component. Memory → memory repo. Public-safe substrate → `jarvis-os-public`/`jarvis-substrate`. **Noesis → private remote ONLY, never public** (leak-gate).
+7. **COMMIT** — per-component. Memory → memory repo. Public-safe substrate → `jarvis-os-public`/`jarvis-substrate`. **Noesis → its public repo (WGlynn/noesis, public since 2026-06-29); run the leak gate first.**
 8. **COMPACT (recursive)** — if a new multi-prompt sub-workflow emerged, formalize IT into a command too ([F·compact-workflows-into-commands]).
 9. **MENU** — end with the Story Mode menu (loop continue-affordance). Keep looping until Will stops it.
 
 ## Invariants
-- Follow existing rules; HIERO on memory writes; keep Noesis private; one blocked item ⇒ pivot not halt.
+- Follow existing rules; plain words on memory writes; one blocked item, pivot not halt.
 - Each run leaves the substrate MORE operator-extension, not less ([J·jarvis-design-goal-forever]).
