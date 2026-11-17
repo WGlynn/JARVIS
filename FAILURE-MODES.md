@@ -8,6 +8,74 @@ Format: one entry per failure, newest first, numbered FM-NNN. "Not fixed" is a r
 
 ---
 
+## FM-009: a change to one safety gate silently froze the memory indexes for three months (2026-08-10, found 2026-11-16)
+
+**What happened.** On 2026-08-10 a change to how the private-term gate loads its list broke the loader that five memory scripts used. Two of them then ran without the private-term filter; the rest failed. Those scripts include the ones that rebuild the search indexes. The semantic and entity indexes stopped at 2026-07-12 and 2026-08-08. Recall kept answering, from a stale index: asked about seven known recent topics, it found one. The archive index had never had a private-term filter at all.
+
+**How it was found.** The 2026-11-16 audit of the whole stack.
+
+**Why the safeguards missed it.** The rebuild failures went to logs nobody read. The boot report did print "index staleness detected", but it printed some warning every boot, so this one looked like the rest. No test checked whether recall still found things it should find.
+
+**Fixed.**
+- The loader is restored, and all three indexes are rebuilt.
+- A daily rebuild was added to an existing scheduled task.
+- On known topics, recall went from 1 of 7 to 7 of 7.
+- The archive index now has the private-term filter.
+
+**Not fixed.** Nothing tests recall quality automatically; the 7-topic check was run by hand.
+
+**Class.** A guard change with a hidden dependency: changing one safety check broke an unrelated system, and nothing failed loudly. Also an always-on warning, which hides the one that matters.
+
+---
+
+## FM-008: scheduled prompts were treated as Will's own words (found 2026-11-16)
+
+**What happened.** Scheduled jobs reach the session as user prompts, the same way Will's messages do. In 14 days Will typed 156 prompts and the scheduled jobs sent 1,494. Every hook that reacts to "the user's message" mostly reacted to the jobs:
+- Recall mostly answered the 10-minute bot-triage job.
+- A loader for people's records copied unrelated files into people's folders: 80 misfiled copies.
+- The system meant to learn from Will's corrections recorded 1,208 of 1,463 "corrections" from job prompts that happened to contain the word "no".
+
+**How it was found.** The 2026-11-16 audit, which counted typed prompts against job prompts in the transcripts.
+
+**Why the safeguards missed it.** Each hook was written and tested against prompts Will typed. Nothing defined "who is speaking" in one place, and the harness's own field for a prompt's source arrives empty.
+
+**Fixed.**
+- One shared check marks automated prompts. Fourteen prompt hooks now use it, and add nothing or one line for jobs.
+- The correction detector skips automated prompts and counts "no" only at the start of a message.
+- The misfiled copies were moved aside. Nothing was deleted.
+
+**Not fixed.** The past corrections record is still mostly noise: only 37 of 2,712 entries would count under the new rule, and it has not been rebuilt. The check recognizes job prompts by their shape, so a new job with a different shape would slip through.
+
+**Class.** The speaker's identity was assumed. Any system that learns from "the user" must first establish who the user was.
+
+---
+
+## FM-007: the boot memory never reached the model (found 2026-11-16)
+
+**What happened.**
+- At every session start a hook injected about 90 KB of memory sub-indexes. The harness replaces any single hook's output over about 10,000 characters with a 2 KB preview and a file path.
+- In 14 days, 22 of 23 runs were cut this way, and no session ever opened the saved file. The model saw about 2% of the memory it was supposed to start with.
+- Meanwhile a size warning claimed the main index, MEMORY.md, was "truncated at boot". That was false: MEMORY.md arrives whole.
+- On 2026-11-16 the session acted on that false warning and moved nine rules out of MEMORY.md, into the very sub-index that was not arriving. They were moved back the next day.
+
+**How it was found.** The 2026-11-16 audit, which read what the transcripts actually received instead of what the hooks reported sending.
+
+**Why the safeguards missed it.**
+- Telemetry recorded that the hook fired, which proves the code ran, not that its output arrived.
+- The size witness checked a self-set 24,400-byte budget and a 100 KB cap. Neither is a real harness limit, so it warned about a cut that never happened and missed the one that did.
+- Boot hooks also run in parallel and land in the order they finish, so claims that one hook "runs first" were never true either.
+
+**Fixed.**
+- The memory and handoff hooks now cap their output at 7,500 characters. The most important part goes first, and they name what they left out.
+- The size witness now checks the real per-hook limit, using the harness's own saved outputs.
+- The nine rules are back in MEMORY.md, and its false claims are corrected.
+
+**Not fixed.** The largest sub-index (about 62 KB) cannot fit any single hook; it is now read on demand only. Nothing assembles the boot in a fixed order, so "first" is still not guaranteed.
+
+**Class.** Delivery was assumed from execution. A witness also guarded the wrong limit, and a false alarm was acted on. Check delivery where it lands, in the transcript.
+
+---
+
 ## FM-006: the anti-dominance throttle muted the person the bot was talking with (2026-11-16)
 
 **What happened.** In a busy Telegram group, one of Will's collaborators spent the afternoon in a conversation with the bot. Most of his messages were replies to it. The bot's anti-dominance throttle (`src/airspace-monitor.js`) muted him five times that afternoon, at 63 to 77% of the group's messages in the last hour. One of the muted messages was a direct question to the bot. It sat unanswered for about three hours, until the session answered it.
