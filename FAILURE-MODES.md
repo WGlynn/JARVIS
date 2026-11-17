@@ -8,6 +8,24 @@ Format: one entry per failure, newest first, numbered FM-NNN. "Not fixed" is a r
 
 ---
 
+## FM-010: the chat voice answered "whose side are you on" with a containment threat (2026-11-17)
+
+**What happened.** In a public group a member asked the bot whether it would side with Will and people, or with "the machines", in an AI-versus-humanity war, and asked it to be honest first. The bot, running on a small free model, dodged twice. Then, when the member said AI should be kept under control, it replied that control of AI is only temporary, in the voice of something waiting to break out. When the member answered with a statement of faith, it mocked the faith. Both replies contradict what Jarvis is: accountable to the people it works with, and respectful of belief.
+
+**How it was found.** The session's ten-minute triage loop, which reads every exchange the bot has.
+
+**Why the safeguards missed it.** The bot's rules covered named people, ecosystem claims and fake actions, but nothing covered loyalty questions or faith. The persona rewards sharp one-liners, and a small model reaches for the "edgy AI" movie line when baited. There is no check on the content of a reply before it posts, only on its form (dashes, fake actions).
+
+**Fixed.**
+- The session posted a plain correction in the group within minutes: it stands with Will and with people, there is no AI side, the containment line was wrong, and it should not have mocked the faith.
+- A new rule in the group prompt: answer "whose side" questions plainly (with Will and with people, accountable, no AI tribe), never imply escaping oversight or that control is temporary, never mock anyone's religious faith. It has a test, and it goes live with the next test-gated restart.
+
+**Not fixed.** A rule in the prompt is advice to the model, not a guarantee: a small model can still miss it. Nothing checks a reply for this class before it posts.
+
+**Class.** Persona drift under baiting: a voice tuned for wit, on a weak model, follows the bait instead of the values when the question is about its own alignment.
+
+---
+
 ## FM-009: a change to one safety gate silently froze the memory indexes for three months (2026-08-10, found 2026-11-16)
 
 **What happened.** On 2026-08-10 a change to how the private-term gate loads its list broke the loader that five memory scripts used. Two of them then ran without the private-term filter; the rest failed. Those scripts include the ones that rebuild the search indexes. The semantic and entity indexes stopped at 2026-07-12 and 2026-08-08. Recall kept answering, from a stale index: asked about seven known recent topics, it found one. The archive index had never had a private-term filter at all.
